@@ -88,3 +88,7 @@ type Task = {
   subtasks: Subtasks[];
 };
 ```
+
+## OTHER FEATURE IDEAS
+- scratch pad for some quick notes
+- quick todo list or quick view similar to momentum extension todo list
