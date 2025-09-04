@@ -7,8 +7,12 @@
 
   padding: 0 2rem;
 
-  background-color: rgb(17 24 39 / 0.8);
-  backdrop-filter: blur(4px);
+  background-image: linear-gradient(
+    to top,
+    var(--color-bg),
+    rgb(17 24 39 / 0.8),
+    var(--color-bg)
+  );
 }
 
 .keep-awake-btn {
