@@ -1,11 +1,13 @@
 import "./App.css";
 import Navbar from "./components/navigation/Navbar";
+import TaskHeader from "./components/task-header/TaskHeader";
 
 const App = () => {
   return (
-    <div>
+    <>
       <Navbar />
-    </div>
+      <TaskHeader />
+    </>
   );
 };
 
