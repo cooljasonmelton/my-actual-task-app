@@ -1,0 +1,181 @@
+/* TODO: reset sizes to rem */
+/* TODO: reset colors to color variables */
+
+.btn {
+  /* Reset */
+  border: none;
+  outline: none;
+  background: none;
+
+  /* Base styles */
+  font-family: "Courier New", "Consolas", monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Size variants */
+.btn--small {
+  padding: 6px 12px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.btn--medium {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+.btn--large {
+  padding: 16px 28px;
+  font-size: 16px;
+}
+
+/* Primary variant - Red gradient */
+.btn--primary {
+  background: linear-gradient(135deg, #ff0040 0%, #cc0033 100%);
+  color: #fff;
+  border: 2px solid #ff0040;
+  box-shadow: 0 2px 8px rgba(255, 0, 64, 0.2);
+}
+
+.btn--primary:hover:not(.btn--disabled) {
+  background: linear-gradient(135deg, #ff3366 0%, #ff0040 100%);
+  box-shadow: 0 4px 20px rgba(255, 0, 64, 0.4);
+  transform: translateY(-2px);
+  border-color: #ff3366;
+}
+
+.btn--primary:active:not(.btn--disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(255, 0, 64, 0.3);
+}
+
+/* Secondary variant - Green outline */
+.btn--secondary {
+  background: transparent;
+  color: #00ff80;
+  border: 2px solid #00ff80;
+  box-shadow: 0 0 10px rgba(0, 255, 128, 0.1);
+}
+
+.btn--secondary:hover:not(.btn--disabled) {
+  background: rgba(0, 255, 128, 0.1);
+  box-shadow: 0 0 20px rgba(0, 255, 128, 0.3);
+  transform: translateY(-2px);
+  color: #33ff99;
+  border-color: #33ff99;
+}
+
+.btn--secondary:active:not(.btn--disabled) {
+  transform: translateY(0);
+  background: rgba(0, 255, 128, 0.2);
+}
+
+/* Danger variant - Darker red */
+.btn--danger {
+  background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+  color: #fff;
+  border: 2px solid #cc0000;
+  box-shadow: 0 2px 8px rgba(204, 0, 0, 0.2);
+}
+
+.btn--danger:hover:not(.btn--disabled) {
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4);
+  transform: translateY(-2px);
+  border-color: #ff0000;
+}
+
+.btn--danger:active:not(.btn--disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+}
+
+/* Dark variant - For dark backgrounds */
+.btn--dark {
+  background: #1a1a1a;
+  color: #ccc;
+  border: 2px solid #444;
+}
+
+.btn--dark:hover:not(.btn--disabled) {
+  background: #333;
+  color: #fff;
+  border-color: #666;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.btn--dark:active:not(.btn--disabled) {
+  transform: translateY(0);
+  background: #2a2a2a;
+}
+
+/* Ghost variant - Minimal */
+.btn--ghost {
+  background: transparent;
+  color: #ccc;
+  border: 1px solid transparent;
+}
+
+.btn--ghost:hover:not(.btn--disabled) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #444;
+}
+
+/* Disabled state */
+.btn--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Focus styles for accessibility */
+.btn:focus-visible {
+  outline: 2px solid #00ffff;
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.btn--loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.btn--loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Icon support */
+.btn svg,
+.btn .icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}

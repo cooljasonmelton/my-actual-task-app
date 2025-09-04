@@ -1,7 +1,16 @@
 .nav-container {
-  width: 100%;
-
   border: 1px solid var(--color-border);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 2rem;
+
   background-color: rgb(17 24 39 / 0.8);
   backdrop-filter: blur(4px);
+}
+
+.keep-awake-btn {
+  height: 2rem;
 }

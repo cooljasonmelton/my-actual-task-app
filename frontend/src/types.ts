@@ -8,7 +8,7 @@ type Subtask = {
   id: string;
   title: string;
   deletedAt: Date | null;
-  order: number; // is this right? Track order or default by id or order of tasks saved to array under Task?
+  order: number;
 };
 
 export type Task = {
