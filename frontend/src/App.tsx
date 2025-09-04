@@ -1,10 +1,11 @@
 import "./App.css";
+import Navbar from "./components/navigation/Navbar";
 
 const App = () => {
   return (
-    <>
-      <div>whats up</div>
-    </>
+    <div>
+      <Navbar />
+    </div>
   );
 };
 

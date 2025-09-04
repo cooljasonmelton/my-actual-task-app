@@ -1,9 +1,12 @@
+/* TODO: review basic styles */
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  font-size: 16px;
 
-  color-scheme: light dark;
+  /* color-scheme: dark; */
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -11,30 +14,53 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+
+  /* COLOR VARIABLES */
+  /* Backgrounds */
+  --color-bg: #0d0d0d; /* near-black */
+  --color-bg-alt: #1a1a1a; /* dark gray, subtle contrast */
+
+  /* Accents (punchy, clashing) */
+  --color-accent-pink: #ff2d95; /* neon punk pink */
+  --color-accent-green: #39ff14; /* acid green */
+  --color-accent-yellow: #ffef00; /* lo-fi hi-vis yellow */
+  --color-accent-blue: #00bfff; /* dirty cyan/sky blue */
+
+  /* Text */
+  --color-text: #f5f5f5; /* off-white for readability */
+  --color-text-muted: #a3a3a3; /* washed gray, lo-fi vibe */
+  --color-text-invert: #000000; /* for text on bright accents */
+
+  /* Borders / lines (like photocopied zine texture) */
+  --color-border: #333333;
+
+  /* Extras for variety */
+  --color-noise: rgba(255, 255, 255, 0.03); /* can use for grain overlay */
 }
 
-a {
+/* a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
 a:hover {
   color: #535bf2;
-}
+} */
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  /* place-items: center; */
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
+/* h1 {
   font-size: 3.2em;
   line-height: 1.1;
-}
-
+} */
+/* 
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -65,4 +91,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
