@@ -9,6 +9,7 @@
 
 - TODO: figure out rich text for description
 - TODO: figure out how to have a BE job that sets 'status' of all tasks with 'deletedAt' to 'finished' overnight so finished tasks exist on todo list and can be un-deleted from same status list until end of day
+- TODO: drag and drop - to change order of tasks OR drop on section button to update status of task to move it to that container
 
 #### features
 
