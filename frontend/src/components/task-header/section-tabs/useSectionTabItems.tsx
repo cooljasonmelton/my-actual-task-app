@@ -1,8 +1,8 @@
 import { STATUS_SECTION_TAB_ITEMS } from "../../../constants";
 import SectionTab from "./SectionTab";
 
-// TODO: get correct counts
 export const useSectionTabItems = () => {
+  // TODO: replace hardcode with correct counts
   const countsMap = {
     next: 0,
     ongoing: 0,
