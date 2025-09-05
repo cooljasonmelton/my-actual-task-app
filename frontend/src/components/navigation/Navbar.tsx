@@ -2,6 +2,8 @@ import { useState } from "react";
 import Button from "../design-system-components/button/Button";
 import "./Navbar.css";
 
+const HEADING_TEXT = "task app";
+
 const Navbar = () => {
   const [keepAwake, setKeepAwake] = useState(false);
 
@@ -16,7 +18,7 @@ const Navbar = () => {
   };
   return (
     <div className="nav-container">
-      <h1>my actual task app</h1>
+      <h1>{HEADING_TEXT}</h1>
       <Button
         variant={keepAwake ? "danger" : "secondary"}
         size="small"

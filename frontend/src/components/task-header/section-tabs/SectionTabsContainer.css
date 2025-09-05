@@ -1,6 +1,8 @@
 .section-tabs-container {
   border: 0.125rem solid var(--color-border);
-  border-radius: 0.5rem;
+  border-radius: calc(0.5rem - 2px);
 
-  padding: 2rem;
+  padding: 0.5rem;
+
+  background-color: var(--color-bg);
 }

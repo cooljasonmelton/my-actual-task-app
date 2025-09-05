@@ -27,6 +27,6 @@ export type Task = {
 };
 
 export type StatusSectionTabItem = {
-  text: string;
+  cta: string;
   value: Status;
 };

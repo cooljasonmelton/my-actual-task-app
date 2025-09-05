@@ -1,14 +1,15 @@
+import type { ReactNode } from "react";
 import "./RadioButtonGroup.css";
 
 interface RadioButtonItem {
   value: string;
-  text: string;
+  cta: string | ReactNode;
 }
 
 const RadioButton = ({
   name,
   value,
-  text,
+  cta,
   defaultChecked = false,
   onChange,
 }: RadioButtonItem & {
@@ -25,7 +26,7 @@ const RadioButton = ({
         value={value}
         defaultChecked={defaultChecked}
       />
-      <span>{text}</span>
+      {cta}
     </label>
   );
 };
@@ -53,7 +54,7 @@ const RadioButtonGroup = ({
           onChange={onChange}
           key={key + item.value}
           value={item.value}
-          text={item.text}
+          cta={item.cta}
           name={buttonName}
           defaultChecked={defaultValue === item.value}
         />

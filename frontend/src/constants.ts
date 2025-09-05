@@ -2,19 +2,19 @@ import type { StatusSectionTabItem } from "./types";
 
 export const STATUS_SECTION_TAB_ITEMS: StatusSectionTabItem[] = [
   {
-    text: "Next",
+    cta: "Next",
     value: "next",
   },
   {
-    text: "Ongoing",
+    cta: "Ongoing",
     value: "ongoing",
   },
   {
-    text: "Backburner",
+    cta: "Backburner",
     value: "backburner",
   },
   {
-    text: "Finished",
+    cta: "Finished",
     value: "finished",
   },
 ];
