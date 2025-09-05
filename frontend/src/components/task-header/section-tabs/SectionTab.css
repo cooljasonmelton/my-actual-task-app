@@ -1,7 +1,7 @@
 .section-tab {
   display: flex;
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .section-tab-count {
