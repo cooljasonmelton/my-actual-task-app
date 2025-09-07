@@ -14,9 +14,9 @@ const SectionTabsContainer = () => {
   const sectionTabItems = useSectionTabItems();
 
   return (
-    <div className="section-tabs-container">
+    <div className="card">
       <RadioButtonGroup
-        buttonName="status-section-tab"
+        buttonName="status-section-tab-button"
         legendText="select task status view"
         radioButtonItems={sectionTabItems}
         defaultValue={DEFAULT_SECTION_TAB_ITEM}

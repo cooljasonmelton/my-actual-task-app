@@ -6,7 +6,7 @@ interface ButtonProps {
   variant?: "primary" | "secondary" | "danger" | "dark" | "ghost";
   size?: "small" | "medium" | "large";
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   type?: "button" | "submit" | "reset" | undefined;
   isLoading?: boolean;
   className?: string;

@@ -7,6 +7,7 @@
 - React
 - colors: https://coolors.co/111827-1f2937-ff2d95-39ff14-ffef00-00bfff-f5f5f5-a3a3a3-000000
 
+
 - TODO: figure out rich text for description
 - TODO: figure out how to have a BE job that sets 'status' of all tasks with 'deletedAt' to 'finished' overnight so finished tasks exist on todo list and can be un-deleted from same status list until end of day
 - TODO: drag and drop - to change order of tasks OR drop on section button to update status of task to move it to that container
@@ -41,6 +42,7 @@
   - Display Subtasks (optional)
   - Display Tags (optional)
   - Reorder tasks drag and drop
+  - Placeholder screen when no tasks
 
 - Subtasks
 

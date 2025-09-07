@@ -1,10 +1,18 @@
-.section-tab {
+.section-tab-button {
   display: flex;
   white-space: nowrap;
-  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--color-text-muted);
+
+  font-weight: 700;
 }
 
-.section-tab-count {
+input[type="radio"]:checked + .section-tab-button {
+  color: inherit;
+}
+
+.section-tab-button-count {
   margin-left: 0.5rem;
   padding: 0 0.375rem;
 
@@ -12,5 +20,5 @@
 
   background-color: var(--color-accent-purple-blue);
   color: var(--color-text);
-  font-weight: 400;
+  letter-spacing: 0px;
 }
