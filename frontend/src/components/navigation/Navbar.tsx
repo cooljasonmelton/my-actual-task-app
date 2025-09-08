@@ -2,6 +2,8 @@ import { useState } from "react";
 import Button from "../design-system-components/button/Button";
 import "./Navbar.css";
 
+// TODO: redo colors of Keep Awake Button so gray or bg-alt when off and green while on
+
 const HEADING_TEXT = "task app";
 
 const Navbar = () => {
