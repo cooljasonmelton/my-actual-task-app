@@ -52,7 +52,7 @@
 .btn--primary:hover:not(.btn--disabled) {
   background: linear-gradient(135deg, #ff3366 0%, #ff0040 100%);
   box-shadow: 0 4px 20px rgba(255, 0, 64, 0.4);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: #ff3366;
 }
 
@@ -72,7 +72,7 @@
 .btn--secondary:hover:not(.btn--disabled) {
   background: rgba(0, 255, 128, 0.1);
   box-shadow: 0 0 20px rgba(0, 255, 128, 0.3);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   color: #33ff99;
   border-color: #33ff99;
 }
@@ -93,7 +93,7 @@
 .btn--danger:hover:not(.btn--disabled) {
   background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: #ff0000;
 }
 
@@ -113,7 +113,7 @@
   background: #333;
   color: #fff;
   border-color: #666;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
 }
 

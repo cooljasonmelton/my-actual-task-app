@@ -8,6 +8,7 @@
   font-weight: 700;
 }
 
+/* TODO: better way to do this? - code smell */
 input[type="radio"]:checked + .section-tab-button {
   color: inherit;
 }

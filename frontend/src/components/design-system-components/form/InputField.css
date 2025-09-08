@@ -1,0 +1,17 @@
+.input-field-input {
+  display: block;
+  padding: 0.75rem;
+  background-color: var(--color-bg-alt);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+
+  font-family: "Courier New", "Consolas", monospace;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 3px 3px 0px black;
+}
+
+.input-field-input:focus {
+  border-color: var(--color-accent-pink);
+  box-shadow: 1px 1px 0px var(--color-accent-pink);
+}

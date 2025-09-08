@@ -1,0 +1,6 @@
+/* form.css */
+
+.general-form {
+  display: flex;
+  gap: 0.5rem;
+}
