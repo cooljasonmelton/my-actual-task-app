@@ -1,8 +1,8 @@
+import { useState } from "react";
 import RadioButtonGroup from "../../design-system-components/radio-button-group/RadioButtonGroup";
 import { DEFAULT_SECTION_TAB_ITEM } from "../../../constants";
-import "./SectionTabsContainer.css";
-import { useState } from "react";
 import { useSectionTabItems } from "./useSectionTabItems";
+import "./SectionTabsContainer.css";
 
 // TODO: fix styling so tabs stretch across container
 // TODO: figure out logic to list number of tasks for each section
