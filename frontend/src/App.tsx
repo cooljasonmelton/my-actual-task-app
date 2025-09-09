@@ -1,5 +1,5 @@
 import Navbar from "./components/navigation/Navbar";
-import TaskHeader from "./components/task-header/TaskHeader";
+import TaskHeader from "./components/dashboard-header/DashboardHeader";
 import TaskContainer from "./components/task-container/TaskContainer";
 import "./App.css";
 

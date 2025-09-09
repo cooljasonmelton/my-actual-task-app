@@ -41,7 +41,7 @@
 
 - Tasks
 
-  - Title
+  - Title, Priority Star, Hide/show rest
   - Rich Text Description (optional)
   - Display Subtasks (optional)
   - Display Tags (optional)

@@ -1,4 +1,4 @@
-.task-header {
+.dashboard-header {
   margin-left: auto;
   margin-right: auto;
   width: 75%;
@@ -10,7 +10,7 @@
 }
 
 @media screen and (max-width: 768px) {
-  .task-header {
+  .dashboard-header {
     width: 100%;
     padding: 2rem 0;
   }

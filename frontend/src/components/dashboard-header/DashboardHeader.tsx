@@ -1,14 +1,14 @@
 import NewTaskContainer from "./new-task/NewTaskContainer";
 import SectionTabsContainer from "./section-tabs/SectionTabsContainer";
-import "./TaskHeader.css";
+import "./DashboardHeader.css";
 
-const TaskHeader = () => {
+const DashboardHeader = () => {
   return (
-    <div className="task-header">
+    <div className="dashboard-header">
       <SectionTabsContainer />
       <NewTaskContainer />
     </div>
   );
 };
 
-export default TaskHeader;
+export default DashboardHeader;
