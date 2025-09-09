@@ -18,15 +18,27 @@ type TaskHeaderType = React.FC<
   Pick<TaskProps, "title"> & { isExpanded: boolean; setIsExpanded: () => void }
 >;
 
+// TODO: move to own file
 const TaskHeader: TaskHeaderType = ({ title, isExpanded, setIsExpanded }) => {
+  // TODO: move starred to api call
+  const [isStarred, setIsStarred] = useState(false);
+
+  const isStarredClassName = isStarred ? "filled-star" : "empty-star";
+
   return (
     <div className="task-header">
       {isExpanded ? (
-        <ChevronDown size={24} onClick={setIsExpanded} />
+        <ChevronDown size={20} onClick={setIsExpanded} />
       ) : (
-        <ChevronRight size={24} onClick={setIsExpanded} />
+        <ChevronRight size={20} onClick={setIsExpanded} />
       )}
-      <h2>{title}</h2>
+      <Star
+        size={20}
+        onClick={() => setIsStarred(!isStarred)}
+        className={isStarredClassName}
+      />
+      {/* TODO: make headings semantic */}
+      <h3>{title}</h3>
     </div>
   );
 };
