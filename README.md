@@ -22,7 +22,10 @@
 
 - Header
 
-  - Create task form input and button
+  - X Create task form input and button
+
+    - Hook up logic for save new task
+    - error handling for form
 
   - Filter buttons
 
