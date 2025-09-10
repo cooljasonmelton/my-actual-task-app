@@ -1,13 +1,5 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
-import {
-  Plus,
-  Star,
-  Tag,
-  ChevronDown,
-  ChevronRight,
-  Check,
-  Circle,
-} from "lucide-react";
+import { useState } from "react";
+import { Star, ChevronDown, ChevronRight } from "lucide-react";
 import "./Task.css";
 
 interface TaskProps {
