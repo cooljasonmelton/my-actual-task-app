@@ -35,6 +35,7 @@
 
   background-color: var(--color-bg);
 }
+
 @media screen and (max-width: 768px) {
   .card {
     /* padding: 0.5rem 0; */

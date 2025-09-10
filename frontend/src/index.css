@@ -22,6 +22,9 @@
   /* Backgrounds */
   --color-bg: #0d0d0d; /* near-black */
   --color-bg-alt: #1a1a1a; /* dark gray, subtle contrast */
+  --color-bg-gray-0: #262626;
+  --color-bg-gray-1: #2e2e2e;
+  --color-bg-gray-2: #3a3a3a;
 
   /* Accents (punchy, clashing) */
   --color-accent-pink: #ff2d95; /* neon punk pink */

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import TaskHeader from "./TaskHeader";
 import type { TaskProps } from "./types";
-import "./Task.css";
+import TaskHeader from "./TaskHeader";
 import TaskContent from "./TaskContent";
+import "./Task.css";
 
 const Task = ({ title }: TaskProps) => {
+  // TODO: add animation to expansion
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div className="card task">
@@ -13,7 +14,7 @@ const Task = ({ title }: TaskProps) => {
         isExpanded={isExpanded}
         setIsExpanded={() => setIsExpanded(!isExpanded)}
       />
-      <TaskContent />
+      {isExpanded && <TaskContent />}
     </div>
   );
 };
