@@ -1,0 +1,13 @@
+/* TODO: move to own file corresponding to TaskHeader file */
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+/* TODO: add animation when starring tasks */
+.filled-star {
+  fill: var(--color-accent-yellow);
+}
+.empty-star {
+  fill: var(--color-bg);
+}

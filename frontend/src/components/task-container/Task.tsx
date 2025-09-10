@@ -1,39 +1,7 @@
 import { useState } from "react";
-import { Star, ChevronDown, ChevronRight } from "lucide-react";
+import TaskHeader from "./TaskHeader";
+import type { TaskProps } from "./types";
 import "./Task.css";
-
-interface TaskProps {
-  title: string;
-}
-
-type TaskHeaderType = React.FC<
-  Pick<TaskProps, "title"> & { isExpanded: boolean; setIsExpanded: () => void }
->;
-
-// TODO: move to own file
-const TaskHeader: TaskHeaderType = ({ title, isExpanded, setIsExpanded }) => {
-  // TODO: move starred to api call
-  const [isStarred, setIsStarred] = useState(false);
-
-  const isStarredClassName = isStarred ? "filled-star" : "empty-star";
-
-  return (
-    <div className="task-header">
-      {isExpanded ? (
-        <ChevronDown size={20} onClick={setIsExpanded} />
-      ) : (
-        <ChevronRight size={20} onClick={setIsExpanded} />
-      )}
-      <Star
-        size={20}
-        onClick={() => setIsStarred(!isStarred)}
-        className={isStarredClassName}
-      />
-      {/* TODO: make headings semantic */}
-      <h3>{title}</h3>
-    </div>
-  );
-};
 
 const Task = ({ title }: TaskProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
