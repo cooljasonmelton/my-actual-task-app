@@ -4,7 +4,6 @@ import type { TaskHeaderType } from "./types";
 
 import "./TaskHeader.css";
 
-// TODO: move to own file
 const TaskHeader: TaskHeaderType = ({ title, isExpanded, setIsExpanded }) => {
   // TODO: move starred to api call
   const [isStarred, setIsStarred] = useState(false);
