@@ -1,4 +1,4 @@
-import { mockTasks } from "../../assets/mockData";
+import { mockTasks } from "../../data/mockData";
 import Task from "./Task";
 import "./TaskContainer.css";
 

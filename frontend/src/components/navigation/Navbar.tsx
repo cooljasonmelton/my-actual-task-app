@@ -1,34 +1,13 @@
-import { useState } from "react";
-import Button from "../design-system-components/button/Button";
+import KeepAwakeButton from "./KeepAwakeButton";
 import "./Navbar.css";
-
-// TODO: redo colors of Keep Awake Button so gray or bg-alt when off and green while on
 
 const HEADING_TEXT = "task app";
 
 const Navbar = () => {
-  const [keepAwake, setKeepAwake] = useState(false);
-
-  const handleKeepAwake = () => {
-    setKeepAwake(!keepAwake);
-    // TODO: set up screen wake
-    if (!keepAwake) {
-      console.log("Requesting wake lock...");
-    } else {
-      console.log("Releasing wake lock...");
-    }
-  };
   return (
     <div className="nav-container">
       <h1>{HEADING_TEXT}</h1>
-      <Button
-        variant={keepAwake ? "danger" : "secondary"}
-        size="small"
-        onClick={handleKeepAwake}
-        className="keep-awake-btn"
-      >
-        {keepAwake ? "Stay Awake: ON" : "Keep Awake"}
-      </Button>
+      <KeepAwakeButton />
     </div>
   );
 };
