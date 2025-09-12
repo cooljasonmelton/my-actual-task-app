@@ -14,7 +14,7 @@ type Subtask = {
   order: number;
 };
 
-export type Task = {
+export type TaskType = {
   id: string;
   title: string;
   description: string; // rich text

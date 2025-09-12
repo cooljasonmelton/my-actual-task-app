@@ -2,6 +2,10 @@
 
 ## TODO
 
+PRODUCTION NOTE:
+
+- BE: Fix CORS before every pushing to production
+
 ### FRONTEND
 
 - React
