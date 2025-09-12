@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// import { mockTasks } from "../../data/mockData";
 import Task from "./Task";
 import type { TaskType } from "../../types";
 import "./TaskContainer.css";
@@ -9,7 +8,6 @@ const GET_TASKS_URL = "http://localhost:3000/tasks";
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [error, setError] = useState<string | null>(null);
-  // const tasks = mockTasks;
 
   useEffect(() => {
     fetch(GET_TASKS_URL)
@@ -22,7 +20,7 @@ const TaskContainer = () => {
           setError("An unknown error occurred");
         }
       });
-  });
+  }, []);
 
   return (
     <div className="task-container">
