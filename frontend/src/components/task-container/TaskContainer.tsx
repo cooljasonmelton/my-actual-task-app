@@ -13,8 +13,8 @@ const TaskContainer = () => {
     fetch(GET_TASKS_URL)
       .then((res) => res.json())
       .then((data) => setTasks(data))
-      .catch((err) => {
-        if (err instanceof Error) {
+      .catch((err: Error) => {
+        if (err) {
           setError(err.message);
         } else {
           setError("An unknown error occurred");
