@@ -104,3 +104,12 @@ type Task = {
 
 - scratch pad for some quick notes
 - quick todo list or quick view similar to momentum extension todo list
+
+# TODO FILTERING
+
+- For MVP, filter tasks on FE
+- Later, implement adaptative filtering:
+  - When a user has > 2000 tasks, pull tasks from BE instead of FE
+    - get task count and check > 2000
+      - if <2000, use frontend filtering
+      - if >2000, fetch get `/api/tasks?status=${status}`
