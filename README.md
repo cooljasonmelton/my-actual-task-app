@@ -117,3 +117,7 @@ type Task = {
 
 - scratch pad for some quick notes
 - quick todo list or quick view similar to momentum extension todo list
+- first open of day, prompt user to review todos in 'next'
+  - store 'last opened' date in cookie or local storage
+  - compare date on mount, if new date, open modal of current todos with option to delete each
+  - comfirm button overwrites date in storage to new date
