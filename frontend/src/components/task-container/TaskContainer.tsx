@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import Task from "./Task";
+import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { TaskType } from "../../types";
 import "./TaskContainer.css";
-import TaskHeader from "./TaskHeader";
-import DashboardHeader from "../dashboard-header/DashboardHeader";
 
 const TASKS_API_URL = "http://localhost:3000/tasks";
 

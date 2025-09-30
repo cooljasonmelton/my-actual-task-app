@@ -20,26 +20,35 @@ const NewTaskContainer = ({
   setError: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   const [taskTitle, setTaskTitle] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // TODO: animation on submit
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submit", taskTitle);
-    if (taskTitle) {
-      fetch(TASKS_API_URL, {
+
+    const title = taskTitle.trim();
+
+    if (!title) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(TASKS_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: taskTitle.trim() }),
-      })
-        .then((res) => res.json())
-        .then((data) => setTasks((prev) => [...prev, { ...data }]))
-        .catch((err: Error) => {
-          if (err) {
-            setError(err.message);
-          } else {
-            setError("An unknown error occurred");
-          }
-        });
+        body: JSON.stringify({ title }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add task");
+
+      const data = await res.json();
+      setTasks((prev) => [data, ...prev]);
+      setTaskTitle("");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -60,6 +69,7 @@ const NewTaskContainer = ({
           variant="secondary"
           size="medium"
           type="submit"
+          isLoading={loading}
         >
           <Plus size={20} />
           {BUTTON_CTA_TEXT}

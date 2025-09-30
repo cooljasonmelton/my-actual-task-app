@@ -1,8 +1,7 @@
-import { useState } from "react";
 import NewTaskContainer from "./new-task/NewTaskContainer";
 import SectionTabsContainer from "./section-tabs/SectionTabsContainer";
-import "./DashboardHeader.css";
 import type { TaskType } from "../../types";
+import "./DashboardHeader.css";
 
 const DashboardHeader = ({
   setTasks,
