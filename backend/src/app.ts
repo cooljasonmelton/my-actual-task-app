@@ -24,20 +24,3 @@ app.get("/", (req, res) => {
 app.use(errorHandler);
 
 export default app;
-
-// OR safer: allow only your frontend
-app.use(
-  cors({
-    origin: "http://localhost:3000", // React dev server
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // if you use cookies or auth headers
-  })
-);
-
-app.get("/api/data", (req, res) => {
-  res.json({ message: "Hello from backend" });
-});
-
-app.listen(4000, () => {
-  console.log("Server running on http://localhost:4000");
-});
