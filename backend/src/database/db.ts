@@ -26,14 +26,23 @@ export const statements: { [k: string]: Database.Statement } = {
         INSERT INTO tasks (title) 
         VALUES (?)
     `),
-  selectAllTasks: db.prepare(`
+  selectActiveTasks: db.prepare(`
         SELECT * FROM tasks 
         WHERE deleted_at IS NULL 
+        ORDER BY priority DESC, created_at DESC
+    `),
+  selectAllTasks: db.prepare(`
+        SELECT * FROM tasks 
         ORDER BY priority DESC, created_at DESC
     `),
   selectTaskById: db.prepare(
     "SELECT * FROM tasks WHERE id = ? AND deleted_at IS NULL"
   ),
+  selectDeletedTasks: db.prepare(`
+        SELECT * FROM tasks
+        WHERE deleted_at IS NOT NULL
+        ORDER BY deleted_at DESC
+    `),
   updateTask: db.prepare(`
         UPDATE tasks 
         SET title = ?, description = ?, priority = ?, status = ? 
@@ -43,32 +52,18 @@ export const statements: { [k: string]: Database.Statement } = {
     "UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL"
   ),
 
-  // // Tag statements
-  // insertTag: db.prepare("INSERT OR IGNORE INTO tags (name) VALUES (?)"),
-  // selectTagByName: db.prepare("SELECT * FROM tags WHERE name = ?"),
-  // selectTagsByTaskId: db.prepare(`
-  //       SELECT t.* FROM tags t
-  //       JOIN task_tags tt ON t.id = tt.tag_id
-  //       WHERE tt.task_id = ?
-  //   `),
-  // insertTaskTag: db.prepare(
-  //   "INSERT OR IGNORE INTO task_tags (task_id, tag_id) VALUES (?, ?)"
-  // ),
-  // deleteTaskTags: db.prepare("DELETE FROM task_tags WHERE task_id = ?"),
-
-  // // Subtask statements
-  // insertSubtask: db.prepare(
-  //   "INSERT INTO subtasks (task_id, title) VALUES (?, ?)"
-  // ),
-  // selectSubtasksByTaskId: db.prepare(
-  //   "SELECT * FROM subtasks WHERE task_id = ? ORDER BY created_at"
-  // ),
-  // deleteSubtasksByTaskId: db.prepare("DELETE FROM subtasks WHERE task_id = ?"),
 };
 
 export const taskQueries = {
-  getAll: (): Task[] => {
-    return statements.selectAllTasks.all() as Task[];
+  getAll: (includeDeleted = false): Task[] => {
+    const statement = includeDeleted
+      ? statements.selectAllTasks
+      : statements.selectActiveTasks;
+    return statement.all() as Task[];
+  },
+
+  getDeleted: (): Task[] => {
+    return statements.selectDeletedTasks.all() as Task[];
   },
 
   getById: (id: number): Task | undefined => {

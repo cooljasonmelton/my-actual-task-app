@@ -9,7 +9,17 @@ const router = Router();
 router.get(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const tasks = taskQueries.getAll();
+    const includeDeleted = req.query.includeDeleted === "true";
+    const tasks = taskQueries.getAll(includeDeleted);
+    res.json(tasks);
+  })
+);
+
+// GET soft-deleted tasks
+router.get(
+  "/deleted",
+  asyncHandler(async (req: Request, res: Response) => {
+    const tasks = taskQueries.getDeleted();
     res.json(tasks);
   })
 );
