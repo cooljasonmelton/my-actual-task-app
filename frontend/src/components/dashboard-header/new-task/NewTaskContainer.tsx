@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { Plus } from "lucide-react";
 import Button from "../../design-system-components/button/Button";
 import InputField from "../../design-system-components/form/InputField";
 import Form from "../../design-system-components/form/Form";
 
 import "./NewTaskContainer.css";
-import type { TaskType } from "../../../types";
 
 const TASKS_API_URL = "http://localhost:3000/tasks";
 
@@ -13,11 +12,11 @@ const BUTTON_CTA_TEXT = "Add";
 const INPUT_TEXT = "add new task";
 
 const NewTaskContainer = ({
-  setTasks,
-  setError,
+  refreshTasks,
+  reportError,
 }: {
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  refreshTasks: () => Promise<void>;
+  reportError: Dispatch<SetStateAction<string | null>>;
 }) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,11 +39,10 @@ const NewTaskContainer = ({
 
       if (!res.ok) throw new Error("Failed to add task");
 
-      const data = await res.json();
-      setTasks((prev) => [data, ...prev]);
+      await refreshTasks();
       setTaskTitle("");
     } catch (err) {
-      setError(
+      reportError(
         err instanceof Error ? err.message : "An unknown error occurred"
       );
     } finally {

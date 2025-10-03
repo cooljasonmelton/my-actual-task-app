@@ -1,17 +1,22 @@
-import { useState } from "react";
 import RadioButtonGroup from "../../design-system-components/radio-button-group/RadioButtonGroup";
 import { DEFAULT_SECTION_TAB_ITEM } from "../../../constants";
 import { useSectionTabItems } from "./useSectionTabItems";
 import "./SectionTabsContainer.css";
+import type { Status } from "../../../types";
 
 // TODO: fix styling so tabs stretch across container
 // TODO: figure out logic to list number of tasks for each section
 
-const SectionTabsContainer = () => {
-  const [selectedTab, setSelectedTab] = useState(DEFAULT_SECTION_TAB_ITEM);
-  console.log("selectedTab", selectedTab);
-
-  const sectionTabItems = useSectionTabItems();
+const SectionTabsContainer = ({
+  selectedStatus,
+  onChange,
+  counts,
+}: {
+  selectedStatus: Status;
+  onChange: (value: Status) => void;
+  counts: Record<Status, number>;
+}) => {
+  const sectionTabItems = useSectionTabItems(counts);
 
   return (
     <div className="card">
@@ -20,8 +25,9 @@ const SectionTabsContainer = () => {
         legendText="select task status view"
         radioButtonItems={sectionTabItems}
         defaultValue={DEFAULT_SECTION_TAB_ITEM}
+        value={selectedStatus}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setSelectedTab(e.target.value)
+          onChange(e.target.value as Status)
         }
       />
     </div>

@@ -10,10 +10,12 @@ const RadioButton = ({
   name,
   value,
   cta,
+  checked,
   defaultChecked = false,
   onChange,
 }: RadioButtonItem & {
   name: string;
+  checked?: boolean;
   defaultChecked?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
@@ -24,7 +26,8 @@ const RadioButton = ({
         type="radio"
         name={name}
         value={value}
-        defaultChecked={defaultChecked}
+        checked={checked}
+        defaultChecked={checked === undefined ? defaultChecked : undefined}
       />
       {cta}
     </label>
@@ -36,12 +39,14 @@ const RadioButtonGroup = ({
   buttonName,
   radioButtonItems,
   defaultValue,
+  value,
   onChange,
 }: {
   legendText: string;
   buttonName: string;
   radioButtonItems: RadioButtonItem[];
   defaultValue?: string;
+  value?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   const buttonItems = radioButtonItems || [];
@@ -56,6 +61,7 @@ const RadioButtonGroup = ({
           value={item.value}
           cta={item.cta}
           name={buttonName}
+          checked={value === item.value}
           defaultChecked={defaultValue === item.value}
         />
       ))}

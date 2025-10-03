@@ -9,6 +9,15 @@
   gap: 1rem;
 }
 
+.task-container__error,
+.task-container__loading,
+.task-container__empty {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--color-surface, #f8fafc);
+  color: var(--color-text-muted, #64748b);
+}
+
 @media screen and (max-width: 768px) {
   .task-container {
     width: 100%;

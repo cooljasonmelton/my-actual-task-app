@@ -1,19 +1,30 @@
+import type { Dispatch, SetStateAction } from "react";
+import type { Status } from "../../types";
 import NewTaskContainer from "./new-task/NewTaskContainer";
 import SectionTabsContainer from "./section-tabs/SectionTabsContainer";
-import type { TaskType } from "../../types";
 import "./DashboardHeader.css";
 
 const DashboardHeader = ({
-  setTasks,
-  setError,
+  refreshTasks,
+  reportError,
+  selectedStatus,
+  onStatusChange,
+  statusCounts,
 }: {
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  refreshTasks: () => Promise<void>;
+  reportError: Dispatch<SetStateAction<string | null>>;
+  selectedStatus: Status;
+  onStatusChange: (value: Status) => void;
+  statusCounts: Record<Status, number>;
 }) => {
   return (
     <div className="dashboard-header">
-      <SectionTabsContainer />
-      <NewTaskContainer setTasks={setTasks} setError={setError} />
+      <SectionTabsContainer
+        selectedStatus={selectedStatus}
+        onChange={onStatusChange}
+        counts={statusCounts}
+      />
+      <NewTaskContainer refreshTasks={refreshTasks} reportError={reportError} />
     </div>
   );
 };

@@ -20,8 +20,22 @@
   fill: var(--color-bg);
 }
 
+
+.task-header__chevron {
+  fill: var(--color-text, #0f172a);
+}
+
+.task-title--soft-deleted {
+  text-decoration: line-through;
+  color: var(--color-text-muted, #64748b);
+}
+
+.task-title--soft-deleted-today {
+  font-style: italic;
+}
+
 .filled-delete {
-  fill: var(--color-accent-pink);
+  fill: var(--color-accent-red, #ef4444);
 }
 .empty-delete {
   fill: var(--color-bg);
