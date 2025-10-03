@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "PROJECT_ROOT=\"$(cd .. && pwd)\" osascript -e 'set projectRoot to system attribute \"PROJECT_ROOT\"' -e 'set frontendPath to projectRoot & \"/frontend\"' -e 'set backendPath to projectRoot & \"/backend\"' -e 'tell application \"Terminal\"' -e 'activate' -e 'if not (exists window 1) then reopen' -e 'do script \"cd \" & quoted form of frontendPath & \" && npm run dev\" in window 1' -e 'end tell' -e 'delay 0.2' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'tell application \"Terminal\" to do script \"cd \" & quoted form of backendPath & \" && npm run dev\" in window 1'",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
