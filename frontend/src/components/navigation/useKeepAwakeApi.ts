@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 interface WakeLockSentinel extends EventTarget {
   released: boolean;
@@ -8,8 +8,15 @@ interface WakeLockSentinel extends EventTarget {
 }
 
 const useKeepAwakeApi = () => {
-  const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
   const [isActive, setIsActive] = useState(false);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const shouldRestoreRef = useRef(false);
+
+  const handleRelease = useCallback(() => {
+    console.log("Wake Lock was released");
+    wakeLockRef.current = null;
+    setIsActive(false);
+  }, []);
 
   const requestWakeLock = useCallback(async () => {
     if (!("wakeLock" in navigator)) {
@@ -17,36 +24,46 @@ const useKeepAwakeApi = () => {
       return;
     }
     try {
-      // Some TS versions don’t have navigator.wakeLock in lib.dom.d.ts
       const sentinel = await navigator.wakeLock.request("screen");
-      setWakeLock(sentinel);
+      wakeLockRef.current = sentinel;
       setIsActive(true);
-
-      sentinel.addEventListener("release", () => {
-        console.log("Wake Lock was released");
-        setIsActive(false);
-        setWakeLock(null);
-      });
-
+      shouldRestoreRef.current = true;
+      sentinel.addEventListener("release", handleRelease);
       console.log("Wake Lock is active!");
     } catch (err) {
       console.error("Failed to acquire wake lock:", err);
     }
-  }, []);
+  }, [handleRelease]);
 
-  const releaseWakeLock = useCallback(async () => {
-    if (wakeLock) {
-      await wakeLock.release();
-      setWakeLock(null);
+  const releaseWakeLockInternal = useCallback(
+    async (reason: "manual" | "cleanup" = "manual") => {
+      const sentinel = wakeLockRef.current;
+      if (!sentinel) {
+        return;
+      }
+      shouldRestoreRef.current = false;
+      sentinel.removeEventListener("release", handleRelease);
+      await sentinel.release();
+      wakeLockRef.current = null;
       setIsActive(false);
-      console.log("Wake Lock manually released");
-    }
-  }, [wakeLock]);
+      if (reason === "manual") {
+        console.log("Wake Lock manually released");
+      }
+    },
+    [handleRelease]
+  );
 
-  // re-request lock if tab comes back into focus
+  const releaseWakeLock = useCallback(() => {
+    return releaseWakeLockInternal("manual");
+  }, [releaseWakeLockInternal]);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && !wakeLock) {
+      if (
+        document.visibilityState === "visible" &&
+        shouldRestoreRef.current &&
+        !wakeLockRef.current
+      ) {
         requestWakeLock();
       }
     };
@@ -54,9 +71,14 @@ const useKeepAwakeApi = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      releaseWakeLock();
     };
-  }, [wakeLock, requestWakeLock, releaseWakeLock]);
+  }, [requestWakeLock]);
+
+  useEffect(() => {
+    return () => {
+      void releaseWakeLockInternal("cleanup");
+    };
+  }, [releaseWakeLockInternal]);
 
   return {
     isActive,
