@@ -4,6 +4,7 @@ import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import { CreateTaskRequest, Task, UpdateTaskRequest } from "./types";
+import type { Status, Priority } from "../../../shared/types/task";
 
 // Create or open database
 const db: Database.Database = new Database("database.db");
@@ -20,6 +21,43 @@ function initializeDatabase(): void {
 }
 
 initializeDatabase();
+
+type DbTaskRow = {
+  id: number;
+  title: string;
+  description: string | null;
+  priority: number | null;
+  created_at: string | Date;
+  deleted_at: string | Date | null;
+  status: string | null;
+};
+
+const mapDbTaskToTask = (row: DbTaskRow): Task => {
+  const priorityValue =
+    row.priority === null || row.priority === undefined
+      ? 5
+      : Number(row.priority);
+  const statusValue = (row.status ?? "next") as Status;
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description ?? "",
+    priority: priorityValue as Priority,
+    createdAt:
+      row.created_at instanceof Date
+        ? row.created_at
+        : new Date(row.created_at),
+    deletedAt: row.deleted_at
+      ? row.deleted_at instanceof Date
+        ? row.deleted_at
+        : new Date(row.deleted_at)
+      : null,
+    status: statusValue,
+    tags: [],
+    subtasks: [],
+  };
+};
 
 export const statements: { [k: string]: Database.Statement } = {
   insertTask: db.prepare(`
@@ -59,15 +97,18 @@ export const taskQueries = {
     const statement = includeDeleted
       ? statements.selectAllTasks
       : statements.selectActiveTasks;
-    return statement.all() as Task[];
+    return (statement.all() as DbTaskRow[]).map(mapDbTaskToTask);
   },
 
   getDeleted: (): Task[] => {
-    return statements.selectDeletedTasks.all() as Task[];
+    return (statements.selectDeletedTasks.all() as DbTaskRow[]).map(
+      mapDbTaskToTask
+    );
   },
 
   getById: (id: number): Task | undefined => {
-    return statements.selectTaskById.get(id) as Task | undefined;
+    const row = statements.selectTaskById.get(id) as DbTaskRow | undefined;
+    return row ? mapDbTaskToTask(row) : undefined;
   },
 
   create: (TaskData: CreateTaskRequest): { id: number } => {

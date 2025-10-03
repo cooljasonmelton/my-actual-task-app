@@ -21,25 +21,20 @@ const isSameReferenceWindow = (dateA: Date, dateB: Date) =>
   getReferenceWindowStart(dateA).getTime() ===
   getReferenceWindowStart(dateB).getTime();
 
-// TODO: fix any type, are be and fe aligned on Task type?
-const parseTaskFromApi = (task: any): TaskType => ({
-  id: task.id,
-  title: task.title,
-  description: task.description ?? "",
-  priority: (task.priority ?? 5) as TaskType["priority"],
-  createdAt: task.created_at
-    ? new Date(task.created_at)
-    : task.createdAt
-    ? new Date(task.createdAt)
-    : new Date(),
-  deletedAt: task.deleted_at
-    ? new Date(task.deleted_at)
-    : task.deletedAt
-    ? new Date(task.deletedAt)
+type ApiTask = Omit<TaskType, "createdAt" | "deletedAt"> & {
+  createdAt: string | Date;
+  deletedAt: string | Date | null;
+};
+
+const parseTaskFromApi = (task: ApiTask): TaskType => ({
+  ...task,
+  createdAt:
+    task.createdAt instanceof Date ? task.createdAt : new Date(task.createdAt),
+  deletedAt: task.deletedAt
+    ? task.deletedAt instanceof Date
+      ? task.deletedAt
+      : new Date(task.deletedAt)
     : null,
-  status: (task.status ?? "next") as TaskType["status"],
-  tags: task.tags ?? [],
-  subtasks: task.subtasks ?? [],
 });
 
 const TaskContainer = () => {
@@ -61,7 +56,7 @@ const TaskContainer = () => {
 
       const data = await response.json();
       const parsedTasks = Array.isArray(data)
-        ? (data as unknown[]).map(parseTaskFromApi)
+        ? (data as ApiTask[]).map(parseTaskFromApi)
         : [];
       setTasks(parsedTasks);
     } catch (err) {
