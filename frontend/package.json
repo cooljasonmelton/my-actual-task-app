@@ -8,7 +8,9 @@
     "dev:all": "PROJECT_ROOT=\"$(cd .. && pwd)\" osascript -e 'set projectRoot to system attribute \"PROJECT_ROOT\"' -e 'set frontendPath to projectRoot & \"/frontend\"' -e 'set backendPath to projectRoot & \"/backend\"' -e 'tell application \"Terminal\"' -e 'activate' -e 'if not (exists window 1) then reopen' -e 'do script \"cd \" & quoted form of frontendPath & \" && npm run dev\" in window 1' -e 'end tell' -e 'delay 0.2' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'tell application \"Terminal\" to do script \"cd \" & quoted form of backendPath & \" && npm run dev\" in window 1'",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "lucide-react": "^0.542.0",
@@ -17,6 +19,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
@@ -24,8 +29,10 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "jsdom": "^25.0.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^2.1.9"
   }
 }
