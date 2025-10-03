@@ -2,12 +2,29 @@
 .task-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0 0.5rem;
 }
+
+.task-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 /* TODO: add animation when starring tasks */
 .filled-star {
   fill: var(--color-accent-yellow);
 }
 .empty-star {
   fill: var(--color-bg);
+}
+
+.task-header svg[role="button"] {
+  cursor: pointer;
+}
+
+.task-header svg[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

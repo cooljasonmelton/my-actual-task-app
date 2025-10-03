@@ -1,7 +1,16 @@
+import type { TaskType } from "../../types";
+
 export interface TaskProps {
-  title: string;
+  task: TaskType;
+  onDelete: (id: TaskType["id"]) => Promise<void>;
 }
 
 export type TaskHeaderType = React.FC<
-  Pick<TaskProps, "title"> & { isExpanded: boolean; setIsExpanded: () => void }
+  {
+    taskId: TaskType["id"];
+    title: string;
+    isExpanded: boolean;
+    setIsExpanded: () => void;
+    onDelete: (id: TaskType["id"]) => Promise<void>;
+  }
 >;

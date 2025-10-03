@@ -40,7 +40,7 @@ export const statements: { [k: string]: Database.Statement } = {
         WHERE id = ? AND deleted_at IS NULL
     `),
   softDeleteTask: db.prepare(
-    "UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?"
+    "UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL"
   ),
 
   // // Tag statements
@@ -87,7 +87,7 @@ export const taskQueries = {
   },
 
   delete: (id: number): { changes: number } => {
-    const result = statements.deleteTask.run(id);
+    const result = statements.softDeleteTask.run(id);
     return { changes: result.changes };
   },
 };

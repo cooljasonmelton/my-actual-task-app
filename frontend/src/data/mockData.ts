@@ -2,7 +2,7 @@ import type { TaskType } from "../types";
 
 export const mockTasks: TaskType[] = [
   {
-    id: "t1",
+    id: 1,
     title: "Finish frontend setup",
     description:
       "<p>Set up <strong>Vite + React + Tailwind</strong> for the project</p>",
@@ -11,16 +11,16 @@ export const mockTasks: TaskType[] = [
     deletedAt: null,
     status: "next",
     tags: [
-      { id: "tag1", name: "development", color: "#3b82f6" },
-      { id: "tag2", name: "frontend", color: "#10b981" },
+      { id: 1, name: "development", color: "#3b82f6" },
+      { id: 2, name: "frontend", color: "#10b981" },
     ],
     subtasks: [
-      { id: "s1", title: "Install dependencies", deletedAt: null, order: 1 },
-      { id: "s2", title: "Set up Tailwind config", deletedAt: null, order: 2 },
+      { id: 1, title: "Install dependencies", deletedAt: null, order: 1 },
+      { id: 2, title: "Set up Tailwind config", deletedAt: null, order: 2 },
     ],
   },
   {
-    id: "t2",
+    id: 2,
     title: "Design database schema",
     description:
       "<p>Tasks, <em>subtasks</em>, and tags with relationships.</p>",
@@ -28,11 +28,11 @@ export const mockTasks: TaskType[] = [
     createdAt: new Date("2025-09-01T12:00:00Z"),
     deletedAt: null,
     status: "ongoing",
-    tags: [{ id: "tag1", name: "development", color: "#3b82f6" }],
+    tags: [{ id: 1, name: "development", color: "#3b82f6" }],
     subtasks: [
-      { id: "s3", title: "ER diagram", deletedAt: null, order: 1 },
+      { id: 3, title: "ER diagram", deletedAt: null, order: 1 },
       {
-        id: "s4",
+        id: 4,
         title: "Decide on rich text storage",
         deletedAt: null,
         order: 2,
@@ -40,7 +40,7 @@ export const mockTasks: TaskType[] = [
     ],
   },
   {
-    id: "t3",
+    id: 3,
     title: "Write first API endpoint",
     description:
       "<p>Return <code>/api/tasks</code> with joined tags + subtasks.</p>",
@@ -49,13 +49,13 @@ export const mockTasks: TaskType[] = [
     deletedAt: null,
     status: "next",
     tags: [
-      { id: "tag3", name: "backend", color: "#f59e0b" },
-      { id: "tag4", name: "api", color: "#8b5cf6" },
+      { id: 3, name: "backend", color: "#f59e0b" },
+      { id: 4, name: "api", color: "#8b5cf6" },
     ],
     subtasks: [],
   },
   {
-    id: "t4",
+    id: 4,
     title: "Test rich text editor",
     description:
       "<p>Experiment with <u>React Quill</u> and see if it’s good enough for MVP.</p>",
@@ -63,13 +63,13 @@ export const mockTasks: TaskType[] = [
     createdAt: new Date("2025-09-02T14:00:00Z"),
     deletedAt: null,
     status: "backburner",
-    tags: [{ id: "tag2", name: "frontend", color: "#10b981" }],
+    tags: [{ id: 2, name: "frontend", color: "#10b981" }],
     subtasks: [
-      { id: "s5", title: "Try bold/italic/links", deletedAt: null, order: 1 },
+      { id: 5, title: "Try bold/italic/links", deletedAt: null, order: 1 },
     ],
   },
   {
-    id: "t5",
+    id: 5,
     title: "Write mock seed script",
     description:
       "<p>Create some <strong>fake tasks</strong> to test UI components.</p>",
@@ -78,12 +78,12 @@ export const mockTasks: TaskType[] = [
     deletedAt: null,
     status: "finished",
     tags: [
-      { id: "tag1", name: "development", color: "#3b82f6" },
-      { id: "tag5", name: "testing", color: "#ef4444" },
+      { id: 1, name: "development", color: "#3b82f6" },
+      { id: 5, name: "testing", color: "#ef4444" },
     ],
     subtasks: [
-      { id: "s6", title: "Define types", deletedAt: null, order: 1 },
-      { id: "s7", title: "Create JSON file", deletedAt: null, order: 2 },
+      { id: 6, title: "Define types", deletedAt: null, order: 1 },
+      { id: 7, title: "Create JSON file", deletedAt: null, order: 2 },
     ],
   },
 ];
