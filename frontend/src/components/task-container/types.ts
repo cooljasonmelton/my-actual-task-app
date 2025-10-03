@@ -5,12 +5,10 @@ export interface TaskProps {
   onDelete: (id: TaskType["id"]) => Promise<void>;
 }
 
-export type TaskHeaderType = React.FC<
-  {
-    taskId: TaskType["id"];
-    title: string;
-    isExpanded: boolean;
-    setIsExpanded: () => void;
-    onDelete: (id: TaskType["id"]) => Promise<void>;
-  }
->;
+export type TaskHeaderType = React.FC<{
+  taskId: TaskType["id"];
+  title: string;
+  isExpanded: boolean;
+  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  onDelete: (id: TaskType["id"]) => Promise<void>;
+}>;

@@ -20,6 +20,13 @@
   fill: var(--color-bg);
 }
 
+.filled-delete {
+  fill: var(--color-accent-pink);
+}
+.empty-delete {
+  fill: var(--color-bg);
+}
+
 .task-header svg[role="button"] {
   cursor: pointer;
 }

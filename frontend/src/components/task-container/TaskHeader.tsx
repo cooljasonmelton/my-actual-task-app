@@ -47,27 +47,39 @@ const TaskHeader: TaskHeaderType = ({
     }
   };
 
-  const handleDeleteKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+  const handleKeyDown = (
+    event: KeyboardEvent<SVGSVGElement>,
+    type: "expand" | "delete"
+  ) => {
     if (event.key !== "Enter" && event.key !== " ") {
       return;
     }
 
     event.preventDefault();
-    void handleClickDelete();
+    if (type === "delete") {
+      void handleClickDelete();
+    }
+    if (type === "expand") {
+      setIsExpanded(!isExpanded);
+    }
   };
 
   const isStarredClassName = isStarred ? "filled-star" : "empty-star";
-  // TODO: add a classname and color
-  const isReadyForDeleteClassName = shouldDelete ? "filled-star" : "empty-star";
+  const shouldDeleteClassName = shouldDelete ? "filled-delete" : "empty-delete";
+  const Chevron = isExpanded ? ChevronDown : ChevronRight;
 
   return (
     <div className="task-header">
       <div className="task-title-wrapper">
-        {isExpanded ? (
-          <ChevronDown size={20} onClick={setIsExpanded} />
-        ) : (
-          <ChevronRight size={20} onClick={setIsExpanded} />
-        )}
+        <Chevron
+          size={20}
+          onClick={() => setIsExpanded(!isExpanded)}
+          onKeyDown={(e) => handleKeyDown(e, "expand")}
+          className={isStarredClassName}
+          aria-label={isExpanded ? "Hide task details" : "Expand task details"}
+          role="button"
+          tabIndex={0}
+        />
         <Star
           size={20}
           onClick={() => setIsStarred(!isStarred)}
@@ -79,11 +91,9 @@ const TaskHeader: TaskHeaderType = ({
       <XCircle
         size={20}
         onClick={handleClickDelete}
-        onKeyDown={handleDeleteKeyDown}
-        className={isReadyForDeleteClassName}
-        aria-label={
-          shouldDelete ? "Confirm delete task" : "Delete task"
-        }
+        onKeyDown={(e) => handleKeyDown(e, "delete")}
+        className={shouldDeleteClassName}
+        aria-label={shouldDelete ? "Confirm delete task" : "Delete task"}
         role="button"
         aria-disabled={isDeleting}
         tabIndex={0}
