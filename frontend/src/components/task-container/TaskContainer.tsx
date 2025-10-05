@@ -37,6 +37,19 @@ const parseTaskFromApi = (task: ApiTask): TaskType => ({
     : null,
 });
 
+type DerivedTask = {
+  task: TaskType;
+  isSoftDeleted: boolean;
+  isSoftDeletedToday: boolean;
+};
+
+const createEmptyBuckets = (): Record<Status, DerivedTask[]> => ({
+  next: [],
+  ongoing: [],
+  backburner: [],
+  finished: [],
+});
+
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -95,11 +108,8 @@ const TaskContainer = () => {
     [loadTasks]
   );
 
-  const referenceWindowStart = useMemo(
-    () => getReferenceWindowStart(new Date()),
-    []
-  );
-  const derivedTasks = useMemo(() => {
+  const referenceWindowStart = getReferenceWindowStart(new Date());
+  const derivedTasks = useMemo<DerivedTask[]>(() => {
     return tasks.map((task) => {
       const deletedAt = task.deletedAt;
       const isSoftDeleted = Boolean(deletedAt);
@@ -107,35 +117,40 @@ const TaskContainer = () => {
         deletedAt && isSameReferenceWindow(deletedAt, referenceWindowStart)
       );
 
-      const effectiveStatus: Status =
-        isSoftDeleted && !isSoftDeletedToday ? "finished" : task.status;
-
       return {
         task,
-        effectiveStatus,
         isSoftDeleted,
         isSoftDeletedToday,
       };
     });
   }, [tasks, referenceWindowStart]);
 
-  const statusCounts = useMemo(() => {
-    return derivedTasks.reduce<Record<Status, number>>(
-      (acc, { effectiveStatus }) => {
-        acc[effectiveStatus] += 1;
-        return acc;
-      },
-      { next: 0, ongoing: 0, backburner: 0, finished: 0 }
-    );
+  const statusBuckets = useMemo(() => {
+    const buckets = createEmptyBuckets();
+
+    derivedTasks.forEach((item) => {
+      const { task, isSoftDeleted, isSoftDeletedToday } = item;
+
+      if (isSoftDeleted && !isSoftDeletedToday) {
+        buckets.finished.push(item);
+      } else {
+        buckets[task.status].push(item);
+      }
+    });
+
+    return buckets;
   }, [derivedTasks]);
 
-  const tasksForSelectedStatus = useMemo(
-    () =>
-      derivedTasks.filter(
-        (derived) => derived.effectiveStatus === selectedStatus
-      ),
-    [derivedTasks, selectedStatus]
-  );
+  const statusCounts = useMemo<Record<Status, number>>(() => (
+    {
+      next: statusBuckets.next.length,
+      ongoing: statusBuckets.ongoing.length,
+      backburner: statusBuckets.backburner.length,
+      finished: statusBuckets.finished.length,
+    }
+  ), [statusBuckets]);
+
+  const tasksForSelectedStatus = statusBuckets[selectedStatus];
 
   const renderTasks = () => {
     if (tasksForSelectedStatus.length === 0) {
@@ -144,8 +159,7 @@ const TaskContainer = () => {
       );
     }
 
-    return tasksForSelectedStatus.map(
-      ({ task, isSoftDeleted, isSoftDeletedToday }) => (
+    return tasksForSelectedStatus.map(({ task, isSoftDeleted, isSoftDeletedToday }) => (
         <Task
           key={task.id}
           task={task}
