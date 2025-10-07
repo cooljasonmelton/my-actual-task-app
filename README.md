@@ -7,6 +7,7 @@ My Actual Task App is a full-stack productivity dashboard I’m building to keep
 - **Priority-Driven Workflow** – Toggle the star to mark a task as urgent. The UI sorts by priority and reflects the change instantly while the backend keeps everything in sync.
 - **Rich Status Buckets** – Tasks flow between `next`, `dates`, `ongoing`, `get`, `backburner`, and `finished`, with live counts surfaced in the dashboard header.
 - **Soft Delete Safety Net** – Deleted tasks move to an archival state and drop to low priority instead of disappearing outright.
+- **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column; changes persist instantly and play nicely with priority-driven sorting.
 - **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
 - **Quality of Life Utilities** – Wake-lock toggle, keyboard accessibility, ref-focused forms, and automated tests (Vitest) on both sides of the stack.
 
@@ -71,7 +72,7 @@ npm run db:sync --prefix backend
 
 ## 🧭 Project Structure
 
-- `frontend/` – React application, task container logic, dashboard header, design-system components, Vitest tests.
+- `frontend/` – React application, task container logic, drag-and-drop utilities, dashboard header, design-system components, Vitest tests.
 - `backend/` – Express API, SQLite integration, migrations, route tests, scripts for backups/sync.
 - `shared/` – Source of truth for TypeScript types shared across both sides.
 - `package.json` (root) – Convenience scripts to orchestrate both apps simultaneously.
@@ -79,7 +80,7 @@ npm run db:sync --prefix backend
 ## 🔭 Roadmap & Wishlist
 
 - Rich-text task descriptions and tag management.
-- Drag-and-drop reordering with drop targets in the status header.
+- Drag-and-drop reassignment between sections (drop onto tab to move status).
 - Background job to auto-flip soft-deleted tasks into the `finished` bucket at day’s end.
 - More analytics around productivity trends (streaks, bursts, etc.).
 
