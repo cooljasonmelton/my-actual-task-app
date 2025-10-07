@@ -70,7 +70,7 @@ npm run db:backup:dev --prefix backend
 npm run db:sync --prefix backend
 ```
 
-## ℹ️ Useful Scripts
+#### ℹ️ Useful Scripts
 
 ```bash
 # Use app locally with personal database
