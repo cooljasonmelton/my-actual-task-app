@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { Plus } from "lucide-react";
 import Button from "../../design-system-components/button/Button";
 import InputField from "../../design-system-components/form/InputField";
@@ -20,6 +20,7 @@ const NewTaskContainer = ({
 }) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   // TODO: animation on submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,6 +42,7 @@ const NewTaskContainer = ({
 
       await refreshTasks();
       setTaskTitle("");
+      inputRef.current?.focus();
     } catch (err) {
       reportError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -61,6 +63,7 @@ const NewTaskContainer = ({
           label={INPUT_TEXT}
           onChange={(e) => setTaskTitle(e.target.value)}
           value={taskTitle}
+          ref={inputRef}
         />
         <Button
           className="new-task-submit"
