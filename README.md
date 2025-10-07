@@ -1,5 +1,3 @@
-<!-- Portfolio Overview -->
-
 # My Actual Task App
 
 My Actual Task App is a full-stack productivity dashboard I’m building to keep my day organised. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights the tasks I care about (priority stars, flexible status buckets), lets me soft delete without losing data, and even keeps my browser awake when I’m in focus mode.
