@@ -105,6 +105,25 @@ type DbTaskRow = {
   status: string | null;
 };
 
+const SERIALIZED_DATE_TIME_REGEX = /[Tt]|Z$|[+-]\d{2}:?\d{2}$/;
+
+const parseSqliteDate = (value: string | Date | null): Date | null => {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  const normalized = SERIALIZED_DATE_TIME_REGEX.test(value)
+    ? value
+    : `${value.replace(" ", "T")}Z`;
+
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? new Date(value) : parsed;
+};
+
 const mapDbTaskToTask = (row: DbTaskRow): Task => {
   const priorityValue =
     row.priority === null || row.priority === undefined
@@ -112,20 +131,16 @@ const mapDbTaskToTask = (row: DbTaskRow): Task => {
       : Number(row.priority);
   const statusValue = (row.status ?? "next") as Status;
 
+  const createdAt = parseSqliteDate(row.created_at);
+  const deletedAt = parseSqliteDate(row.deleted_at);
+
   return {
     id: row.id,
     title: row.title,
     description: row.description ?? "",
     priority: priorityValue as Priority,
-    createdAt:
-      row.created_at instanceof Date
-        ? row.created_at
-        : new Date(row.created_at),
-    deletedAt: row.deleted_at
-      ? row.deleted_at instanceof Date
-        ? row.deleted_at
-        : new Date(row.deleted_at)
-      : null,
+    createdAt: createdAt ?? new Date(row.created_at),
+    deletedAt,
     status: statusValue,
     tags: [],
     subtasks: [],

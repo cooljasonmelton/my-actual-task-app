@@ -13,22 +13,12 @@ import {
   sortTasks,
 } from "../../utils/taskSorting";
 import type { TaskSortOption } from "../../utils/taskSorting";
+import {
+  parseReferenceWindowDate,
+  useReferenceWindow,
+} from "../../hooks/useReferenceWindow";
 
 const TASKS_API_URL = "http://localhost:3000/tasks";
-
-const REFERENCE_WINDOW_OFFSET_HOURS = 4;
-const REFERENCE_WINDOW_OFFSET_MS =
-  REFERENCE_WINDOW_OFFSET_HOURS * 60 * 60 * 1000;
-
-const getReferenceWindowStart = (date: Date) => {
-  const shifted = new Date(date.getTime() - REFERENCE_WINDOW_OFFSET_MS);
-  shifted.setHours(0, 0, 0, 0);
-  return new Date(shifted.getTime() + REFERENCE_WINDOW_OFFSET_MS);
-};
-
-const isSameReferenceWindow = (dateA: Date, dateB: Date) =>
-  getReferenceWindowStart(dateA).getTime() ===
-  getReferenceWindowStart(dateB).getTime();
 
 type ApiTask = Omit<TaskType, "createdAt" | "deletedAt"> & {
   createdAt: string | Date;
@@ -37,13 +27,8 @@ type ApiTask = Omit<TaskType, "createdAt" | "deletedAt"> & {
 
 const parseTaskFromApi = (task: ApiTask): TaskType => ({
   ...task,
-  createdAt:
-    task.createdAt instanceof Date ? task.createdAt : new Date(task.createdAt),
-  deletedAt: task.deletedAt
-    ? task.deletedAt instanceof Date
-      ? task.deletedAt
-      : new Date(task.deletedAt)
-    : null,
+  createdAt: parseReferenceWindowDate(task.createdAt),
+  deletedAt: task.deletedAt ? parseReferenceWindowDate(task.deletedAt) : null,
 });
 
 type DerivedTask = {
@@ -190,13 +175,13 @@ const TaskContainer = () => {
     [sortOption]
   );
 
-  const referenceWindowStart = getReferenceWindowStart(new Date());
+  const { isInCurrentReferenceWindow } = useReferenceWindow();
   const derivedTasks = useMemo<DerivedTask[]>(() => {
     return tasks.map((task) => {
       const deletedAt = task.deletedAt;
       const isSoftDeleted = Boolean(deletedAt);
       const isSoftDeletedToday = Boolean(
-        deletedAt && isSameReferenceWindow(deletedAt, referenceWindowStart)
+        deletedAt && isInCurrentReferenceWindow(deletedAt)
       );
 
       return {
@@ -205,7 +190,7 @@ const TaskContainer = () => {
         isSoftDeletedToday,
       };
     });
-  }, [tasks, referenceWindowStart]);
+  }, [tasks, isInCurrentReferenceWindow]);
 
   const statusBuckets = useMemo(() => {
     const buckets = createEmptyBuckets();
