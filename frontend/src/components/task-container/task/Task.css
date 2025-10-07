@@ -1,0 +1,22 @@
+.task {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.task--soft-deleted {
+  opacity: 0.6;
+}
+
+.task--draggable {
+  cursor: grab;
+}
+
+.task--dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+}
+
+.task--drag-over {
+  outline: 2px dashed var(--color-border-strong, #94a3b8);
+}
