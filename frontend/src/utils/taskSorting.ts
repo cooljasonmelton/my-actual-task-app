@@ -7,6 +7,15 @@ const sortByPriority = (a: TaskType, b: TaskType) => {
     return a.priority - b.priority;
   }
 
+  const aSortIndex =
+    typeof a.sortIndex === "number" ? a.sortIndex : Number.MAX_SAFE_INTEGER;
+  const bSortIndex =
+    typeof b.sortIndex === "number" ? b.sortIndex : Number.MAX_SAFE_INTEGER;
+
+  if (aSortIndex !== bSortIndex) {
+    return aSortIndex - bSortIndex;
+  }
+
   return b.createdAt.getTime() - a.createdAt.getTime();
 };
 

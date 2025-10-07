@@ -11,6 +11,7 @@ const createTask = (overrides: Partial<TaskType>): TaskType => ({
   title: overrides.title ?? 'Task',
   description: overrides.description ?? '',
   priority: overrides.priority ?? 3,
+  sortIndex: overrides.sortIndex ?? 10,
   createdAt: overrides.createdAt ?? new Date('2024-01-01T00:00:00Z'),
   deletedAt: overrides.deletedAt ?? null,
   status: overrides.status ?? 'next',
@@ -23,11 +24,11 @@ describe('taskSorting utilities', () => {
     expect(DEFAULT_TASK_SORT_OPTION).toBe('priority');
   });
 
-  it('sorts tasks by ascending priority and falls back to newest first', () => {
+  it('sorts tasks by ascending priority and then sortIndex', () => {
     const tasks: TaskType[] = [
-      createTask({ id: 1, priority: 4, createdAt: new Date('2024-01-01T00:00:00Z') }),
-      createTask({ id: 2, priority: 2, createdAt: new Date('2024-02-01T00:00:00Z') }),
-      createTask({ id: 3, priority: 2, createdAt: new Date('2024-01-15T00:00:00Z') }),
+      createTask({ id: 1, priority: 4, sortIndex: 30 }),
+      createTask({ id: 2, priority: 2, sortIndex: 10, createdAt: new Date('2024-02-01T00:00:00Z') }),
+      createTask({ id: 3, priority: 2, sortIndex: 20, createdAt: new Date('2024-01-15T00:00:00Z') }),
     ];
 
     const sorted = sortTasks(tasks, 'priority');

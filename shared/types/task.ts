@@ -25,6 +25,7 @@ export interface Task {
   title: string;
   description: string;
   priority: Priority;
+  sortIndex: number | null;
   createdAt: Date;
   deletedAt: Date | null;
   status: Status;
