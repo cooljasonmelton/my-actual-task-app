@@ -4,6 +4,7 @@ export type { Status, Task };
 
 export interface CreateTaskRequest {
   title: string;
+  status?: Status;
 }
 
 export interface UpdateTaskRequest {

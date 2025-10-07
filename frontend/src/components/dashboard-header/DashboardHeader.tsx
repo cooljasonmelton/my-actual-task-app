@@ -24,7 +24,11 @@ const DashboardHeader = ({
         onChange={onStatusChange}
         counts={statusCounts}
       />
-      <NewTaskContainer refreshTasks={refreshTasks} reportError={reportError} />
+      <NewTaskContainer
+        refreshTasks={refreshTasks}
+        reportError={reportError}
+        selectedStatus={selectedStatus}
+      />
     </div>
   );
 };

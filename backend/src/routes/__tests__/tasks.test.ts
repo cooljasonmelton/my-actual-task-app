@@ -2,13 +2,14 @@ import request from 'supertest';
 import type { Application } from 'express';
 import type Database from 'better-sqlite3';
 import { beforeAll, afterAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Status } from '../../database/types';
 
 let app: Application;
 let db: Database.Database;
 let statements: typeof import('../../database/db').statements;
 
-const insertTask = (title: string) => {
-  const result = statements.insertTask.run(title);
+const insertTask = (title: string, status: Status = 'next') => {
+  const result = statements.insertTask.run(title, status);
   return Number(result.lastInsertRowid);
 };
 
@@ -133,3 +134,16 @@ describe('Tasks routes', () => {
     expect(task.status).toBe('dates');
   });
 });
+  it('creates a task with the provided status', async () => {
+    const response = await request(app)
+      .post('/tasks')
+      .send({ title: 'Status-aware task', status: 'ongoing' });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({ status: 'ongoing' });
+
+    const record = db
+      .prepare('SELECT status FROM tasks WHERE id = ?')
+      .get(response.body.id) as { status: string } | undefined;
+    expect(record?.status).toBe('ongoing');
+  });

@@ -149,8 +149,8 @@ const mapDbTaskToTask = (row: DbTaskRow): Task => {
 
 export const statements: { [k: string]: Database.Statement } = {
   insertTask: db.prepare(`
-        INSERT INTO tasks (title) 
-        VALUES (?)
+        INSERT INTO tasks (title, status) 
+        VALUES (?, ?)
     `),
   selectActiveTasks: db.prepare(`
         SELECT * FROM tasks 
@@ -203,7 +203,8 @@ export const taskQueries = {
   },
 
   create: (TaskData: CreateTaskRequest): { id: number } => {
-    const result = statements.insertTask.run(TaskData.title);
+    const status: Status = TaskData.status ?? "next";
+    const result = statements.insertTask.run(TaskData.title, status);
     return { id: result.lastInsertRowid as number };
   },
 

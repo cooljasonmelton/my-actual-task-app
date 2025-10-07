@@ -36,10 +36,11 @@ export const useReferenceWindow = (now: Date = defaultNow()) => {
     () => getReferenceWindowStart(now),
     [now.getTime()]
   );
+  const referenceWindowStartMs = referenceWindowStart.getTime();
 
   const isInCurrentReferenceWindow = useCallback(
     (date: Date) => areDatesInSameReferenceWindow(date, referenceWindowStart),
-    [referenceWindowStart.getTime()]
+    [referenceWindowStartMs]
   );
 
   return { referenceWindowStart, isInCurrentReferenceWindow };

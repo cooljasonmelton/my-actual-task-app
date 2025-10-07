@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import Button from "../../design-system-components/button/Button";
 import InputField from "../../design-system-components/form/InputField";
 import Form from "../../design-system-components/form/Form";
+import type { Status } from "../../../types";
 
 import "./NewTaskContainer.css";
 
@@ -14,9 +15,11 @@ const INPUT_TEXT = "add new task";
 const NewTaskContainer = ({
   refreshTasks,
   reportError,
+  selectedStatus,
 }: {
   refreshTasks: () => Promise<void>;
   reportError: Dispatch<SetStateAction<string | null>>;
+  selectedStatus: Status;
 }) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +38,7 @@ const NewTaskContainer = ({
       const res = await fetch(TASKS_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, status: selectedStatus }),
       });
 
       if (!res.ok) throw new Error("Failed to add task");

@@ -1,8 +1,20 @@
 import { Router, Request, Response } from "express";
 import { taskQueries } from "../database/db";
 import { CreateTaskRequest, UpdateTaskRequest } from "../database/types";
-import type { Priority } from "../../../shared/types/task";
+import type { Priority, Status } from "../../../shared/types/task";
 import { asyncHandler, ApiError } from "../middleware/errorHandler";
+
+const VALID_STATUSES: Status[] = [
+  "next",
+  "dates",
+  "ongoing",
+  "get",
+  "backburner",
+  "finished",
+];
+
+const isValidStatus = (value: unknown): value is Status =>
+  typeof value === "string" && VALID_STATUSES.includes(value as Status);
 
 const router = Router();
 
@@ -53,7 +65,7 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const { title }: CreateTaskRequest = req.body;
+    const { title, status }: CreateTaskRequest = req.body;
 
     if (!title) {
       const error: ApiError = new Error("Title is required");
@@ -61,9 +73,13 @@ router.post(
       throw error;
     }
 
+    const normalizedStatus: Status = isValidStatus(status)
+      ? status
+      : "next";
+
     try {
-      const { id } = taskQueries.create({ title });
-      res.status(201).json({ id, title });
+      const { id } = taskQueries.create({ title, status: normalizedStatus });
+      res.status(201).json({ id, title, status: normalizedStatus });
     } catch (dbError: any) {
       const error: ApiError = new Error(
         "Failed to create title: " + dbError.message
@@ -175,7 +191,7 @@ router.delete(
       throw error;
     }
 
-    res.status(204).send();
+  res.status(204).send();
   })
 );
 
