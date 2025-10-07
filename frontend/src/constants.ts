@@ -2,12 +2,12 @@ import type { StatusSectionTabItem } from "./types";
 
 export const STATUS_SECTION_TAB_ITEMS: StatusSectionTabItem[] = [
   {
-    cta: "Next",
-    value: "next",
-  },
-  {
     cta: "Dates",
     value: "dates",
+  },
+  {
+    cta: "Next",
+    value: "next",
   },
   {
     cta: "Ongoing",
