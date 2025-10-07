@@ -73,4 +73,46 @@ describe('Tasks routes', () => {
       .get(taskId) as { deleted_at: string | null } | undefined;
     expect(record?.deleted_at).not.toBeNull();
   });
+
+  it('updates a task priority via PATCH /tasks/:id/priority', async () => {
+    const taskId = insertTask('Task to prioritize');
+
+    const response = await request(app)
+      .patch(`/tasks/${taskId}/priority`)
+      .send({ priority: 1 });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: taskId, priority: 1 });
+
+    const record = db
+      .prepare('SELECT priority FROM tasks WHERE id = ?')
+      .get(taskId) as { priority: number } | undefined;
+    expect(record?.priority).toBe(1);
+  });
+
+  it('rejects invalid priority updates', async () => {
+    const taskId = insertTask('Task with invalid priority request');
+
+    const response = await request(app)
+      .patch(`/tasks/${taskId}/priority`)
+      .send({ priority: 42 });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('orders tasks by ascending priority', async () => {
+    const highPriorityId = insertTask('High priority');
+    const lowerPriorityId = insertTask('Lower priority');
+
+    db.prepare('UPDATE tasks SET priority = ? WHERE id = ?')
+      .run(2, highPriorityId);
+    db.prepare('UPDATE tasks SET priority = ? WHERE id = ?')
+      .run(4, lowerPriorityId);
+
+    const response = await request(app).get('/tasks');
+
+    expect(response.status).toBe(200);
+    const ids = response.body.map((task: any) => task.id);
+    expect(ids.indexOf(highPriorityId)).toBeLessThan(ids.indexOf(lowerPriorityId));
+  });
 });

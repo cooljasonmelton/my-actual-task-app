@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { taskQueries } from "../database/db";
 import { CreateTaskRequest, UpdateTaskRequest } from "../database/types";
+import type { Priority } from "../../../shared/types/task";
 import { asyncHandler, ApiError } from "../middleware/errorHandler";
 
 const router = Router();
@@ -102,6 +103,55 @@ router.put(
     }
 
     res.json({ id, title });
+  })
+);
+
+router.patch(
+  "/:id/priority",
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = Number.parseInt(req.params.id, 10);
+    const { priority } = req.body as Pick<UpdateTaskRequest, "priority">;
+
+    if (Number.isNaN(id)) {
+      const error: ApiError = new Error("Invalid task ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (priority === undefined || priority === null) {
+      const error: ApiError = new Error("Priority is required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const parsedPriority = Number(priority);
+    const isValidPriority = Number.isInteger(parsedPriority) && parsedPriority >= 1 && parsedPriority <= 5;
+
+    if (!isValidPriority) {
+      const error: ApiError = new Error("Priority must be an integer between 1 and 5");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const normalizedPriority = parsedPriority as Priority;
+
+    const { changes } = taskQueries.updatePriority(id, normalizedPriority);
+
+    if (changes === 0) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const updatedTask = taskQueries.getById(id);
+
+    if (!updatedTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.json(updatedTask);
   })
 );
 
