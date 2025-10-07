@@ -1,6 +1,5 @@
 .task-container {
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto 4rem;
   width: 75%;
   padding: 0 2rem;
 
