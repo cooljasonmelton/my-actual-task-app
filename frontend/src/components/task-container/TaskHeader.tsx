@@ -88,7 +88,6 @@ const TaskHeader: TaskHeaderType = ({
     isSoftDeleted ? " task-title--soft-deleted" : ""
   }${isSoftDeletedToday ? " task-title--soft-deleted-today" : ""}`;
 
-  // TODO: remove priority when deleted
   const handleToggleStar = () => {
     if (isPriorityDisabled) {
       return;
