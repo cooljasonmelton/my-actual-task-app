@@ -38,6 +38,7 @@ const TaskHeader: TaskHeaderType = ({
     }
   }, [isSoftDeleted]);
 
+  // TODO: create delete button comp and move delete logic to comp
   const handleClickDelete = async () => {
     if (isDeleting || isSoftDeleted) {
       return;
@@ -58,6 +59,7 @@ const TaskHeader: TaskHeaderType = ({
     }
   };
 
+  // TODO: abstract and move to utils params: event, fn => conditions, fn()
   const handleKeyDown = (
     event: KeyboardEvent<SVGSVGElement>,
     action: "expand" | "delete" | "star"
