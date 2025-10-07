@@ -142,6 +142,7 @@ TODO: say something like this in main readme (above)?
 
 ## TODO
 
+- TODO: FE: slightly change styling for priority tasks
 - TODO: BE: Production: Fix CORS allowing all sites before ever pushing to production
 - TODO: FE: error handling and messaging on create task form
 - TODO: FE: better empty task section placeholder

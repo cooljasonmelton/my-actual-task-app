@@ -102,19 +102,17 @@ const TaskHeader: TaskHeaderType = ({
     <div className="task-header">
       <div className="task-title-wrapper">
         <Chevron
-          size={20}
           onClick={toggleExpanded}
           onKeyDown={(e) => handleKeyDown(e, "expand")}
-          className="task-header__chevron"
+          className="task-header__chevron task-header__icon"
           aria-label={isExpanded ? "Hide task details" : "Expand task details"}
           role="button"
           tabIndex={0}
         />
         <Star
-          size={20}
           onClick={handleToggleStar}
           onKeyDown={(e) => handleKeyDown(e, "star")}
-          className={isStarredClassName}
+          className={`${isStarredClassName} task-header__icon task-header__icon--star`}
           aria-label={isStarred ? "Unstar task" : "Star task"}
           role="button"
           tabIndex={isPriorityDisabled ? -1 : 0}
@@ -124,11 +122,10 @@ const TaskHeader: TaskHeaderType = ({
         <h3 className={titleClassName}>{title}</h3>
       </div>
       {!isSoftDeleted && (
-        <XCircle
-          size={20}
+      <XCircle
           onClick={handleClickDelete}
           onKeyDown={(e) => handleKeyDown(e, "delete")}
-          className={shouldDelete ? "filled-delete" : "empty-delete"}
+          className={`${shouldDelete ? "filled-delete" : "empty-delete"} task-header__icon`}
           aria-label={shouldDelete ? "Confirm delete task" : "Delete task"}
           role="button"
           aria-disabled={isDeleting}
