@@ -116,4 +116,20 @@ describe('Tasks routes', () => {
     const ids = response.body.map((task: any) => task.id);
     expect(ids.indexOf(highPriorityId)).toBeLessThan(ids.indexOf(lowerPriorityId));
   });
+
+  it('supports the expanded set of task statuses', async () => {
+    const taskId = insertTask('Task with custom status');
+
+    db.prepare('UPDATE tasks SET status = ? WHERE id = ?')
+      .run('dates', taskId);
+
+    const response = await request(app)
+      .get('/tasks')
+      .query({ includeDeleted: 'true' });
+
+    expect(response.status).toBe(200);
+    const task = response.body.find((item: any) => item.id === taskId);
+    expect(task).toBeTruthy();
+    expect(task.status).toBe('dates');
+  });
 });

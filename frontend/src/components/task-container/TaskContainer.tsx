@@ -3,7 +3,10 @@ import Task from "./Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
 import "./TaskContainer.css";
-import { DEFAULT_SECTION_TAB_ITEM } from "../../constants";
+import {
+  DEFAULT_SECTION_TAB_ITEM,
+  STATUS_SECTION_TAB_ITEMS,
+} from "../../constants";
 import {
   DEFAULT_TASK_SORT_OPTION,
   getNextPriority,
@@ -49,12 +52,14 @@ type DerivedTask = {
   isSoftDeletedToday: boolean;
 };
 
-const createEmptyBuckets = (): Record<Status, DerivedTask[]> => ({
-  next: [],
-  ongoing: [],
-  backburner: [],
-  finished: [],
-});
+const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
+
+const createEmptyBuckets = (): Record<Status, DerivedTask[]> => {
+  return STATUS_VALUES.reduce((acc, status) => {
+    acc[status] = [];
+    return acc;
+  }, {} as Record<Status, DerivedTask[]>);
+};
 
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -218,14 +223,12 @@ const TaskContainer = () => {
     return buckets;
   }, [derivedTasks]);
 
-  const statusCounts = useMemo<Record<Status, number>>(() => (
-    {
-      next: statusBuckets.next.length,
-      ongoing: statusBuckets.ongoing.length,
-      backburner: statusBuckets.backburner.length,
-      finished: statusBuckets.finished.length,
-    }
-  ), [statusBuckets]);
+  const statusCounts = useMemo<Record<Status, number>>(() => {
+    return STATUS_VALUES.reduce((acc, status) => {
+      acc[status] = statusBuckets[status]?.length ?? 0;
+      return acc;
+    }, {} as Record<Status, number>);
+  }, [statusBuckets]);
 
   const tasksForSelectedStatus = statusBuckets[selectedStatus];
 

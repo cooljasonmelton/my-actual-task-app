@@ -6,8 +6,16 @@ export const STATUS_SECTION_TAB_ITEMS: StatusSectionTabItem[] = [
     value: "next",
   },
   {
+    cta: "Dates",
+    value: "dates",
+  },
+  {
     cta: "Ongoing",
     value: "ongoing",
+  },
+  {
+    cta: "Get",
+    value: "get",
   },
   {
     cta: "Backburner",

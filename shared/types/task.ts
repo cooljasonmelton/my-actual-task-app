@@ -1,4 +1,10 @@
-export type Status = "next" | "ongoing" | "backburner" | "finished";
+export type Status =
+  | "next"
+  | "dates"
+  | "ongoing"
+  | "get"
+  | "backburner"
+  | "finished";
 export type Priority = 1 | 2 | 3 | 4 | 5;
 
 export interface Tag {

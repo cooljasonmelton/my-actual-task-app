@@ -14,12 +14,83 @@ const db: Database.Database = new Database(dbPath);
 // Enable WAL mode for better performance
 db.pragma("journal_mode = WAL");
 
+const REQUIRED_STATUS_VALUES = [
+  "next",
+  "dates",
+  "ongoing",
+  "get",
+  "backburner",
+  "finished",
+];
+
+const createTasksTableSQL = `
+  CREATE TABLE tasks_new (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    priority INTEGER CHECK(priority IN (1, 2, 3, 4, 5)) NOT NULL DEFAULT 5,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    status TEXT CHECK(status IN ('next', 'dates', 'ongoing', 'get', 'backburner', 'finished')) NOT NULL DEFAULT 'next'
+  )
+`;
+
+const recreateTaskIndexesSQL = `
+  CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+  CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
+  CREATE INDEX IF NOT EXISTS idx_tasks_deleted_at ON tasks(deleted_at);
+  CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at);
+`;
+
+function migrateTasksTableStatusConstraint(): void {
+  const tableDefinition = db
+    .prepare(
+      "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'tasks'"
+    )
+    .get() as { sql: string } | undefined;
+
+  if (!tableDefinition?.sql) {
+    return;
+  }
+
+  const hasAllStatuses = REQUIRED_STATUS_VALUES.every((status) =>
+    tableDefinition.sql.includes(`'${status}'`)
+  );
+
+  if (hasAllStatuses) {
+    return;
+  }
+
+  db.exec(`
+    BEGIN TRANSACTION;
+    ${createTasksTableSQL};
+    INSERT INTO tasks_new (id, title, description, priority, created_at, deleted_at, status)
+    SELECT
+      id,
+      title,
+      description,
+      priority,
+      created_at,
+      deleted_at,
+      CASE
+        WHEN status IN ('next', 'dates', 'ongoing', 'get', 'backburner', 'finished') THEN status
+        ELSE 'next'
+      END as status
+    FROM tasks;
+    DROP TABLE tasks;
+    ALTER TABLE tasks_new RENAME TO tasks;
+    ${recreateTaskIndexesSQL}
+    COMMIT;
+  `);
+}
+
 function initializeDatabase(): void {
   const schemaSQL = fs.readFileSync(
     path.join(__dirname, "schema.sql"),
     "utf-8"
   );
   db.exec(schemaSQL);
+  migrateTasksTableStatusConstraint();
 }
 
 initializeDatabase();
