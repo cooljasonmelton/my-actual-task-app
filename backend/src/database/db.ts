@@ -5,9 +5,11 @@ import fs from "fs";
 import path from "path";
 import { CreateTaskRequest, Task, UpdateTaskRequest } from "./types";
 import type { Status, Priority } from "../../../shared/types/task";
+import { getDatabasePath } from "../config/databasePath";
 
-// Create or open database
-const db: Database.Database = new Database("database.db");
+// Create or open database using configurable path
+const dbPath = getDatabasePath({ ensureDir: true, warnOnTestFile: true });
+const db: Database.Database = new Database(dbPath);
 
 // Enable WAL mode for better performance
 db.pragma("journal_mode = WAL");
@@ -67,11 +69,11 @@ export const statements: { [k: string]: Database.Statement } = {
   selectActiveTasks: db.prepare(`
         SELECT * FROM tasks 
         WHERE deleted_at IS NULL 
-        ORDER BY priority DESC, created_at DESC
+        ORDER BY priority ASC, created_at DESC
     `),
   selectAllTasks: db.prepare(`
         SELECT * FROM tasks 
-        ORDER BY priority DESC, created_at DESC
+        ORDER BY priority ASC, created_at DESC
     `),
   selectTaskById: db.prepare(
     "SELECT * FROM tasks WHERE id = ? AND deleted_at IS NULL"
@@ -86,6 +88,9 @@ export const statements: { [k: string]: Database.Statement } = {
         SET title = ?, description = ?, priority = ?, status = ? 
         WHERE id = ? AND deleted_at IS NULL
     `),
+  updateTaskPriority: db.prepare(
+    "UPDATE tasks SET priority = ? WHERE id = ? AND deleted_at IS NULL"
+  ),
   softDeleteTask: db.prepare(
     "UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL"
   ),
@@ -119,6 +124,14 @@ export const taskQueries = {
   // TODO: update so tasks can update all fields and not just title
   update: (id: number, TaskData: UpdateTaskRequest): { changes: number } => {
     const result = statements.updateTask.run(TaskData.title, id);
+    return { changes: result.changes };
+  },
+
+  updatePriority: (
+    id: number,
+    priority: Task["priority"]
+  ): { changes: number } => {
+    const result = statements.updateTaskPriority.run(priority, id);
     return { changes: result.changes };
   },
 
