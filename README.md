@@ -70,6 +70,19 @@ npm run db:backup:dev --prefix backend
 npm run db:sync --prefix backend
 ```
 
+## ℹ️ Useful Scripts
+
+```bash
+# Use app locally with personal database
+npm run use:all
+
+# Run app locally with dev database
+npm run dev:all
+
+# Run frontend and backend tests
+npm run dev:all
+```
+
 ## 🧭 Project Structure
 
 - `frontend/` – React application, task container logic, drag-and-drop utilities, dashboard header, design-system components, Vitest tests.
@@ -79,10 +92,26 @@ npm run db:sync --prefix backend
 
 ## 🔭 Roadmap & Wishlist
 
-- Rich-text task descriptions and tag management.
+### short term
+
+- Rich-text task descriptions
+- Tag management and sorting
+- Double click task title to edit
+- Restore soft-deleted tasks, permantely delete soft-deleted tasks
+- Subtasks for breaking big tasks into steps
 - Drag-and-drop reassignment between sections (drop onto tab to move status).
-- Background job to auto-flip soft-deleted tasks into the `finished` bucket at day’s end.
-- More analytics around productivity trends (streaks, bursts, etc.).
+- Sort (asc/desc) and filter by tag, created date, priority
+
+### long term
+
+- Search bar for tasks
+- Analytics around productivity trends
+- AI ADHD helpers to help give suggestions on tasks, brainstorm, keep focused, etc
+- Animnations for creating task, completing task, or completing X number of tasks (rewards)
+- Scratch pad for some quick notes
+- Quick tasks list or quick view similar to momentum extension todo list?
+- Stale tasks - if date is greater than X, style task to indicate stale
+- First app open of day, prompt user to review tasks in 'next' and setup days goals (cookies or storage)
 
 ---
 
@@ -90,105 +119,7 @@ npm run db:sync --prefix backend
 
 # JUNKYARD / NOTES
 
-# my-actual-task-app
-
-## USING APP
-
-run app for personal use
-
-```
-npm run use:all
-```
-
-start all with dev db
-
-```
-npm run dev:all
-```
-
-## TODO
-
-PRODUCTION NOTE:
-
-- BE: Fix CORS before every pushing to production
-
-### FRONTEND
-
-- React
-- colors: https://coolors.co/111827-1f2937-ff2d95-39ff14-ffef00-00bfff-f5f5f5-a3a3a3-000000
-
-- TODO: FE: figure out rich text for description
-- TODO: BE: figure out how to have a BE job that sets 'status' of all tasks with 'deletedAt' to 'finished' overnight so finished tasks exist on todo list and can be un-deleted from same status list until end of day
-- TODO: FE: drag and drop - to change order of tasks OR drop on section button to update status of task to move it to that container
-- TODO: FE: animation on submit new task, complete task
-- TODO: FE: move all text to conts at top of file
-
-#### features
-
-- Nav
-
-  - Name / Logo /
-    - ? Redirects to home or refreshes dashboard call?
-  - Keep Awake button - feature clicking keeps browser from going to sleep
-
-- Header
-
-  - X Create task form input and button
-
-    - Hook up logic for save new task
-    - error handling for form
-
-  - Filter buttons
-
-    - Filter / Sort by:
-
-      - Search tasks (filter by search terms)
-      - Filter by status
-      - Date created or reverse (newest first or oldest first)
-      - Priority
-      - ? alphabetical
-
-    - Number of tasks in each filter like "Next [2]"
-
-<!--  -->
-
-# TODO FILTERING
-
-- For MVP, filter tasks on FE
-- Later, implement adaptative filtering:
-  - When a user has > 2000 tasks, pull tasks from BE instead of FE
-    - get task count and check > 2000
-      - if <2000, use frontend filtering
-      - if >2000, fetch get `/api/tasks?status=${status}`
-
-<!--  -->
-
-- Tasks
-
-  - Title, Priority Star, Hide/show rest
-  - Rich Text Description (optional)
-  - Display Subtasks (optional)
-  - Display Tags (optional)
-  - Reorder tasks drag and drop
-  - Placeholder screen when no tasks
-
-- Subtasks
-
-  - Display
-  - Order
-  - Reorder subtasks drag and drop
-
-- Tags
-
-  - Display
-  - Create when adding to task: name, color (later)
-
--
-
-### BACKEND
-
-- Node.js + Express + SQLite with better-sqlite3
--
+TODO: say something like this in main readme (above)?
 
 #### Environment profiles & databases
 
@@ -208,6 +139,44 @@ PRODUCTION NOTE:
   - anything else → `backend/database.db`
 - Sync the personal DB into the dev DB anytime with `npm run db:sync --prefix backend`. Pass `--from`/`--to` (or `--from-path`/`--to-path`) if you need custom sources.
 - Tests always run against an in-memory database; they no longer mutate the files from your personal profile.
+
+## TODO
+
+- TODO: BE: Production: Fix CORS allowing all sites before ever pushing to production
+- TODO: FE: error handling and messaging on create task form
+- TODO: FE: better empty task section placeholder
+
+### FRONTEND NOTES
+
+- colors: https://coolors.co/111827-1f2937-ff2d95-39ff14-ffef00-00bfff-f5f5f5-a3a3a3-000000
+
+# TODO FILTERING
+
+- For MVP, filter tasks on FE
+- Later, implement adaptative filtering:
+
+  - When a user has > 2000 tasks, pull tasks from BE instead of FE
+    - get task count and check > 2000
+      - if <2000, use frontend filtering
+      - if >2000, fetch get `/api/tasks?status=${status}`
+
+- Tasks
+
+  - Rich Text Description (optional)
+  - Display Subtasks (optional)
+  - Display Tags (optional)
+  - Placeholder screen when no tasks
+
+- Subtasks
+
+  - Display
+  - Order
+  - Reorder subtasks drag and drop
+
+- Tags
+
+  - Display
+  - Create when adding to task: name, color (later)
 
 #### models
 
@@ -238,12 +207,3 @@ type Task = {
   sortIndex: number // ?
 };
 ```
-
-## OTHER FEATURE IDEAS
-
-- scratch pad for some quick notes
-- quick todo list or quick view similar to momentum extension todo list
-- first open of day, prompt user to review todos in 'next'
-  - store 'last opened' date in cookie or local storage
-  - compare date on mount, if new date, open modal of current todos with option to delete each
-  - comfirm button overwrites date in storage to new date
