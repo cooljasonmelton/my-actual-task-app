@@ -4,6 +4,12 @@ import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
 import "./TaskContainer.css";
 import { DEFAULT_SECTION_TAB_ITEM } from "../../constants";
+import {
+  DEFAULT_TASK_SORT_OPTION,
+  getNextPriority,
+  sortTasks,
+} from "../../utils/taskSorting";
+import type { TaskSortOption } from "../../utils/taskSorting";
 
 const TASKS_API_URL = "http://localhost:3000/tasks";
 
@@ -57,6 +63,10 @@ const TaskContainer = () => {
   const [selectedStatus, setSelectedStatus] = useState<Status>(
     DEFAULT_SECTION_TAB_ITEM
   );
+  const [updatingPriorities, setUpdatingPriorities] = useState<Set<number>>(
+    () => new Set()
+  );
+  const sortOption: TaskSortOption = DEFAULT_TASK_SORT_OPTION;
 
   const loadTasks = useCallback(async () => {
     setIsLoading(true);
@@ -71,7 +81,7 @@ const TaskContainer = () => {
       const parsedTasks = Array.isArray(data)
         ? (data as ApiTask[]).map(parseTaskFromApi)
         : [];
-      setTasks(parsedTasks);
+      setTasks(sortTasks(parsedTasks, sortOption));
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "An unknown error occurred";
@@ -79,7 +89,7 @@ const TaskContainer = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [sortOption]);
 
   useEffect(() => {
     void loadTasks();
@@ -106,6 +116,73 @@ const TaskContainer = () => {
       }
     },
     [loadTasks]
+  );
+
+  const handleTogglePriority = useCallback(
+    async (id: TaskType["id"], currentPriority: TaskType["priority"]) => {
+      setError(null);
+
+      let shouldSkip = false;
+
+      setUpdatingPriorities((prev) => {
+        if (prev.has(id)) {
+          shouldSkip = true;
+          return prev;
+        }
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
+
+      if (shouldSkip) {
+        return;
+      }
+
+      const nextPriority = getNextPriority(currentPriority);
+
+      try {
+        const response = await fetch(`${TASKS_API_URL}/${id}/priority`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ priority: nextPriority }),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to update task priority (${response.status})`
+          );
+        }
+
+        const data = (await response.json()) as ApiTask;
+        const updatedTask = parseTaskFromApi(data);
+
+        setTasks((previousTasks) =>
+          sortTasks(
+            previousTasks.map((task) =>
+              task.id === id ? updatedTask : task
+            ),
+            sortOption
+          )
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setUpdatingPriorities((prev) => {
+          if (!prev.has(id)) {
+            return prev;
+          }
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    },
+    [sortOption]
   );
 
   const referenceWindowStart = getReferenceWindowStart(new Date());
@@ -159,13 +236,16 @@ const TaskContainer = () => {
       );
     }
 
-    return tasksForSelectedStatus.map(({ task, isSoftDeleted, isSoftDeletedToday }) => (
+    return tasksForSelectedStatus.map(
+      ({ task, isSoftDeleted, isSoftDeletedToday }) => (
         <Task
           key={task.id}
           task={task}
           onDelete={handleDeleteTask}
+          onTogglePriority={handleTogglePriority}
           isSoftDeleted={isSoftDeleted}
           isSoftDeletedToday={isSoftDeletedToday}
+          isPriorityUpdating={updatingPriorities.has(task.id)}
         />
       )
     );

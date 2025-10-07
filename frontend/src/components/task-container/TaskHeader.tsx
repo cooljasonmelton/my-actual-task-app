@@ -7,14 +7,15 @@ import "./TaskHeader.css";
 const TaskHeader: TaskHeaderType = ({
   taskId,
   title,
+  priority,
   isExpanded,
   toggleExpanded,
   onDelete,
+  onTogglePriority,
   isSoftDeleted,
   isSoftDeletedToday,
+  isPriorityUpdating,
 }) => {
-  // TODO: move starred to api call and debounce
-  const [isStarred, setIsStarred] = useState(false);
   const [shouldDelete, setShouldDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -59,7 +60,7 @@ const TaskHeader: TaskHeaderType = ({
 
   const handleKeyDown = (
     event: KeyboardEvent<SVGSVGElement>,
-    action: "expand" | "delete"
+    action: "expand" | "delete" | "star"
   ) => {
     if (event.key !== "Enter" && event.key !== " ") {
       return;
@@ -73,13 +74,30 @@ const TaskHeader: TaskHeaderType = ({
     if (action === "delete" && !isSoftDeleted) {
       void handleClickDelete();
     }
+
+    if (action === "star") {
+      handleToggleStar();
+    }
   };
 
   const Chevron = isExpanded ? ChevronDown : ChevronRight;
+  const isStarred = priority === 1;
+  const isPriorityDisabled = isPriorityUpdating || isSoftDeleted;
   const isStarredClassName = isStarred ? "filled-star" : "empty-star";
   const titleClassName = `task-title${
     isSoftDeleted ? " task-title--soft-deleted" : ""
   }${isSoftDeletedToday ? " task-title--soft-deleted-today" : ""}`;
+
+  // TODO: remove priority when deleted
+  const handleToggleStar = () => {
+    if (isPriorityDisabled) {
+      return;
+    }
+
+    void onTogglePriority(taskId, priority).catch((error) => {
+      console.error("Failed to update task priority", error);
+    });
+  };
 
   return (
     <div className="task-header">
@@ -95,11 +113,13 @@ const TaskHeader: TaskHeaderType = ({
         />
         <Star
           size={20}
-          onClick={() => setIsStarred(!isStarred)}
+          onClick={handleToggleStar}
+          onKeyDown={(e) => handleKeyDown(e, "star")}
           className={isStarredClassName}
           aria-label={isStarred ? "Unstar task" : "Star task"}
           role="button"
-          tabIndex={0}
+          tabIndex={isPriorityDisabled ? -1 : 0}
+          aria-disabled={isPriorityDisabled}
         />
         {/* TODO: make headings semantic */}
         <h3 className={titleClassName}>{title}</h3>
