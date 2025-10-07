@@ -1,3 +1,96 @@
+<!-- Portfolio Overview -->
+
+# My Actual Task App
+
+My Actual Task App is a full-stack productivity dashboard I’m building to keep my day organised. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights the tasks I care about (priority stars, flexible status buckets), lets me soft delete without losing data, and even keeps my browser awake when I’m in focus mode.
+
+## ✨ Highlights
+
+- **Priority-Driven Workflow** – Toggle the star to mark a task as urgent. The UI sorts by priority and reflects the change instantly while the backend keeps everything in sync.
+- **Rich Status Buckets** – Tasks flow between `next`, `dates`, `ongoing`, `get`, `backburner`, and `finished`, with live counts surfaced in the dashboard header.
+- **Soft Delete Safety Net** – Deleted tasks move to an archival state and drop to low priority instead of disappearing outright.
+- **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
+- **Quality of Life Utilities** – Wake-lock toggle, keyboard accessibility, ref-focused forms, and automated tests (Vitest) on both sides of the stack.
+
+## 🛠️ Tech Stack
+
+| Layer    | Technologies                                                              |
+| -------- | ------------------------------------------------------------------------- |
+| Frontend | React 19, TypeScript, Vite, lucide-react, custom design system components |
+| Backend  | Node.js, Express, better-sqlite3, TypeScript                              |
+| Tooling  | Vitest, Testing Library, ts-node, nodemon                                 |
+| Scripts  | AppleScript helpers to launch FE/BE together, DB backup & sync utilities  |
+
+## 🚀 Getting Started
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/<your-username>/my-actual-task-app.git
+cd my-actual-task-app
+npm install
+```
+
+### 2. Configure Environments
+
+```bash
+cp backend/.env.personal.example backend/.env.personal
+cp backend/.env.development.example backend/.env.development
+```
+
+- Adjust `DATABASE_PATH` or other env vars if you want custom locations.
+- Personal and development profiles resolve to different SQLite files by default.
+
+### 3. Run the App
+
+```bash
+# Personal profile (uses your real daily tasks)
+npm run use:all
+
+# Development profile (safe sandbox to experiment)
+npm run dev:all
+```
+
+The scripts open two Terminal tabs: one for the Vite dev server and one for the Express backend with the correct `APP_ENV` wired in.
+
+### 4. Utilities & Scripts
+
+```bash
+# Run full test suite
+npm run test:all
+
+# Backend-only / Frontend-only tests
+npm run backend:test
+npm run test --prefix frontend
+
+# Create timestamped DB backups
+npm run db:backup:personal --prefix backend
+npm run db:backup:dev --prefix backend
+
+# Sync personal tasks into the dev database
+npm run db:sync --prefix backend
+```
+
+## 🧭 Project Structure
+
+- `frontend/` – React application, task container logic, dashboard header, design-system components, Vitest tests.
+- `backend/` – Express API, SQLite integration, migrations, route tests, scripts for backups/sync.
+- `shared/` – Source of truth for TypeScript types shared across both sides.
+- `package.json` (root) – Convenience scripts to orchestrate both apps simultaneously.
+
+## 🔭 Roadmap & Wishlist
+
+- Rich-text task descriptions and tag management.
+- Drag-and-drop reordering with drop targets in the status header.
+- Background job to auto-flip soft-deleted tasks into the `finished` bucket at day’s end.
+- More analytics around productivity trends (streaks, bursts, etc.).
+
+---
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+# JUNKYARD / NOTES
+
 # my-actual-task-app
 
 ## USING APP
