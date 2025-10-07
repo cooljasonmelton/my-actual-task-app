@@ -1,9 +1,0 @@
-.task {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.task--soft-deleted {
-  opacity: 0.6;
-}
