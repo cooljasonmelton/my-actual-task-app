@@ -79,7 +79,12 @@ router.post(
 
     try {
       const { id } = taskQueries.create({ title, status: normalizedStatus });
-      res.status(201).json({ id, title, status: normalizedStatus });
+      const createdTask = taskQueries.getById(id);
+      res
+        .status(201)
+        .json(
+          createdTask ?? { id, title, status: normalizedStatus }
+        );
     } catch (dbError: any) {
       const error: ApiError = new Error(
         "Failed to create title: " + dbError.message
@@ -119,6 +124,59 @@ router.put(
     }
 
     res.json({ id, title });
+  })
+);
+
+router.patch(
+  "/reorder",
+  asyncHandler(async (req: Request, res: Response) => {
+    const { status, orderedTaskIds } = req.body as {
+      status?: Status;
+      orderedTaskIds?: unknown;
+    };
+
+    if (!status || !isValidStatus(status)) {
+      const error: ApiError = new Error("A valid status is required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (status === "finished") {
+      const error: ApiError = new Error(
+        "Reordering is not supported for finished tasks"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!Array.isArray(orderedTaskIds) || orderedTaskIds.length === 0) {
+      const error: ApiError = new Error(
+        "orderedTaskIds must be a non-empty array"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const taskIds = orderedTaskIds.map((id) => Number.parseInt(String(id), 10));
+    if (taskIds.some((id) => Number.isNaN(id))) {
+      const error: ApiError = new Error(
+        "orderedTaskIds must contain only integers"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const { updated } = taskQueries.updateSortOrder(status, taskIds);
+
+    if (updated !== taskIds.length) {
+      const error: ApiError = new Error(
+        "One or more tasks could not be reordered"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    res.status(204).send();
   })
 );
 
