@@ -7,7 +7,7 @@ My Actual Task App is a full-stack productivity dashboard I’m building to keep
 - **Priority-Driven Workflow** – Toggle the star to mark a task as urgent. The UI sorts by priority and reflects the change instantly while the backend keeps everything in sync.
 - **Rich Status Buckets** – Tasks flow between `next`, `dates`, `ongoing`, `get`, `backburner`, and `finished`, with live counts surfaced in the dashboard header.
 - **Soft Delete Safety Net** – Deleted tasks move to an archival state and drop to low priority instead of disappearing outright.
-- **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column; changes persist instantly and play nicely with priority-driven sorting.
+- **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column; changes persist instantly for priority-driven sorting.
 - **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
 - **Quality of Life Utilities** – Wake-lock toggle, keyboard accessibility, ref-focused forms, and automated tests (Vitest) on both sides of the stack.
 
