@@ -112,7 +112,7 @@ const TaskHeader: TaskHeaderType = ({
         <Star
           onClick={handleToggleStar}
           onKeyDown={(e) => handleKeyDown(e, "star")}
-          className={`${isStarredClassName} task-header__icon task-header__icon--star`}
+          className={`${isStarredClassName} task-header__icon--star`}
           aria-label={isStarred ? "Unstar task" : "Star task"}
           role="button"
           tabIndex={isPriorityDisabled ? -1 : 0}
@@ -122,10 +122,12 @@ const TaskHeader: TaskHeaderType = ({
         <h3 className={titleClassName}>{title}</h3>
       </div>
       {!isSoftDeleted && (
-      <XCircle
+        <XCircle
           onClick={handleClickDelete}
           onKeyDown={(e) => handleKeyDown(e, "delete")}
-          className={`${shouldDelete ? "filled-delete" : "empty-delete"} task-header__icon`}
+          className={`${
+            shouldDelete ? "filled-delete" : "empty-delete"
+          } task-header__icon`}
           aria-label={shouldDelete ? "Confirm delete task" : "Delete task"}
           role="button"
           aria-disabled={isDeleting}

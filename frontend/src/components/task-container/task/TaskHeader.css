@@ -20,7 +20,6 @@
   fill: var(--color-bg);
 }
 
-
 .task-header__chevron {
   fill: var(--color-text, #0f172a);
 }
@@ -60,4 +59,5 @@
 .task-header__icon--star {
   width: 1.375rem;
   height: 1.375rem;
+  flex-shrink: 0;
 }
