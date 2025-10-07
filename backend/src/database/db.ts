@@ -92,7 +92,7 @@ export const statements: { [k: string]: Database.Statement } = {
     "UPDATE tasks SET priority = ? WHERE id = ? AND deleted_at IS NULL"
   ),
   softDeleteTask: db.prepare(
-    "UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL"
+    "UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP, priority = 5 WHERE id = ? AND deleted_at IS NULL"
   ),
 
 };

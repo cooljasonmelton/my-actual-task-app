@@ -69,9 +69,10 @@ describe('Tasks routes', () => {
 
     expect(response.status).toBe(204);
     const record = db
-      .prepare('SELECT deleted_at FROM tasks WHERE id = ?')
-      .get(taskId) as { deleted_at: string | null } | undefined;
+      .prepare('SELECT deleted_at, priority FROM tasks WHERE id = ?')
+      .get(taskId) as { deleted_at: string | null; priority: number } | undefined;
     expect(record?.deleted_at).not.toBeNull();
+    expect(record?.priority).toBe(5);
   });
 
   it('updates a task priority via PATCH /tasks/:id/priority', async () => {
