@@ -9,6 +9,11 @@
   gap: 1rem;
 }
 
+.task-container--reordering {
+  border: 1px dashed var(--color-border, #cbd5f5);
+  border-radius: 0.75rem;
+}
+
 .task-container__error,
 .task-container__loading,
 .task-container__empty {

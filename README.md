@@ -234,6 +234,7 @@ type Task = {
   status: "next" | "ongoing" | "backburner" | "finished";
   tags: Tag[];
   subtasks: Subtasks[];
+  sortIndex: number // ?
 };
 ```
 

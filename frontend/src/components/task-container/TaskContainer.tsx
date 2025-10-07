@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Task from "./Task";
+import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
-import "./TaskContainer.css";
+import type { ApiTask, DerivedTask } from "./types";
+import type { TaskSortOption } from "../../utils/taskSorting";
 import {
   DEFAULT_SECTION_TAB_ITEM,
   STATUS_SECTION_TAB_ITEMS,
@@ -12,39 +13,14 @@ import {
   getNextPriority,
   sortTasks,
 } from "../../utils/taskSorting";
-import type { TaskSortOption } from "../../utils/taskSorting";
-import {
-  parseReferenceWindowDate,
-  useReferenceWindow,
-} from "../../hooks/useReferenceWindow";
+import { useTaskDragAndDrop } from "../../utils/taskDragAndDrop";
+import { useReferenceWindow } from "../../hooks/useReferenceWindow";
+import { parseTaskFromApi, createEmptyBuckets } from "./taskContainerUtils";
+
+import "./TaskContainer.css";
 
 const TASKS_API_URL = "http://localhost:3000/tasks";
-
-type ApiTask = Omit<TaskType, "createdAt" | "deletedAt"> & {
-  createdAt: string | Date;
-  deletedAt: string | Date | null;
-};
-
-const parseTaskFromApi = (task: ApiTask): TaskType => ({
-  ...task,
-  createdAt: parseReferenceWindowDate(task.createdAt),
-  deletedAt: task.deletedAt ? parseReferenceWindowDate(task.deletedAt) : null,
-});
-
-type DerivedTask = {
-  task: TaskType;
-  isSoftDeleted: boolean;
-  isSoftDeletedToday: boolean;
-};
-
 const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
-
-const createEmptyBuckets = (): Record<Status, DerivedTask[]> => {
-  return STATUS_VALUES.reduce((acc, status) => {
-    acc[status] = [];
-    return acc;
-  }, {} as Record<Status, DerivedTask[]>);
-};
 
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -150,9 +126,7 @@ const TaskContainer = () => {
 
         setTasks((previousTasks) =>
           sortTasks(
-            previousTasks.map((task) =>
-              task.id === id ? updatedTask : task
-            ),
+            previousTasks.map((task) => (task.id === id ? updatedTask : task)),
             sortOption
           )
         );
@@ -175,6 +149,55 @@ const TaskContainer = () => {
     [sortOption]
   );
 
+  const persistReorder = useCallback(
+    async (status: Status, orderedIds: number[]) => {
+      if (orderedIds.length === 0) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${TASKS_API_URL}/reorder`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+            orderedTaskIds: orderedIds,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to reorder tasks (${response.status})`);
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        await loadTasks();
+        setError(message);
+      }
+    },
+    [loadTasks]
+  );
+
+  const {
+    draggingTask,
+    dragOverTaskId,
+    handleDragStart,
+    handleDragEnter,
+    handleDragOver,
+    handleDragLeave,
+    handleDragEnd,
+    handleDropOnTask,
+    handleContainerDragOver,
+    handleDropOnContainer,
+  } = useTaskDragAndDrop({
+    sortOption,
+    selectedStatus,
+    setTasks,
+    persistReorder,
+  });
+
   const { isInCurrentReferenceWindow } = useReferenceWindow();
   const derivedTasks = useMemo<DerivedTask[]>(() => {
     return tasks.map((task) => {
@@ -193,7 +216,7 @@ const TaskContainer = () => {
   }, [tasks, isInCurrentReferenceWindow]);
 
   const statusBuckets = useMemo(() => {
-    const buckets = createEmptyBuckets();
+    const buckets = createEmptyBuckets(STATUS_VALUES);
 
     derivedTasks.forEach((item) => {
       const { task, isSoftDeleted, isSoftDeletedToday } = item;
@@ -234,10 +257,26 @@ const TaskContainer = () => {
           isSoftDeleted={isSoftDeleted}
           isSoftDeletedToday={isSoftDeletedToday}
           isPriorityUpdating={updatingPriorities.has(task.id)}
+          draggable={!isSoftDeleted && selectedStatus !== "finished"}
+          isDragging={draggingTask?.id === task.id}
+          isDragOver={dragOverTaskId === task.id}
+          onDragStart={handleDragStart}
+          onDragEnter={handleDragEnter}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDragEnd={handleDragEnd}
+          onDrop={handleDropOnTask}
         />
       )
     );
   };
+
+  const isDraggingInSelectedStatus = Boolean(
+    draggingTask && draggingTask.status === selectedStatus
+  );
+  const taskContainerClassName = `task-container${
+    isDraggingInSelectedStatus ? " task-container--reordering" : ""
+  }`;
 
   return (
     <>
@@ -249,7 +288,11 @@ const TaskContainer = () => {
         statusCounts={statusCounts}
       />
 
-      <div className="task-container">
+      <div
+        className={taskContainerClassName}
+        onDragOver={handleContainerDragOver}
+        onDrop={handleDropOnContainer}
+      >
         {error && <p className="task-container__error">{error}</p>}
         {isLoading ? (
           <p className="task-container__loading">Loading tasks…</p>
