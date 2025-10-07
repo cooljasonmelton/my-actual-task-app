@@ -10,7 +10,13 @@
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node server.ts",
     "dev:watch": "nodemon --exec ts-node --watch src server.ts",
-    "clean": "rm -rf dist"
+    "dev:personal": "APP_ENV=personal npm run dev",
+    "dev:dev": "APP_ENV=development npm run dev",
+    "clean": "rm -rf dist",
+    "db:backup": "ts-node scripts/backup-db.ts",
+    "db:backup:personal": "APP_ENV=personal npm run db:backup",
+    "db:backup:dev": "APP_ENV=development npm run db:backup",
+    "db:sync": "ts-node scripts/sync-db.ts"
   },
   "keywords": [],
   "author": "",

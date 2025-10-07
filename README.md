@@ -1,5 +1,19 @@
 # my-actual-task-app
 
+## USING APP
+
+run app for personal use
+
+```
+npm run use:all
+```
+
+start all with dev db
+
+```
+npm run dev:all
+```
+
 ## TODO
 
 PRODUCTION NOTE:
@@ -83,6 +97,25 @@ PRODUCTION NOTE:
 
 - Node.js + Express + SQLite with better-sqlite3
 -
+
+#### Environment profiles & databases
+
+- Environment variables live under `backend/`. Copy the sample files to create real configs:
+  - `cp backend/.env.development.example backend/.env.development`
+  - `cp backend/.env.personal.example backend/.env.personal`
+- Set `APP_ENV` to choose which file to load. Example commands:
+  - `npm run dev:dev --prefix backend` (uses `APP_ENV=development`)
+  - `npm run dev:personal --prefix backend` (uses `APP_ENV=personal`)
+  - `npm run db:backup:dev --prefix backend` / `npm run db:backup:personal --prefix backend`
+- Use the root scripts to launch both apps:
+  - `npm run use:all` → personal profile (`APP_ENV=personal`).
+  - `npm run dev:all` → development profile (`APP_ENV=development`).
+- Each environment can point at its own `DATABASE_PATH`. If you don’t set one, the defaults are:
+  - personal → `backend/data/tasks.personal.sqlite`
+  - development → `backend/data/tasks.dev.sqlite`
+  - anything else → `backend/database.db`
+- Sync the personal DB into the dev DB anytime with `npm run db:sync --prefix backend`. Pass `--from`/`--to` (or `--from-path`/`--to-path`) if you need custom sources.
+- Tests always run against an in-memory database; they no longer mutate the files from your personal profile.
 
 #### models
 
