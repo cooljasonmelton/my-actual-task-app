@@ -1,9 +1,9 @@
 // TODO: add tags, subtasks and joins for them to task
-
+// TODO: refactor for smaller file size
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
-import { CreateTaskRequest, Task, UpdateTaskRequest } from "./types";
+import { CreateTaskRequest, Task } from "./types";
 import type { Status, Priority } from "../../../shared/types/task";
 import { getDatabasePath } from "../config/databasePath";
 
@@ -90,9 +90,9 @@ function migrateTasksTableStatusConstraint(): void {
 
 const initializeSortIndexForStatus = db.transaction((status: Status) => {
   if (status === "finished") {
-    db.prepare(
-      "UPDATE tasks SET sort_index = NULL WHERE status = ?"
-    ).run(status);
+    db.prepare("UPDATE tasks SET sort_index = NULL WHERE status = ?").run(
+      status
+    );
     return;
   }
 
@@ -115,13 +115,15 @@ const initializeSortIndexForStatus = db.transaction((status: Status) => {
     updateSortIndex.run((index + 1) * SORT_INDEX_STEP, row.id);
   });
 
-  db.prepare("UPDATE tasks SET sort_index = NULL WHERE status = ? AND deleted_at IS NOT NULL").run(status);
+  db.prepare(
+    "UPDATE tasks SET sort_index = NULL WHERE status = ? AND deleted_at IS NOT NULL"
+  ).run(status);
 });
 
 function ensureTaskSortIndexColumn(): void {
-  const columns = db
-    .prepare("PRAGMA table_info(tasks)")
-    .all() as Array<{ name: string }>;
+  const columns = db.prepare("PRAGMA table_info(tasks)").all() as Array<{
+    name: string;
+  }>;
 
   const hasSortIndex = columns.some((column) => column.name === "sort_index");
   let columnWasAdded = false;
@@ -142,14 +144,16 @@ function ensureTaskSortIndexColumn(): void {
     ? REQUIRED_STATUS_VALUES
     : (
         db
-          .prepare(`
+          .prepare(
+            `
             SELECT DISTINCT status
             FROM tasks
             WHERE sort_index IS NULL
               AND status IS NOT NULL
               AND status <> 'finished'
               AND deleted_at IS NULL
-          `)
+          `
+          )
           .all() as Array<{ status: string }>
       ).map((row) => row.status);
 
@@ -256,11 +260,13 @@ export const statements: { [k: string]: Database.Statement } = {
         WHERE deleted_at IS NOT NULL
         ORDER BY deleted_at DESC
     `),
-  updateTask: db.prepare(`
+  updateTaskTitle: db.prepare(
+    `
         UPDATE tasks 
-        SET title = ?, description = ?, priority = ?, status = ? 
+        SET title = ?
         WHERE id = ? AND deleted_at IS NULL
-    `),
+    `
+  ),
   updateTaskPriority: db.prepare(
     "UPDATE tasks SET priority = ? WHERE id = ? AND deleted_at IS NULL"
   ),
@@ -294,7 +300,6 @@ export const statements: { [k: string]: Database.Statement } = {
       WHERE id = ? AND deleted_at IS NULL
     `
   ),
-
 };
 
 export const taskQueries = {
@@ -340,9 +345,8 @@ export const taskQueries = {
     return { id: result.lastInsertRowid as number };
   },
 
-  // TODO: update so tasks can update all fields and not just title
-  update: (id: number, TaskData: UpdateTaskRequest): { changes: number } => {
-    const result = statements.updateTask.run(TaskData.title, id);
+  updateTitle: (id: number, title: string): { changes: number } => {
+    const result = statements.updateTaskTitle.run(title, id);
     return { changes: result.changes };
   },
 
@@ -354,26 +358,27 @@ export const taskQueries = {
     return { changes: result.changes };
   },
 
-  updateSortOrder: (status: Status, orderedTaskIds: number[]): { updated: number } => {
+  updateSortOrder: (
+    status: Status,
+    orderedTaskIds: number[]
+  ): { updated: number } => {
     if (status === "finished") {
       return { updated: 0 };
     }
 
-    const applySortOrder = db.transaction(
-      (ids: number[]): number => {
-        let updated = 0;
-        ids.forEach((taskId, index) => {
-          const sortIndex = (index + 1) * SORT_INDEX_STEP;
-          const result = statements.updateTaskSortIndexWithinStatus.run(
-            sortIndex,
-            taskId,
-            status
-          );
-          updated += result.changes ?? 0;
-        });
-        return updated;
-      }
-    );
+    const applySortOrder = db.transaction((ids: number[]): number => {
+      let updated = 0;
+      ids.forEach((taskId, index) => {
+        const sortIndex = (index + 1) * SORT_INDEX_STEP;
+        const result = statements.updateTaskSortIndexWithinStatus.run(
+          sortIndex,
+          taskId,
+          status
+        );
+        updated += result.changes ?? 0;
+      });
+      return updated;
+    });
 
     const updated = applySortOrder(orderedTaskIds);
     return { updated };

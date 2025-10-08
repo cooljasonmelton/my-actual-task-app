@@ -124,6 +124,40 @@ describe("Tasks routes", () => {
     expect(response.status).toBe(400);
   });
 
+  it("updates a task title via PUT /tasks/:id", async () => {
+    const taskId = insertTask("Original title");
+
+    const response = await request(baseUrl)
+      .put(`/tasks/${taskId}`)
+      .send({ title: "  Updated title  " });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: taskId, title: "Updated title" });
+
+    const record = db
+      .prepare("SELECT title FROM tasks WHERE id = ?")
+      .get(taskId) as { title: string } | undefined;
+    expect(record?.title).toBe("Updated title");
+  });
+
+  it("rejects empty titles on update", async () => {
+    const taskId = insertTask("Needs validation");
+
+    const response = await request(baseUrl)
+      .put(`/tasks/${taskId}`)
+      .send({ title: "   " });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("returns 404 when updating a missing task", async () => {
+    const response = await request(baseUrl)
+      .put("/tasks/9999")
+      .send({ title: "Doesn't matter" });
+
+    expect(response.status).toBe(404);
+  });
+
   it("orders tasks by ascending priority", async () => {
     const highPriorityId = insertTask("High priority");
     const lowerPriorityId = insertTask("Lower priority");

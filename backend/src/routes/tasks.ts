@@ -1,3 +1,4 @@
+// TODO: refactor for smaller file size
 import { Router, Request, Response } from "express";
 import { taskQueries } from "../database/db";
 import { CreateTaskRequest, UpdateTaskRequest } from "../database/types";
@@ -73,18 +74,14 @@ router.post(
       throw error;
     }
 
-    const normalizedStatus: Status = isValidStatus(status)
-      ? status
-      : "next";
+    const normalizedStatus: Status = isValidStatus(status) ? status : "next";
 
     try {
       const { id } = taskQueries.create({ title, status: normalizedStatus });
       const createdTask = taskQueries.getById(id);
       res
         .status(201)
-        .json(
-          createdTask ?? { id, title, status: normalizedStatus }
-        );
+        .json(createdTask ?? { id, title, status: normalizedStatus });
     } catch (dbError: any) {
       const error: ApiError = new Error(
         "Failed to create title: " + dbError.message
@@ -115,7 +112,15 @@ router.put(
       throw error;
     }
 
-    const { changes } = taskQueries.update(id, { title });
+    const trimmedTitle = title.trim();
+
+    if (trimmedTitle.length === 0) {
+      const error: ApiError = new Error("Title cannot be empty");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const { changes } = taskQueries.updateTitle(id, trimmedTitle);
 
     if (changes === 0) {
       const error: ApiError = new Error("title not found");
@@ -123,7 +128,15 @@ router.put(
       throw error;
     }
 
-    res.json({ id, title });
+    const updatedTask = taskQueries.getById(id);
+
+    if (!updatedTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.json(updatedTask);
   })
 );
 
@@ -199,10 +212,15 @@ router.patch(
     }
 
     const parsedPriority = Number(priority);
-    const isValidPriority = Number.isInteger(parsedPriority) && parsedPriority >= 1 && parsedPriority <= 5;
+    const isValidPriority =
+      Number.isInteger(parsedPriority) &&
+      parsedPriority >= 1 &&
+      parsedPriority <= 5;
 
     if (!isValidPriority) {
-      const error: ApiError = new Error("Priority must be an integer between 1 and 5");
+      const error: ApiError = new Error(
+        "Priority must be an integer between 1 and 5"
+      );
       error.statusCode = 400;
       throw error;
     }
@@ -249,7 +267,7 @@ router.delete(
       throw error;
     }
 
-  res.status(204).send();
+    res.status(204).send();
   })
 );
 
