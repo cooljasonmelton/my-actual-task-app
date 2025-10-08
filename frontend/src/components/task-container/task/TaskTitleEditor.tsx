@@ -7,6 +7,7 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from "react";
+import Button from "../../design-system-components/button/Button";
 
 type TaskTitleEditorProps = {
   taskId: number;
@@ -29,7 +30,7 @@ const TaskTitleEditor = ({
   const [draftTitle, setDraftTitle] = useState(title);
   const [isSavingTitle, setIsSavingTitle] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
-  const titleInputRef = useRef<HTMLInputElement | null>(null);
+  const titleInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     if (!isEditing) {
@@ -37,12 +38,30 @@ const TaskTitleEditor = ({
     }
   }, [title, isEditing]);
 
+  const adjustTextareaHeight = useCallback(() => {
+    const textarea = titleInputRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
   useEffect(() => {
     if (isEditing) {
-      titleInputRef.current?.focus();
-      titleInputRef.current?.select();
+      const textarea = titleInputRef.current;
+      textarea?.focus();
+      textarea?.select();
+      adjustTextareaHeight();
     }
-  }, [isEditing]);
+  }, [adjustTextareaHeight, isEditing]);
+
+  useEffect(() => {
+    if (isEditing) {
+      adjustTextareaHeight();
+    }
+  }, [adjustTextareaHeight, draftTitle, isEditing]);
 
   useEffect(() => {
     onEditingChange?.(isEditing);
@@ -107,7 +126,7 @@ const TaskTitleEditor = ({
   );
 
   const handleTitleInputKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>) => {
+    (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === "Escape") {
         event.preventDefault();
         handleCancelEditing();
@@ -141,7 +160,7 @@ const TaskTitleEditor = ({
         onSubmit={handleSubmitTitle}
         onBlur={handleFormBlur}
       >
-        <input
+        <textarea
           ref={titleInputRef}
           className="task-title-form__input"
           value={draftTitle}
@@ -151,21 +170,23 @@ const TaskTitleEditor = ({
           aria-label="Task title"
         />
         <div className="task-title-form__actions">
-          <button
+          <Button
+            variant="secondary"
+            size="small"
             type="submit"
-            className="task-title-form__button"
             disabled={isSavingTitle}
           >
             Save
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="task-title-form__button task-title-form__button--secondary"
+            variant="dark"
+            size="small"
             onClick={handleCancelEditing}
             disabled={isSavingTitle}
           >
             Cancel
-          </button>
+          </Button>
         </div>
         {titleError && (
           <p className="task-title-form__error" role="alert">

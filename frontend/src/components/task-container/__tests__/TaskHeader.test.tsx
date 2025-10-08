@@ -147,6 +147,15 @@ describe("TaskHeader", () => {
     );
   });
 
+  it("uses a textarea when editing the title to support multiple lines", () => {
+    render(<TaskHeader {...defaultProps} />);
+
+    fireEvent.doubleClick(screen.getByText("Test Task"));
+    const input = screen.getByRole("textbox", { name: /task title/i });
+
+    expect(input.tagName).toBe("TEXTAREA");
+  });
+
   it("cancels title editing when focus leaves the form", async () => {
     render(<TaskHeader {...defaultProps} />);
 
@@ -162,5 +171,21 @@ describe("TaskHeader", () => {
         screen.queryByRole("textbox", { name: /task title/i })
       ).not.toBeInTheDocument();
     });
+  });
+
+  it("submits multi-line titles without removing line breaks", async () => {
+    const onUpdateTitle = vi.fn().mockResolvedValue(undefined);
+    render(<TaskHeader {...defaultProps} onUpdateTitle={onUpdateTitle} />);
+
+    fireEvent.doubleClick(screen.getByText("Test Task"));
+
+    const input = screen.getByRole("textbox", { name: /task title/i });
+    fireEvent.change(input, { target: { value: "Line 1\nLine 2" } });
+
+    await act(async () => {
+      fireEvent.submit(input.closest("form") as HTMLFormElement);
+    });
+
+    expect(onUpdateTitle).toHaveBeenCalledWith(1, "Line 1\nLine 2");
   });
 });

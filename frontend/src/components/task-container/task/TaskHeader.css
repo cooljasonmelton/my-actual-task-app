@@ -1,15 +1,16 @@
 /* TODO: move to own file corresponding to TaskHeader file */
 .task-header {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   justify-content: space-between;
-  padding: 0 0.5rem;
+  padding: 0.5rem 0.5rem;
 }
 
 .task-title-wrapper {
+  width: 100%;
   display: flex;
-  align-items: center;
   gap: 1.5rem;
+  padding-right: 2rem;
 }
 
 /* TODO: add animation when starring tasks */
@@ -51,8 +52,8 @@
 }
 
 .task-header__icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.35rem;
+  height: 1.35rem;
   flex-shrink: 0;
 }
 
@@ -63,35 +64,46 @@
 }
 
 .task-title-container {
+  width: 100%;
   flex: 1 1 auto;
   min-width: 0;
 }
 
 .task-title {
+  width: 100%;
   margin: 0;
   font-size: 1rem;
   line-height: 1.4;
   cursor: pointer;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .task-title-form {
   width: 100%;
-  display: flex;
+  display: grid;
   gap: 0.5rem;
 }
 
 .task-title-form__input {
   width: 100%;
+  min-height: 2.5rem;
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--color-border, #cbd5f5);
   border-radius: 0.5rem;
   font: inherit;
   line-height: 1.4;
+  resize: none;
+  overflow: hidden;
 }
 
 .task-title-form__actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: start;
 }
 
 .task-title-form__button {
