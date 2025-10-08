@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type FocusEvent,
   type FormEvent,
   type KeyboardEvent,
 } from "react";
@@ -13,6 +14,7 @@ type TaskTitleEditorProps = {
   isSoftDeleted: boolean;
   isSoftDeletedToday: boolean;
   onUpdateTitle: (id: number, updatedTitle: string) => Promise<void>;
+  onEditingChange?: (isEditing: boolean) => void;
 };
 
 const TaskTitleEditor = ({
@@ -21,6 +23,7 @@ const TaskTitleEditor = ({
   isSoftDeleted,
   isSoftDeletedToday,
   onUpdateTitle,
+  onEditingChange,
 }: TaskTitleEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title);
@@ -40,6 +43,10 @@ const TaskTitleEditor = ({
       titleInputRef.current?.select();
     }
   }, [isEditing]);
+
+  useEffect(() => {
+    onEditingChange?.(isEditing);
+  }, [isEditing, onEditingChange]);
 
   const handleStartEditing = useCallback(() => {
     if (isSoftDeleted) {
@@ -109,13 +116,31 @@ const TaskTitleEditor = ({
     [handleCancelEditing]
   );
 
+  const handleFormBlur = useCallback(
+    (event: FocusEvent<HTMLFormElement>) => {
+      if (isSavingTitle) {
+        return;
+      }
+
+      const nextFocusTarget = event.relatedTarget as Node | null;
+      if (!event.currentTarget.contains(nextFocusTarget)) {
+        handleCancelEditing();
+      }
+    },
+    [handleCancelEditing, isSavingTitle]
+  );
+
   const titleClassName = `task-title${
     isSoftDeleted ? " task-title--soft-deleted" : ""
   }${isSoftDeletedToday ? " task-title--soft-deleted-today" : ""}`;
 
   if (isEditing) {
     return (
-      <form className="task-title-form" onSubmit={handleSubmitTitle}>
+      <form
+        className="task-title-form"
+        onSubmit={handleSubmitTitle}
+        onBlur={handleFormBlur}
+      >
         <input
           ref={titleInputRef}
           className="task-title-form__input"

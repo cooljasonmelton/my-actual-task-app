@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { beforeEach } from "vitest";
 import TaskHeader from "../task/TaskHeader";
 import type { TaskHeaderProps } from "../types";
@@ -16,6 +16,7 @@ describe("TaskHeader", () => {
     isSoftDeleted: false,
     isSoftDeletedToday: false,
     isPriorityUpdating: false,
+    onTitleEditingChange: vi.fn(),
   };
 
   beforeEach(() => {
@@ -122,5 +123,44 @@ describe("TaskHeader", () => {
       "aria-disabled",
       "true"
     );
+  });
+
+  it("notifies when the title editing state changes", async () => {
+    const onTitleEditingChange = vi.fn();
+    render(
+      <TaskHeader
+        {...defaultProps}
+        onTitleEditingChange={onTitleEditingChange}
+      />
+    );
+
+    await waitFor(() =>
+      expect(onTitleEditingChange).toHaveBeenCalledWith(false)
+    );
+
+    onTitleEditingChange.mockClear();
+
+    fireEvent.doubleClick(screen.getByText("Test Task"));
+
+    await waitFor(() =>
+      expect(onTitleEditingChange).toHaveBeenCalledWith(true)
+    );
+  });
+
+  it("cancels title editing when focus leaves the form", async () => {
+    render(<TaskHeader {...defaultProps} />);
+
+    fireEvent.doubleClick(screen.getByText("Test Task"));
+
+    const input = screen.getByRole("textbox", { name: /task title/i });
+    const form = input.closest("form") as HTMLFormElement;
+
+    fireEvent.blur(form);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("textbox", { name: /task title/i })
+      ).not.toBeInTheDocument();
+    });
   });
 });

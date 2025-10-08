@@ -49,4 +49,5 @@ export type TaskHeaderProps = {
   isSoftDeleted: boolean;
   isSoftDeletedToday: boolean;
   isPriorityUpdating: boolean;
+  onTitleEditingChange: (isEditing: boolean) => void;
 };

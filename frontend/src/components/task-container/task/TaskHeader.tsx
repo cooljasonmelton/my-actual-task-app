@@ -17,6 +17,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   isSoftDeleted,
   isSoftDeletedToday,
   isPriorityUpdating,
+  onTitleEditingChange,
 }) => {
   const [shouldDelete, setShouldDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -124,6 +125,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
             isSoftDeleted={isSoftDeleted}
             isSoftDeletedToday={isSoftDeletedToday}
             onUpdateTitle={onUpdateTitle}
+            onEditingChange={onTitleEditingChange}
           />
         </div>
       </div>
