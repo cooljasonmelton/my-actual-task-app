@@ -61,3 +61,60 @@
   height: 1.375rem;
   flex-shrink: 0;
 }
+
+.task-title-container {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.task-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.task-title-form {
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.task-title-form__input {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border, #cbd5f5);
+  border-radius: 0.5rem;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.task-title-form__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.task-title-form__button {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border, #cbd5f5);
+  background: var(--color-surface, #f8fafc);
+  color: var(--color-text, #0f172a);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.task-title-form__button--secondary {
+  background: transparent;
+}
+
+.task-title-form__button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.task-title-form__error {
+  margin: 0;
+  color: var(--color-accent-red, #ef4444);
+  font-size: 0.75rem;
+}

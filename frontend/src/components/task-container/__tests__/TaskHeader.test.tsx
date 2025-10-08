@@ -1,9 +1,10 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { beforeEach } from "vitest";
 import TaskHeader from "../task/TaskHeader";
+import type { TaskHeaderProps } from "../types";
 
 describe("TaskHeader", () => {
-  const defaultProps = {
+  const defaultProps: TaskHeaderProps = {
     taskId: 1,
     title: "Test Task",
     priority: 5,
@@ -11,6 +12,7 @@ describe("TaskHeader", () => {
     toggleExpanded: vi.fn(),
     onDelete: vi.fn(),
     onTogglePriority: vi.fn().mockResolvedValue(undefined),
+    onUpdateTitle: vi.fn().mockResolvedValue(undefined),
     isSoftDeleted: false,
     isSoftDeletedToday: false,
     isPriorityUpdating: false,
@@ -23,6 +25,30 @@ describe("TaskHeader", () => {
   it("renders the task title", () => {
     render(<TaskHeader {...defaultProps} />);
     expect(screen.getByText("Test Task")).toBeInTheDocument();
+  });
+
+  it("opens the inline editor on double click", () => {
+    render(<TaskHeader {...defaultProps} />);
+    fireEvent.doubleClick(screen.getByText("Test Task"));
+
+    expect(screen.getByRole("textbox", { name: /task title/i })).toHaveValue(
+      "Test Task"
+    );
+  });
+
+  it("submits the edited title", async () => {
+    const onUpdateTitle = vi.fn().mockResolvedValue(undefined);
+    render(<TaskHeader {...defaultProps} onUpdateTitle={onUpdateTitle} />);
+
+    fireEvent.doubleClick(screen.getByText("Test Task"));
+
+    const input = screen.getByRole("textbox", { name: /task title/i });
+    fireEvent.change(input, { target: { value: "Updated Title" } });
+    await act(async () => {
+      fireEvent.submit(input.closest("form") as HTMLFormElement);
+    });
+
+    expect(onUpdateTitle).toHaveBeenCalledWith(1, "Updated Title");
   });
 
   it("calls toggleExpanded when chevron is clicked", () => {

@@ -19,6 +19,7 @@ export interface TaskProps {
     id: TaskType["id"],
     currentPriority: TaskType["priority"]
   ) => Promise<void>;
+  onUpdateTitle: (id: TaskType["id"], updatedTitle: string) => Promise<void>;
   isSoftDeleted: boolean;
   isSoftDeletedToday: boolean;
   isPriorityUpdating: boolean;
@@ -33,7 +34,7 @@ export interface TaskProps {
   onDrop?: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
 }
 
-export type TaskHeaderType = React.FC<{
+export type TaskHeaderProps = {
   taskId: TaskType["id"];
   title: string;
   priority: TaskType["priority"];
@@ -44,7 +45,8 @@ export type TaskHeaderType = React.FC<{
     id: TaskType["id"],
     currentPriority: TaskType["priority"]
   ) => Promise<void>;
+  onUpdateTitle: (id: TaskType["id"], updatedTitle: string) => Promise<void>;
   isSoftDeleted: boolean;
   isSoftDeletedToday: boolean;
   isPriorityUpdating: boolean;
-}>;
+};

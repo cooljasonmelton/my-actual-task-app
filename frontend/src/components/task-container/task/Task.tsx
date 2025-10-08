@@ -2,12 +2,13 @@ import { useState } from "react";
 import TaskHeader from "./TaskHeader";
 import TaskContent from "./TaskContent";
 import "./Task.css";
-import type { TaskProps } from "./types";
+import type { TaskProps } from "../types";
 
 const Task = ({
   task,
   onDelete,
   onTogglePriority,
+  onUpdateTitle,
   isSoftDeleted,
   isSoftDeletedToday,
   isPriorityUpdating,
@@ -23,9 +24,11 @@ const Task = ({
 }: TaskProps) => {
   // TODO: add animation to expansion
   const [isExpanded, setIsExpanded] = useState(false);
-  const taskCardClassName = `card task${isSoftDeleted ? " task--soft-deleted" : ""}${
-    draggable ? " task--draggable" : ""
-  }${isDragging ? " task--dragging" : ""}${isDragOver ? " task--drag-over" : ""}`;
+  const taskCardClassName = `card task${
+    isSoftDeleted ? " task--soft-deleted" : ""
+  }${draggable ? " task--draggable" : ""}${
+    isDragging ? " task--dragging" : ""
+  }${isDragOver ? " task--drag-over" : ""}`;
 
   return (
     <div
@@ -46,6 +49,7 @@ const Task = ({
         toggleExpanded={() => setIsExpanded(!isExpanded)}
         onDelete={onDelete}
         onTogglePriority={onTogglePriority}
+        onUpdateTitle={onUpdateTitle}
         isSoftDeleted={isSoftDeleted}
         isSoftDeletedToday={isSoftDeletedToday}
         isPriorityUpdating={isPriorityUpdating}

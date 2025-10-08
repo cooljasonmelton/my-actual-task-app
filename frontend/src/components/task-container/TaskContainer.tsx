@@ -1,3 +1,5 @@
+// TODO: refactor for smaller file size
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
@@ -149,6 +151,51 @@ const TaskContainer = () => {
     [sortOption]
   );
 
+  const handleUpdateTitle = useCallback(
+    async (id: TaskType["id"], updatedTitle: string) => {
+      const trimmedTitle = updatedTitle.trim();
+
+      if (!trimmedTitle) {
+        const message = "Title cannot be empty";
+        setError(message);
+        throw new Error(message);
+      }
+
+      setError(null);
+
+      try {
+        const response = await fetch(`${TASKS_API_URL}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title: trimmedTitle }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update title (${response.status})`);
+        }
+
+        const data = (await response.json()) as ApiTask;
+        const updatedTask = parseTaskFromApi(data);
+
+        setTasks((previousTasks) =>
+          sortTasks(
+            previousTasks.map((task) => (task.id === id ? updatedTask : task)),
+            sortOption
+          )
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(message);
+        await loadTasks();
+        throw new Error(message);
+      }
+    },
+    [loadTasks, sortOption]
+  );
+
   const persistReorder = useCallback(
     async (status: Status, orderedIds: number[]) => {
       if (orderedIds.length === 0) {
@@ -254,6 +301,7 @@ const TaskContainer = () => {
           task={task}
           onDelete={handleDeleteTask}
           onTogglePriority={handleTogglePriority}
+          onUpdateTitle={handleUpdateTitle}
           isSoftDeleted={isSoftDeleted}
           isSoftDeletedToday={isSoftDeletedToday}
           isPriorityUpdating={updatingPriorities.has(task.id)}

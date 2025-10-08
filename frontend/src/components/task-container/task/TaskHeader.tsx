@@ -1,10 +1,11 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { Star, ChevronDown, ChevronRight, XCircle } from "lucide-react";
-import type { TaskHeaderType } from "../types";
+import type { TaskHeaderProps } from "../types";
+import TaskTitleEditor from "./TaskTitleEditor";
 
 import "./TaskHeader.css";
 
-const TaskHeader: TaskHeaderType = ({
+const TaskHeader: React.FC<TaskHeaderProps> = ({
   taskId,
   title,
   priority,
@@ -12,6 +13,7 @@ const TaskHeader: TaskHeaderType = ({
   toggleExpanded,
   onDelete,
   onTogglePriority,
+  onUpdateTitle,
   isSoftDeleted,
   isSoftDeletedToday,
   isPriorityUpdating,
@@ -38,7 +40,6 @@ const TaskHeader: TaskHeaderType = ({
     }
   }, [isSoftDeleted]);
 
-  // TODO: create delete button comp and move delete logic to comp
   const handleClickDelete = async () => {
     if (isDeleting || isSoftDeleted) {
       return;
@@ -59,7 +60,6 @@ const TaskHeader: TaskHeaderType = ({
     }
   };
 
-  // TODO: abstract and move to utils params: event, fn => conditions, fn()
   const handleKeyDown = (
     event: KeyboardEvent<SVGSVGElement>,
     action: "expand" | "delete" | "star"
@@ -86,9 +86,6 @@ const TaskHeader: TaskHeaderType = ({
   const isStarred = priority === 1;
   const isPriorityDisabled = isPriorityUpdating || isSoftDeleted;
   const isStarredClassName = isStarred ? "filled-star" : "empty-star";
-  const titleClassName = `task-title${
-    isSoftDeleted ? " task-title--soft-deleted" : ""
-  }${isSoftDeletedToday ? " task-title--soft-deleted-today" : ""}`;
 
   const handleToggleStar = () => {
     if (isPriorityDisabled) {
@@ -114,14 +111,21 @@ const TaskHeader: TaskHeaderType = ({
         <Star
           onClick={handleToggleStar}
           onKeyDown={(e) => handleKeyDown(e, "star")}
-          className={`${isStarredClassName} task-header__icon--star`}
+          className={`${isStarredClassName} task-header__icon task-header__icon--star`}
           aria-label={isStarred ? "Unstar task" : "Star task"}
           role="button"
           tabIndex={isPriorityDisabled ? -1 : 0}
           aria-disabled={isPriorityDisabled}
         />
-        {/* TODO: make headings semantic */}
-        <h3 className={titleClassName}>{title}</h3>
+        <div className="task-title-container">
+          <TaskTitleEditor
+            taskId={taskId}
+            title={title}
+            isSoftDeleted={isSoftDeleted}
+            isSoftDeletedToday={isSoftDeletedToday}
+            onUpdateTitle={onUpdateTitle}
+          />
+        </div>
       </div>
       {!isSoftDeleted && (
         <XCircle
