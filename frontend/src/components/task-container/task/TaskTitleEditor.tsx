@@ -32,20 +32,21 @@ const TaskTitleEditor = ({
   const [titleError, setTitleError] = useState<string | null>(null);
   const titleInputRef = useRef<HTMLTextAreaElement | null>(null);
 
-  useEffect(() => {
-    if (!isEditing) {
-      setDraftTitle(title);
-    }
-  }, [title, isEditing]);
-
   const adjustTextareaHeight = useCallback(() => {
     const textarea = titleInputRef.current;
     if (!textarea) {
       return;
     }
 
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    const nearestRem = Math.round(textarea.scrollHeight / 16);
+
+    // textarea.style.height = "auto";
+    console.log(
+      "textarea.scrollHeight",
+      textarea.scrollHeight / 50,
+      nearestRem
+    );
+    textarea.style.height = `${nearestRem}rem`;
   }, []);
 
   useEffect(() => {
