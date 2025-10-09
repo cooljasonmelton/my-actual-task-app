@@ -58,12 +58,6 @@ const TaskTitleEditor = ({
   }, [adjustTextareaHeight, isEditing]);
 
   useEffect(() => {
-    if (isEditing) {
-      adjustTextareaHeight();
-    }
-  }, [adjustTextareaHeight, draftTitle, isEditing]);
-
-  useEffect(() => {
     onEditingChange?.(isEditing);
   }, [isEditing, onEditingChange]);
 
@@ -86,14 +80,14 @@ const TaskTitleEditor = ({
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const trimmed = draftTitle.trim();
+      const trimmedTitle = draftTitle.trim();
 
-      if (!trimmed) {
+      if (!trimmedTitle) {
         setTitleError("Title cannot be empty");
         return;
       }
 
-      if (trimmed === title) {
+      if (trimmedTitle === title) {
         handleCancelEditing();
         return;
       }
@@ -102,9 +96,10 @@ const TaskTitleEditor = ({
       setTitleError(null);
 
       try {
-        await onUpdateTitle(taskId, trimmed);
+        await onUpdateTitle(taskId, trimmedTitle);
         setIsEditing(false);
       } catch (error) {
+        // TODO: make error message not cause card to jump
         const message =
           error instanceof Error ? error.message : "Failed to update title";
         setTitleError(message);
@@ -115,6 +110,7 @@ const TaskTitleEditor = ({
     [draftTitle, handleCancelEditing, onUpdateTitle, taskId, title]
   );
 
+  // TODO: move keydown logic to a shared hook or util function - share with new task form
   const handleTitleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLHeadingElement>) => {
       if (event.key === "Enter" || event.key === " ") {
