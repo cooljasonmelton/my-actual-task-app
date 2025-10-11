@@ -40,7 +40,7 @@ export const useLoadTasks = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [setError, setTasks]);
 
   return {
     isLoading,
