@@ -1,3 +1,5 @@
+TODO: cleanup this readme
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -69,6 +71,7 @@ export default tseslint.config([
 ```
 
 <!-- CODE FOR COOL RADIO GROUP -- NOT YET NEEDED -->
+
 /\* :root {
 --color-bg: #0d0d0d;
 --color-bg-alt: #1a1a1a;
@@ -171,4 +174,5 @@ outline-offset: 2px;
         DIY
       </label>
     </fieldset>
+
 <!-- END CODE FOR COOL RADIO GROUP -- NOT YET NEEDED -->
