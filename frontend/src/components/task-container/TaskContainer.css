@@ -14,8 +14,7 @@
 }
 
 .task-container__error,
-.task-container__loading,
-.task-container__empty {
+.task-container__loading {
   padding: 1rem;
   border-radius: 0.75rem;
   background: var(--color-surface, #f8fafc);

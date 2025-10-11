@@ -17,6 +17,7 @@ import { useTogglePriority } from "./useTogglePriorty";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
 import { usePersistReorder } from "./usePersistReorder";
+import NoTasksPlaceholder from "./NoTasksPlaceholder";
 
 import "./TaskContainer.css";
 
@@ -118,9 +119,7 @@ const TaskContainer = () => {
 
   const renderTasks = () => {
     if (tasksForSelectedStatus.length === 0) {
-      return (
-        <p className="task-container__empty">No tasks in this section yet.</p>
-      );
+      return <NoTasksPlaceholder status={selectedStatus} />;
     }
 
     return tasksForSelectedStatus.map(
