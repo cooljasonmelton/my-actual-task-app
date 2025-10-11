@@ -1,9 +1,14 @@
-import type { ReactNode } from "react";
+import type { DragEvent, ReactNode } from "react";
 import "./RadioButtonGroup.css";
 
 interface RadioButtonItem {
   value: string;
   cta: string | ReactNode;
+  className?: string;
+  onDragOver?: (event: DragEvent<HTMLElement>) => void;
+  onDragEnter?: (event: DragEvent<HTMLElement>) => void;
+  onDragLeave?: (event: DragEvent<HTMLElement>) => void;
+  onDrop?: (event: DragEvent<HTMLElement>) => void;
 }
 
 const RadioButton = ({
@@ -13,14 +18,29 @@ const RadioButton = ({
   checked,
   defaultChecked = false,
   onChange,
+  className,
+  onDragOver,
+  onDragEnter,
+  onDragLeave,
+  onDrop,
 }: RadioButtonItem & {
   name: string;
   checked?: boolean;
   defaultChecked?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
+  const labelClassName = className
+    ? `radio-btn ${className}`
+    : "radio-btn";
+
   return (
-    <label className="radio-btn">
+    <label
+      className={labelClassName}
+      onDragOver={onDragOver}
+      onDragEnter={onDragEnter}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
       <input
         onChange={onChange}
         type="radio"
@@ -63,6 +83,11 @@ const RadioButtonGroup = ({
           name={buttonName}
           checked={value === item.value}
           defaultChecked={defaultValue === item.value}
+          className={item.className}
+          onDragOver={item.onDragOver}
+          onDragEnter={item.onDragEnter}
+          onDragLeave={item.onDragLeave}
+          onDrop={item.onDrop}
         />
       ))}
     </fieldset>

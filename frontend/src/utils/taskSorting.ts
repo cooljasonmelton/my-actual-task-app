@@ -1,5 +1,7 @@
 import type { TaskType } from "../types";
 
+export const DEFAULT_TASK_SORT_OPTION: TaskSortOption = "priority";
+
 export type TaskSortOption = "priority" | "createdAt";
 
 const sortByPriority = (a: TaskType, b: TaskType) => {
@@ -26,8 +28,6 @@ const sorters: Record<TaskSortOption, (a: TaskType, b: TaskType) => number> = {
   priority: sortByPriority,
   createdAt: sortByCreatedAt,
 };
-
-export const DEFAULT_TASK_SORT_OPTION: TaskSortOption = "priority";
 
 export const sortTasks = (
   tasks: TaskType[],

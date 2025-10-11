@@ -5,7 +5,6 @@ import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
 import type { ApiTask, DerivedTask } from "./types";
-import type { TaskSortOption } from "../../utils/taskSorting";
 import {
   DEFAULT_SECTION_TAB_ITEM,
   STATUS_SECTION_TAB_ITEMS,
@@ -18,46 +17,24 @@ import {
 import { useTaskDragAndDrop } from "../../utils/taskDragAndDrop";
 import { useReferenceWindow } from "../../hooks/useReferenceWindow";
 import { parseTaskFromApi, createEmptyBuckets } from "./taskContainerUtils";
+import { useLoadTasks } from "./useLoadTasks";
+import { TASKS_API_URL } from "./constants";
 
 import "./TaskContainer.css";
 
-const TASKS_API_URL = "http://localhost:3000/tasks";
 const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
 
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<Status>(
     DEFAULT_SECTION_TAB_ITEM
   );
   const [updatingPriorities, setUpdatingPriorities] = useState<Set<number>>(
     () => new Set()
   );
-  const sortOption: TaskSortOption = DEFAULT_TASK_SORT_OPTION;
 
-  const loadTasks = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      setError(null);
-      const response = await fetch(`${TASKS_API_URL}?includeDeleted=true`);
-      if (!response.ok) {
-        throw new Error(`Failed to load tasks: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const parsedTasks = Array.isArray(data)
-        ? (data as ApiTask[]).map(parseTaskFromApi)
-        : [];
-      setTasks(sortTasks(parsedTasks, sortOption));
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "An unknown error occurred";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [sortOption]);
+  const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
 
   useEffect(() => {
     void loadTasks();
@@ -129,7 +106,7 @@ const TaskContainer = () => {
         setTasks((previousTasks) =>
           sortTasks(
             previousTasks.map((task) => (task.id === id ? updatedTask : task)),
-            sortOption
+            DEFAULT_TASK_SORT_OPTION
           )
         );
       } catch (err) {
@@ -148,7 +125,7 @@ const TaskContainer = () => {
         });
       }
     },
-    [sortOption]
+    []
   );
 
   const handleUpdateTitle = useCallback(
@@ -182,7 +159,7 @@ const TaskContainer = () => {
         setTasks((previousTasks) =>
           sortTasks(
             previousTasks.map((task) => (task.id === id ? updatedTask : task)),
-            sortOption
+            DEFAULT_TASK_SORT_OPTION
           )
         );
       } catch (err) {
@@ -193,7 +170,45 @@ const TaskContainer = () => {
         throw new Error(message);
       }
     },
-    [loadTasks, sortOption]
+    [loadTasks]
+  );
+
+  const handleUpdateStatus = useCallback(
+    async (id: TaskType["id"], nextStatus: Status) => {
+      setError(null);
+
+      try {
+        const response = await fetch(`${TASKS_API_URL}/${id}/status`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: nextStatus }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update task status (${response.status})`);
+        }
+
+        const data = (await response.json()) as ApiTask;
+        const updatedTask = parseTaskFromApi(data);
+
+        setTasks((previousTasks) => {
+          const taskExists = previousTasks.some((task) => task.id === id);
+          const nextTasks = taskExists
+            ? previousTasks.map((task) => (task.id === id ? updatedTask : task))
+            : [...previousTasks, updatedTask];
+          return sortTasks(nextTasks, DEFAULT_TASK_SORT_OPTION);
+        });
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(message);
+        await loadTasks();
+        throw new Error(message);
+      }
+    },
+    [loadTasks]
   );
 
   const persistReorder = useCallback(
@@ -230,6 +245,7 @@ const TaskContainer = () => {
   const {
     draggingTask,
     dragOverTaskId,
+    dragOverStatus,
     handleDragStart,
     handleDragEnter,
     handleDragOver,
@@ -238,11 +254,15 @@ const TaskContainer = () => {
     handleDropOnTask,
     handleContainerDragOver,
     handleDropOnContainer,
+    handleStatusDragOver,
+    handleStatusDragLeave,
+    handleStatusDrop,
   } = useTaskDragAndDrop({
-    sortOption,
+    sortOption: DEFAULT_TASK_SORT_OPTION,
     selectedStatus,
     setTasks,
     persistReorder,
+    persistStatusChange: handleUpdateStatus,
   });
 
   const { isInCurrentReferenceWindow } = useReferenceWindow();
@@ -334,6 +354,11 @@ const TaskContainer = () => {
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
         statusCounts={statusCounts}
+        isDragActive={Boolean(draggingTask)}
+        dragOverStatus={dragOverStatus}
+        onStatusDragOver={handleStatusDragOver}
+        onStatusDragLeave={handleStatusDragLeave}
+        onStatusDrop={handleStatusDrop}
       />
 
       <div

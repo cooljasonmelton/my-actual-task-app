@@ -142,6 +142,8 @@ TODO: say something like this in main readme (above)?
 
 ## TODO
 
+- TODO: FE: update test coverage to cover all logic
+- TODO: BE: update test coverage to cover all logic
 - TODO: FE: slightly change styling for priority tasks
 - TODO: BE: Production: Fix CORS allowing all sites before ever pushing to production
 - TODO: FE: error handling and messaging on create task form

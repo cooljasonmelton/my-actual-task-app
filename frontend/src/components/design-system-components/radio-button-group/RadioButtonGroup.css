@@ -32,6 +32,12 @@
   color: var(--color-accent-pink);
 }
 
+.radio-btn--drop-target {
+  border-color: var(--color-accent-purple-blue);
+  box-shadow: 0 0 0 2px rgba(125, 108, 232, 0.35);
+  color: var(--color-accent-purple-blue);
+}
+
 /* checked state (radio selected) */
 .radio-btn:has(input[type="radio"]:checked) {
   border-color: var(--color-accent-pink);

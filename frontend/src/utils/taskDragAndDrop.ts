@@ -82,12 +82,14 @@ export interface UseTaskDragAndDropOptions {
   selectedStatus: Status;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   persistReorder: (status: Status, orderedTaskIds: number[]) => Promise<void>;
+  persistStatusChange: (taskId: number, status: Status) => Promise<void>;
   taskReorderStep?: number;
 }
 
 export interface UseTaskDragAndDropResult {
   draggingTask: DraggingTask;
   dragOverTaskId: number | null;
+  dragOverStatus: Status | null;
   handleDragStart: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
   handleDragEnter: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
   handleDragOver: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
@@ -96,6 +98,12 @@ export interface UseTaskDragAndDropResult {
   handleDropOnTask: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
   handleContainerDragOver: (event: DragEvent<HTMLDivElement>) => void;
   handleDropOnContainer: (event: DragEvent<HTMLDivElement>) => void;
+  handleStatusDragOver: (event: DragEvent<HTMLElement>, status: Status) => void;
+  handleStatusDragLeave: (
+    event: DragEvent<HTMLElement>,
+    status: Status
+  ) => void;
+  handleStatusDrop: (event: DragEvent<HTMLElement>, status: Status) => void;
 }
 
 export const useTaskDragAndDrop = ({
@@ -103,10 +111,12 @@ export const useTaskDragAndDrop = ({
   selectedStatus,
   setTasks,
   persistReorder,
+  persistStatusChange,
   taskReorderStep = TASK_REORDER_STEP,
 }: UseTaskDragAndDropOptions): UseTaskDragAndDropResult => {
   const [draggingTask, setDraggingTask] = useState<DraggingTask>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<number | null>(null);
+  const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null);
 
   const applyReorder = useCallback<
     (status: Status, sourceId: number, targetId: number | null) => number[] | null
@@ -224,6 +234,7 @@ export const useTaskDragAndDrop = ({
   const handleDragEnd = useCallback(() => {
     setDraggingTask(null);
     setDragOverTaskId(null);
+    setDragOverStatus(null);
   }, []);
 
   const handleDropOnTask = useCallback(
@@ -287,14 +298,89 @@ export const useTaskDragAndDrop = ({
     [applyReorder, draggingTask, handleDragEnd, persistReorder, selectedStatus]
   );
 
+  const handleStatusDragOver = useCallback(
+    (event: DragEvent<HTMLElement>, status: Status) => {
+      if (!draggingTask) {
+        return;
+      }
+
+      if (draggingTask.status === status) {
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        if (dragOverStatus !== null) {
+          setDragOverStatus(null);
+        }
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+      }
+
+      if (dragOverStatus !== status) {
+        setDragOverStatus(status);
+      }
+    },
+    [dragOverStatus, draggingTask]
+  );
+
+  const handleStatusDragLeave = useCallback(
+    (event: DragEvent<HTMLElement>, status: Status) => {
+      if (!draggingTask) {
+        return;
+      }
+
+      const relatedTarget = event.relatedTarget as Node | null;
+      if (relatedTarget && event.currentTarget.contains(relatedTarget)) {
+        return;
+      }
+
+      if (dragOverStatus === status) {
+        setDragOverStatus(null);
+      }
+    },
+    [dragOverStatus, draggingTask]
+  );
+
+  const handleStatusDrop = useCallback(
+    (event: DragEvent<HTMLElement>, status: Status) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!draggingTask) {
+        setDragOverStatus(null);
+        return;
+      }
+
+      const taskId = draggingTask.id;
+
+      setDragOverStatus(null);
+      handleDragEnd();
+
+      if (draggingTask.status === status) {
+        return;
+      }
+
+      void persistStatusChange(taskId, status).catch((error) => {
+        console.error("Failed to update task status", error);
+      });
+    },
+    [draggingTask, handleDragEnd, persistStatusChange]
+  );
+
   useEffect(() => {
     setDragOverTaskId(null);
     setDraggingTask(null);
+    setDragOverStatus(null);
   }, [selectedStatus]);
 
   return {
     draggingTask,
     dragOverTaskId,
+    dragOverStatus,
     handleDragStart,
     handleDragEnter,
     handleDragOver,
@@ -303,6 +389,9 @@ export const useTaskDragAndDrop = ({
     handleDropOnTask,
     handleContainerDragOver,
     handleDropOnContainer,
+    handleStatusDragOver,
+    handleStatusDragLeave,
+    handleStatusDrop,
   };
 };
 

@@ -6,11 +6,25 @@
   color: var(--color-text-muted);
 
   font-weight: 700;
+  transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
 /* TODO: better way to do this? - code smell */
 input[type="radio"]:checked + .section-tab-button {
   color: inherit;
+}
+
+.section-tab-button--drag-active {
+  opacity: 0.85;
+}
+
+.section-tab-button--drop-target {
+  color: var(--color-accent-purple-blue);
+  transform: translateY(-2px);
+}
+
+.section-tab-button--drop-target .section-tab-button-count {
+  background-color: var(--color-accent-pink);
 }
 
 .section-tab-button-count {

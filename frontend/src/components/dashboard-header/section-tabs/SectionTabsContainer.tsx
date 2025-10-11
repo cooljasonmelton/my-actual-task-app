@@ -3,20 +3,36 @@ import { DEFAULT_SECTION_TAB_ITEM } from "../../../constants";
 import { useSectionTabItems } from "./useSectionTabItems";
 import "./SectionTabsContainer.css";
 import type { Status } from "../../../types";
+import type { DragEvent } from "react";
 
 // TODO: fix styling so tabs stretch across container
-// TODO: figure out logic to list number of tasks for each section
 
 const SectionTabsContainer = ({
   selectedStatus,
   onChange,
   counts,
+  isDragActive,
+  dragOverStatus,
+  onStatusDragOver,
+  onStatusDragLeave,
+  onStatusDrop,
 }: {
   selectedStatus: Status;
   onChange: (value: Status) => void;
   counts: Record<Status, number>;
+  isDragActive: boolean;
+  dragOverStatus: Status | null;
+  onStatusDragOver: (event: DragEvent<HTMLElement>, status: Status) => void;
+  onStatusDragLeave: (event: DragEvent<HTMLElement>, status: Status) => void;
+  onStatusDrop: (event: DragEvent<HTMLElement>, status: Status) => void;
 }) => {
-  const sectionTabItems = useSectionTabItems(counts);
+  const sectionTabItems = useSectionTabItems(counts, {
+    isDragActive,
+    dragOverStatus,
+    onStatusDragOver,
+    onStatusDragLeave,
+    onStatusDrop,
+  });
 
   return (
     <div className="card">
