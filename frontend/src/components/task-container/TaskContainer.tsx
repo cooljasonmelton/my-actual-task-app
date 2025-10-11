@@ -4,20 +4,23 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
-import type { ApiTask, DerivedTask } from "./types";
+import type { DerivedTask } from "./types";
 import {
   DEFAULT_SECTION_TAB_ITEM,
   STATUS_SECTION_TAB_ITEMS,
 } from "../../constants";
-import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "../../utils/taskSorting";
+import { DEFAULT_TASK_SORT_OPTION } from "../../utils/taskSorting";
 import { useTaskDragAndDrop } from "../../utils/taskDragAndDrop";
 import { useReferenceWindow } from "../../hooks/useReferenceWindow";
-import { parseTaskFromApi, createEmptyBuckets } from "./taskContainerUtils";
+import { createEmptyBuckets } from "./taskContainerUtils";
 import { useLoadTasks } from "./useLoadTasks";
 import { useTogglePriority } from "./useTogglePriorty";
 import { TASKS_API_URL } from "./constants";
+import { useUpdateStatus } from "./useUpdateStatus";
 
 import "./TaskContainer.css";
+import { useUpdateTitle } from "./useUpdateTitle";
+import { useSoftDeleteTask } from "./useSoftDeletetask";
 
 const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
 
@@ -29,121 +32,27 @@ const TaskContainer = () => {
   );
 
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
-  const { updatingPriorities, handleTogglePriority } = useTogglePriority({
-    setError,
-    setTasks,
-  });
-
   useEffect(() => {
     void loadTasks();
   }, [loadTasks]);
 
-  const handleDeleteTask = useCallback(
-    async (id: TaskType["id"]) => {
-      setError(null);
-      try {
-        const response = await fetch(`${TASKS_API_URL}/${id}`, {
-          method: "DELETE",
-        });
+  const { updatingPriorities, handleTogglePriority } = useTogglePriority({
+    setError,
+    setTasks,
+  });
+  const { handleUpdateStatus } = useUpdateStatus({
+    setError,
+    setTasks,
+    loadTasks,
+  });
+  const { handleDeleteTask } = useSoftDeleteTask({ setError, loadTasks });
+  const { handleUpdateTitle } = useUpdateTitle({
+    setError,
+    setTasks,
+    loadTasks,
+  });
 
-        if (!response.ok) {
-          throw new Error(`Failed to delete task (${response.status})`);
-        }
-
-        await loadTasks();
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(message);
-        throw new Error(message);
-      }
-    },
-    [loadTasks]
-  );
-
-  const handleUpdateTitle = useCallback(
-    async (id: TaskType["id"], updatedTitle: string) => {
-      const trimmedTitle = updatedTitle.trim();
-
-      if (!trimmedTitle) {
-        const message = "Title cannot be empty";
-        setError(message);
-        throw new Error(message);
-      }
-
-      setError(null);
-
-      try {
-        const response = await fetch(`${TASKS_API_URL}/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ title: trimmedTitle }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to update title (${response.status})`);
-        }
-
-        const data = (await response.json()) as ApiTask;
-        const updatedTask = parseTaskFromApi(data);
-
-        setTasks((previousTasks) =>
-          sortTasks(
-            previousTasks.map((task) => (task.id === id ? updatedTask : task)),
-            DEFAULT_TASK_SORT_OPTION
-          )
-        );
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(message);
-        await loadTasks();
-        throw new Error(message);
-      }
-    },
-    [loadTasks]
-  );
-
-  const handleUpdateStatus = useCallback(
-    async (id: TaskType["id"], nextStatus: Status) => {
-      setError(null);
-
-      try {
-        const response = await fetch(`${TASKS_API_URL}/${id}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: nextStatus }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to update task status (${response.status})`);
-        }
-
-        const data = (await response.json()) as ApiTask;
-        const updatedTask = parseTaskFromApi(data);
-
-        setTasks((previousTasks) => {
-          const taskExists = previousTasks.some((task) => task.id === id);
-          const nextTasks = taskExists
-            ? previousTasks.map((task) => (task.id === id ? updatedTask : task))
-            : [...previousTasks, updatedTask];
-          return sortTasks(nextTasks, DEFAULT_TASK_SORT_OPTION);
-        });
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(message);
-        await loadTasks();
-        throw new Error(message);
-      }
-    },
-    [loadTasks]
-  );
-
+  // TODO: move to be with sort logic like frontend/src/utils/taskSorting.ts
   const persistReorder = useCallback(
     async (status: Status, orderedIds: number[]) => {
       if (orderedIds.length === 0) {
@@ -299,6 +208,7 @@ const TaskContainer = () => {
         onDragOver={handleContainerDragOver}
         onDrop={handleDropOnContainer}
       >
+        {/* TODO: better error component */}
         {error && <p className="task-container__error">{error}</p>}
         {/* TODO: better loading component */}
         {isLoading ? (

@@ -1,3 +1,5 @@
+// TODO: refactor smaller file size
+
 import { useCallback, useEffect, useState, type DragEvent } from "react";
 import { sortTasks } from "./taskSorting";
 import type { Status, TaskType } from "../types";
@@ -119,8 +121,13 @@ export const useTaskDragAndDrop = ({
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null);
 
   const applyReorder = useCallback<
-    (status: Status, sourceId: number, targetId: number | null) => number[] | null
-  >((status, sourceId, targetId) => {
+    (
+      status: Status,
+      sourceId: number,
+      targetId: number | null
+    ) => number[] | null
+  >(
+    (status, sourceId, targetId) => {
       let updatedOrder: number[] | null = null;
       let didChange = false;
 
