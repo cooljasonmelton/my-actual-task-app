@@ -17,10 +17,10 @@ import { useLoadTasks } from "./useLoadTasks";
 import { useTogglePriority } from "./useTogglePriorty";
 import { TASKS_API_URL } from "./constants";
 import { useUpdateStatus } from "./useUpdateStatus";
-
-import "./TaskContainer.css";
 import { useUpdateTitle } from "./useUpdateTitle";
 import { useSoftDeleteTask } from "./useSoftDeletetask";
+
+import "./TaskContainer.css";
 
 const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
 
