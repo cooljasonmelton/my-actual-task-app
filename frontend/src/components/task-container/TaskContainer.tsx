@@ -7,15 +7,15 @@ import {
   DEFAULT_SECTION_TAB_ITEM,
   STATUS_SECTION_TAB_ITEMS,
 } from "../../constants";
-import { DEFAULT_TASK_SORT_OPTION } from "../../utils/taskSorting";
-import { useTaskDragAndDrop } from "../../utils/taskDragAndDrop";
-import { useReferenceWindow } from "../../hooks/useReferenceWindow";
-import { createEmptyBuckets } from "./taskContainerUtils";
+import { DEFAULT_TASK_SORT_OPTION } from "./utils/taskSorting";
+import { useTaskDragAndDrop } from "./utils/taskDragAndDrop";
+import { useReferenceWindow } from "./useReferenceWindow";
+import { createEmptyBuckets } from "./utils/taskContainerUtils";
 import { useLoadTasks } from "./useLoadTasks";
+import { useSoftDeleteTask } from "./useSoftDeleteTask";
 import { useTogglePriority } from "./useTogglePriorty";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
-import { useSoftDeleteTask } from "./useSoftDeletetask";
 import { usePersistReorder } from "./usePersistReorder";
 
 import "./TaskContainer.css";

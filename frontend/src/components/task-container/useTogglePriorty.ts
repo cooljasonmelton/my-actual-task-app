@@ -5,7 +5,7 @@ import {
   type SetStateAction,
 } from "react";
 import { TASKS_API_URL } from "./constants";
-import { parseTaskFromApi } from "./taskContainerUtils";
+import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import type { Task } from "../../../../shared/types/task";
 import type { ApiTask } from "./types";
 import type { TaskType } from "../../types";
@@ -13,7 +13,7 @@ import {
   DEFAULT_TASK_SORT_OPTION,
   getNextPriority,
   sortTasks,
-} from "../../utils/taskSorting";
+} from "./utils/taskSorting";
 
 export const useTogglePriority = ({
   setError,

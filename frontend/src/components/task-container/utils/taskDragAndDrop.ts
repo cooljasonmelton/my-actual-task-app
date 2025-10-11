@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type DragEvent } from "react";
 import { sortTasks } from "./taskSorting";
-import type { Status, TaskType } from "../types";
+import type { Status, TaskType } from "../../../types";
 import type { TaskSortOption } from "./taskSorting";
 
 export const TASK_REORDER_STEP = 10;

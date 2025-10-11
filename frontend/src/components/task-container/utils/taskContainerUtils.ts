@@ -1,6 +1,6 @@
-import type { Status, TaskType } from "../../types";
-import type { ApiTask, DerivedTask } from "./types";
-import { parseReferenceWindowDate } from "../../hooks/useReferenceWindow";
+import type { Status, TaskType } from "../../../types";
+import type { ApiTask, DerivedTask } from "../types";
+import { parseReferenceWindowDate } from "../useReferenceWindow";
 
 export const parseTaskFromApi = (task: ApiTask): TaskType => ({
   ...task,

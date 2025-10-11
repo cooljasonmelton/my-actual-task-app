@@ -3,8 +3,8 @@ import type { Status, TaskType } from "../../types";
 import type { Task } from "../../../../shared/types/task";
 import { TASKS_API_URL } from "./constants";
 import type { ApiTask } from "./types";
-import { parseTaskFromApi } from "./taskContainerUtils";
-import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "../../utils/taskSorting";
+import { parseTaskFromApi } from "./utils/taskContainerUtils";
+import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "./utils/taskSorting";
 
 export const useUpdateStatus = ({
   setError,

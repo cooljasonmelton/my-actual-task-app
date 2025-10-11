@@ -5,9 +5,9 @@ import {
   type SetStateAction,
 } from "react";
 import { TASKS_API_URL } from "./constants";
-import { parseTaskFromApi } from "./taskContainerUtils";
+import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import type { Task } from "../../../../shared/types/task";
-import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "../../utils/taskSorting";
+import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "./utils/taskSorting";
 import type { ApiTask } from "./types";
 
 export const useLoadTasks = ({
