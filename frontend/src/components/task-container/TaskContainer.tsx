@@ -9,15 +9,12 @@ import {
   DEFAULT_SECTION_TAB_ITEM,
   STATUS_SECTION_TAB_ITEMS,
 } from "../../constants";
-import {
-  DEFAULT_TASK_SORT_OPTION,
-  getNextPriority,
-  sortTasks,
-} from "../../utils/taskSorting";
+import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "../../utils/taskSorting";
 import { useTaskDragAndDrop } from "../../utils/taskDragAndDrop";
 import { useReferenceWindow } from "../../hooks/useReferenceWindow";
 import { parseTaskFromApi, createEmptyBuckets } from "./taskContainerUtils";
 import { useLoadTasks } from "./useLoadTasks";
+import { useTogglePriority } from "./useTogglePriorty";
 import { TASKS_API_URL } from "./constants";
 
 import "./TaskContainer.css";
@@ -30,11 +27,12 @@ const TaskContainer = () => {
   const [selectedStatus, setSelectedStatus] = useState<Status>(
     DEFAULT_SECTION_TAB_ITEM
   );
-  const [updatingPriorities, setUpdatingPriorities] = useState<Set<number>>(
-    () => new Set()
-  );
 
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
+  const { updatingPriorities, handleTogglePriority } = useTogglePriority({
+    setError,
+    setTasks,
+  });
 
   useEffect(() => {
     void loadTasks();
@@ -61,71 +59,6 @@ const TaskContainer = () => {
       }
     },
     [loadTasks]
-  );
-
-  const handleTogglePriority = useCallback(
-    async (id: TaskType["id"], currentPriority: TaskType["priority"]) => {
-      setError(null);
-
-      let shouldSkip = false;
-
-      setUpdatingPriorities((prev) => {
-        if (prev.has(id)) {
-          shouldSkip = true;
-          return prev;
-        }
-        const next = new Set(prev);
-        next.add(id);
-        return next;
-      });
-
-      if (shouldSkip) {
-        return;
-      }
-
-      const nextPriority = getNextPriority(currentPriority);
-
-      try {
-        const response = await fetch(`${TASKS_API_URL}/${id}/priority`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ priority: nextPriority }),
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to update task priority (${response.status})`
-          );
-        }
-
-        const data = (await response.json()) as ApiTask;
-        const updatedTask = parseTaskFromApi(data);
-
-        setTasks((previousTasks) =>
-          sortTasks(
-            previousTasks.map((task) => (task.id === id ? updatedTask : task)),
-            DEFAULT_TASK_SORT_OPTION
-          )
-        );
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(message);
-        throw new Error(message);
-      } finally {
-        setUpdatingPriorities((prev) => {
-          if (!prev.has(id)) {
-            return prev;
-          }
-          const next = new Set(prev);
-          next.delete(id);
-          return next;
-        });
-      }
-    },
-    []
   );
 
   const handleUpdateTitle = useCallback(
@@ -367,6 +300,7 @@ const TaskContainer = () => {
         onDrop={handleDropOnContainer}
       >
         {error && <p className="task-container__error">{error}</p>}
+        {/* TODO: better loading component */}
         {isLoading ? (
           <p className="task-container__loading">Loading tasks…</p>
         ) : (
