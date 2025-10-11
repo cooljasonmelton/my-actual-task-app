@@ -99,6 +99,12 @@ const statements: TaskStatementsType = {
       WHERE id = ? AND deleted_at IS NULL
     `
   ),
+  hardDeleteTask: db.prepare(
+    `
+      DELETE FROM tasks
+      WHERE id = ?
+    `
+  ),
 };
 
 export const taskQueries = {
@@ -214,10 +220,24 @@ export const taskQueries = {
     statements.clearTaskSortIndex.run(taskId);
   },
 
-  // TODO: update to capture soft and hard delete
-  delete: (id: number): { changes: number } => {
-    const result = statements.softDeleteTask.run(id);
-    return { changes: result.changes };
+  delete: (
+    id: number,
+    options?: {
+      hard?: boolean;
+    }
+  ): { changes: number } => {
+    if (options?.hard) {
+      const hardDeleteResult = statements.hardDeleteTask.run(id);
+      return { changes: hardDeleteResult.changes };
+    }
+
+    const softDeleteResult = statements.softDeleteTask.run(id);
+    if (softDeleteResult.changes) {
+      return { changes: softDeleteResult.changes };
+    }
+
+    const hardDeleteResult = statements.hardDeleteTask.run(id);
+    return { changes: hardDeleteResult.changes };
   },
 };
 
