@@ -1,10 +1,12 @@
 // TODO: refactor for smaller file size
 import { Router, Request, Response } from "express";
-import { taskQueries } from "../database/db";
+import { taskQueries } from "../database/taskRepository";
 import { CreateTaskRequest, UpdateTaskRequest } from "../database/types";
 import type { Priority, Status } from "../../../shared/types/task";
 import { asyncHandler, ApiError } from "../middleware/errorHandler";
 
+
+// TODO: refactor for one source of truth for FE and BE, prefer easily editable
 const VALID_STATUSES: Status[] = [
   "next",
   "dates",
@@ -93,7 +95,6 @@ router.post(
 );
 
 // PUT update title
-// TODO: update to allow all fields can be updated
 router.put(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
@@ -140,6 +141,7 @@ router.put(
   })
 );
 
+// PATCH update sort_index
 router.patch(
   "/reorder",
   asyncHandler(async (req: Request, res: Response) => {
@@ -193,6 +195,7 @@ router.patch(
   })
 );
 
+// PATCH update priorty 
 router.patch(
   "/:id/priority",
   asyncHandler(async (req: Request, res: Response) => {
@@ -247,7 +250,39 @@ router.patch(
   })
 );
 
+// PATCH update status
+router.patch(
+  "/:id/status",
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = Number.parseInt(req.params.id, 10);
+    const { status } = req.body as Pick<UpdateTaskRequest, "status">;
+
+    if (Number.isNaN(id)) {
+      const error: ApiError = new Error("Invalid task ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!status || !isValidStatus(status)) {
+      const error: ApiError = new Error("A valid status is required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const updatedTask = taskQueries.updateStatus(id, status);
+
+    if (!updatedTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.json(updatedTask);
+  })
+);
+
 // DELETE task
+// TODO: update to capture soft and hard delete
 router.delete(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {

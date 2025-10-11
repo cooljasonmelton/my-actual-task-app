@@ -8,7 +8,7 @@ import type { Status } from "../../database/types";
 
 let app: Application;
 let db: Database.Database;
-let taskQueries: typeof import("../../database/db").taskQueries;
+let taskQueries: typeof import("../../database/taskRepository").taskQueries;
 let server: Server;
 let baseUrl: string;
 
@@ -22,7 +22,9 @@ beforeAll(async () => {
 
   const dbModule = await import("../../database/db");
   db = dbModule.default;
-  taskQueries = dbModule.taskQueries;
+
+  const taskRepoModule = await import("../../database/taskRepository");
+  taskQueries = taskRepoModule.taskQueries;
 
   const appModule = await import("../../app");
   app = appModule.default;
@@ -112,6 +114,64 @@ describe("Tasks routes", () => {
       .prepare("SELECT priority FROM tasks WHERE id = ?")
       .get(taskId) as { priority: number } | undefined;
     expect(record?.priority).toBe(1);
+  });
+
+  it("updates a task status via PATCH /tasks/:id/status", async () => {
+    const taskId = insertTask("Task to move", "next");
+    const otherTaskId = insertTask("Existing task in ongoing", "ongoing");
+    db.prepare("UPDATE tasks SET sort_index = ? WHERE id = ?").run(20, otherTaskId);
+
+    const response = await request(baseUrl)
+      .patch(`/tasks/${taskId}/status`)
+      .send({ status: "ongoing" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: taskId, status: "ongoing" });
+
+    const updatedRecord = db
+      .prepare("SELECT status, sort_index FROM tasks WHERE id = ?")
+      .get(taskId) as { status: string; sort_index: number | null } | undefined;
+
+    expect(updatedRecord?.status).toBe("ongoing");
+    expect(updatedRecord?.sort_index).not.toBeNull();
+    expect(updatedRecord?.sort_index).toBeLessThan(20);
+  });
+
+  it("clears sort index when moving a task to finished", async () => {
+    const taskId = insertTask("Task headed to done", "ongoing");
+    db.prepare("UPDATE tasks SET sort_index = ? WHERE id = ?").run(40, taskId);
+
+    const response = await request(baseUrl)
+      .patch(`/tasks/${taskId}/status`)
+      .send({ status: "finished" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: taskId, status: "finished" });
+
+    const updatedRecord = db
+      .prepare("SELECT status, sort_index FROM tasks WHERE id = ?")
+      .get(taskId) as { status: string; sort_index: number | null } | undefined;
+
+    expect(updatedRecord?.status).toBe("finished");
+    expect(updatedRecord?.sort_index).toBeNull();
+  });
+
+  it("rejects invalid status updates", async () => {
+    const taskId = insertTask("Task with invalid status request");
+
+    const response = await request(baseUrl)
+      .patch(`/tasks/${taskId}/status`)
+      .send({ status: "not-a-status" });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("returns 404 when updating status for a missing task", async () => {
+    const response = await request(baseUrl)
+      .patch("/tasks/9999/status")
+      .send({ status: "next" });
+
+    expect(response.status).toBe(404);
   });
 
   it("rejects invalid priority updates", async () => {
