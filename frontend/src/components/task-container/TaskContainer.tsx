@@ -16,9 +16,9 @@ import { useTogglePriority } from "./useTogglePriorty";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
 import { useSoftDeleteTask } from "./useSoftDeletetask";
+import { usePersistReorder } from "./usePersistReorder";
 
 import "./TaskContainer.css";
-import { usePersistReorder } from "./usePersistReorder";
 
 const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
 
