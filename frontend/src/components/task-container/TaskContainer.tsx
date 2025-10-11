@@ -119,7 +119,7 @@ const TaskContainer = () => {
 
   const renderTasks = () => {
     if (tasksForSelectedStatus.length === 0) {
-      return <NoTasksPlaceholder status={selectedStatus} />;
+      return <NoTasksPlaceholder />;
     }
 
     return tasksForSelectedStatus.map(
