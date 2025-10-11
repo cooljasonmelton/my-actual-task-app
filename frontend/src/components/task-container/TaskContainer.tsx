@@ -1,6 +1,4 @@
-// TODO: refactor for smaller file size
-
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
@@ -15,12 +13,12 @@ import { useReferenceWindow } from "../../hooks/useReferenceWindow";
 import { createEmptyBuckets } from "./taskContainerUtils";
 import { useLoadTasks } from "./useLoadTasks";
 import { useTogglePriority } from "./useTogglePriorty";
-import { TASKS_API_URL } from "./constants";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
 import { useSoftDeleteTask } from "./useSoftDeletetask";
 
 import "./TaskContainer.css";
+import { usePersistReorder } from "./usePersistReorder";
 
 const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
 
@@ -51,38 +49,7 @@ const TaskContainer = () => {
     setTasks,
     loadTasks,
   });
-
-  // TODO: move to be with sort logic like frontend/src/utils/taskSorting.ts
-  const persistReorder = useCallback(
-    async (status: Status, orderedIds: number[]) => {
-      if (orderedIds.length === 0) {
-        return;
-      }
-
-      try {
-        const response = await fetch(`${TASKS_API_URL}/reorder`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status,
-            orderedTaskIds: orderedIds,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to reorder tasks (${response.status})`);
-        }
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        await loadTasks();
-        setError(message);
-      }
-    },
-    [loadTasks]
-  );
+  const { persistReorder } = usePersistReorder({ loadTasks, setError });
 
   const {
     draggingTask,
