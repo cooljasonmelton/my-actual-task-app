@@ -61,6 +61,10 @@
   flex-shrink: 0;
 }
 
+.task-header__icon--restore {
+  opacity: 0.6;
+}
+
 .task-title-container {
   width: 100%;
   flex: 1 1 auto;

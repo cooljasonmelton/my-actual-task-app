@@ -13,6 +13,7 @@ import { useReferenceWindow } from "./useReferenceWindow";
 import { createEmptyBuckets } from "./utils/taskContainerUtils";
 import { useLoadTasks } from "./useLoadTasks";
 import { useSoftDeleteTask } from "./useSoftDeleteTask";
+import { useRestoreTask } from "./useRestoreTask";
 import { useTogglePriority } from "./useTogglePriorty";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
@@ -45,6 +46,7 @@ const TaskContainer = () => {
     loadTasks,
   });
   const { handleDeleteTask } = useSoftDeleteTask({ setError, loadTasks });
+  const { handleRestoreTask } = useRestoreTask({ setError, loadTasks });
   const { handleUpdateTitle } = useUpdateTitle({
     setError,
     setTasks,
@@ -128,6 +130,7 @@ const TaskContainer = () => {
           key={task.id}
           task={task}
           onDelete={handleDeleteTask}
+          onRestore={handleRestoreTask}
           onTogglePriority={handleTogglePriority}
           onUpdateTitle={handleUpdateTitle}
           isSoftDeleted={isSoftDeleted}

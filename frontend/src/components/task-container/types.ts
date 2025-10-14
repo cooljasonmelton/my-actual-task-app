@@ -15,6 +15,7 @@ export type DerivedTask = {
 export interface TaskProps {
   task: TaskType;
   onDelete: (id: TaskType["id"]) => Promise<void>;
+  onRestore: (id: TaskType["id"]) => Promise<void>;
   onTogglePriority: (
     id: TaskType["id"],
     currentPriority: TaskType["priority"]
@@ -50,4 +51,5 @@ export type TaskHeaderProps = {
   isSoftDeletedToday: boolean;
   isPriorityUpdating: boolean;
   onTitleEditingChange: (isEditing: boolean) => void;
+  onRestoreRequest: () => void;
 };

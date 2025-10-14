@@ -1,5 +1,11 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { Star, ChevronDown, ChevronRight, XCircle } from "lucide-react";
+import {
+  Star,
+  ChevronDown,
+  ChevronRight,
+  XCircle,
+  ArchiveRestore,
+} from "lucide-react";
 import type { TaskHeaderProps } from "../types";
 import TaskTitleEditor from "./TaskTitleEditor";
 
@@ -18,6 +24,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   isSoftDeletedToday,
   isPriorityUpdating,
   onTitleEditingChange,
+  onRestoreRequest,
 }) => {
   const [shouldDelete, setShouldDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -63,7 +70,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
 
   const handleKeyDown = (
     event: KeyboardEvent<SVGSVGElement>,
-    action: "expand" | "delete" | "star"
+    action: "expand" | "delete" | "star" | "restore"
   ) => {
     if (event.key !== "Enter" && event.key !== " ") {
       return;
@@ -76,6 +83,10 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
 
     if (action === "delete" && !isSoftDeleted) {
       void handleClickDelete();
+    }
+
+    if (action === "restore" && isSoftDeleted) {
+      onRestoreRequest();
     }
 
     if (action === "star") {
@@ -129,7 +140,16 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
           />
         </div>
       </div>
-      {!isSoftDeleted && (
+      {isSoftDeleted ? (
+        <ArchiveRestore
+          onClick={onRestoreRequest}
+          onKeyDown={(e) => handleKeyDown(e, "restore")}
+          className="task-header__icon task-header__icon--restore"
+          aria-label="Restore task"
+          role="button"
+          tabIndex={0}
+        />
+      ) : (
         <XCircle
           onClick={handleClickDelete}
           onKeyDown={(e) => handleKeyDown(e, "delete")}

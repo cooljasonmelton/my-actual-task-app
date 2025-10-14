@@ -17,6 +17,7 @@ describe("TaskHeader", () => {
     isSoftDeletedToday: false,
     isPriorityUpdating: false,
     onTitleEditingChange: vi.fn(),
+    onRestoreRequest: vi.fn(),
   };
 
   beforeEach(() => {
@@ -62,12 +63,19 @@ describe("TaskHeader", () => {
 
   it("hides the delete button when task is already soft deleted", () => {
     render(
-      <TaskHeader {...defaultProps} isSoftDeleted isSoftDeletedToday={false} />
+      <TaskHeader
+        {...defaultProps}
+        isSoftDeleted
+        isSoftDeletedToday={false}
+      />
     );
 
     expect(
       screen.queryByRole("button", { name: /delete task/i })
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /restore task/i })
+    ).toBeInTheDocument();
   });
 
   it("renders a filled star when priority is 1", () => {
@@ -123,6 +131,20 @@ describe("TaskHeader", () => {
       "aria-disabled",
       "true"
     );
+  });
+
+  it("calls onRestoreRequest when the restore button is clicked", () => {
+    const onRestoreRequest = vi.fn();
+    render(
+      <TaskHeader
+        {...defaultProps}
+        isSoftDeleted
+        onRestoreRequest={onRestoreRequest}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /restore task/i }));
+    expect(onRestoreRequest).toHaveBeenCalled();
   });
 
   it("notifies when the title editing state changes", async () => {
