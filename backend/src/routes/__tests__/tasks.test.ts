@@ -1,16 +1,12 @@
 import request from "supertest";
 import type { Application } from "express";
 import type Database from "better-sqlite3";
-import type { Server } from "http";
-import type { AddressInfo } from "net";
 import { beforeAll, afterAll, beforeEach, describe, expect, it } from "vitest";
 import type { Status } from "../../database/types";
 
 let app: Application;
 let db: Database.Database;
 let taskQueries: typeof import("../../database/taskRepository").taskQueries;
-let server: Server;
-let baseUrl: string;
 
 const insertTask = (title: string, status: Status = "next") => {
   const { id } = taskQueries.create({ title, status });
@@ -28,16 +24,6 @@ beforeAll(async () => {
 
   const appModule = await import("../../app");
   app = appModule.default;
-
-  await new Promise<void>((resolve) => {
-    server = app.listen(0, "127.0.0.1", resolve);
-  });
-
-  const address = server.address() as AddressInfo | null;
-  if (!address || typeof address === "string") {
-    throw new Error("Failed to determine server address for tests");
-  }
-  baseUrl = `http://127.0.0.1:${address.port}`;
 });
 
 beforeEach(() => {
@@ -46,7 +32,6 @@ beforeEach(() => {
 
 afterAll(() => {
   db.close();
-  server?.close();
 });
 
 describe("Tasks routes", () => {
@@ -58,7 +43,7 @@ describe("Tasks routes", () => {
       deletedId
     );
 
-    const response = await request(baseUrl).get("/tasks");
+    const response = await request(app).get("/tasks");
 
     expect(response.status).toBe(200);
     const ids = response.body.map((task: any) => task.id);
@@ -74,7 +59,7 @@ describe("Tasks routes", () => {
       deletedId
     );
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .get("/tasks")
       .query({ includeDeleted: "true" });
 
@@ -87,7 +72,7 @@ describe("Tasks routes", () => {
   it("soft deletes a task via DELETE /tasks/:id", async () => {
     const taskId = insertTask("Task to delete");
 
-    const response = await request(baseUrl).delete(`/tasks/${taskId}`);
+    const response = await request(app).delete(`/tasks/${taskId}`);
 
     expect(response.status).toBe(204);
     const record = db
@@ -100,10 +85,28 @@ describe("Tasks routes", () => {
     expect(record?.sort_index).toBeNull();
   });
 
+  it("restores a soft-deleted task via PATCH /tasks/:id/restore", async () => {
+    const taskId = insertTask("Task to restore");
+    await request(app).delete(`/tasks/${taskId}`);
+
+    const response = await request(app).patch(`/tasks/${taskId}/restore`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ id: taskId });
+    expect(response.body.deletedAt).toBeNull();
+
+    const record = db
+      .prepare("SELECT deleted_at, sort_index FROM tasks WHERE id = ?")
+      .get(taskId) as { deleted_at: string | null; sort_index: number | null } | undefined;
+
+    expect(record?.deleted_at).toBeNull();
+    expect(record?.sort_index).not.toBeNull();
+  });
+
   it("updates a task priority via PATCH /tasks/:id/priority", async () => {
     const taskId = insertTask("Task to prioritize");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch(`/tasks/${taskId}/priority`)
       .send({ priority: 1 });
 
@@ -121,7 +124,7 @@ describe("Tasks routes", () => {
     const otherTaskId = insertTask("Existing task in ongoing", "ongoing");
     db.prepare("UPDATE tasks SET sort_index = ? WHERE id = ?").run(20, otherTaskId);
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch(`/tasks/${taskId}/status`)
       .send({ status: "ongoing" });
 
@@ -141,7 +144,7 @@ describe("Tasks routes", () => {
     const taskId = insertTask("Task headed to done", "ongoing");
     db.prepare("UPDATE tasks SET sort_index = ? WHERE id = ?").run(40, taskId);
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch(`/tasks/${taskId}/status`)
       .send({ status: "finished" });
 
@@ -159,7 +162,7 @@ describe("Tasks routes", () => {
   it("rejects invalid status updates", async () => {
     const taskId = insertTask("Task with invalid status request");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch(`/tasks/${taskId}/status`)
       .send({ status: "not-a-status" });
 
@@ -167,7 +170,7 @@ describe("Tasks routes", () => {
   });
 
   it("returns 404 when updating status for a missing task", async () => {
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch("/tasks/9999/status")
       .send({ status: "next" });
 
@@ -177,7 +180,7 @@ describe("Tasks routes", () => {
   it("rejects invalid priority updates", async () => {
     const taskId = insertTask("Task with invalid priority request");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch(`/tasks/${taskId}/priority`)
       .send({ priority: 42 });
 
@@ -187,7 +190,7 @@ describe("Tasks routes", () => {
   it("updates a task title via PUT /tasks/:id", async () => {
     const taskId = insertTask("Original title");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .put(`/tasks/${taskId}`)
       .send({ title: "  Updated title  " });
 
@@ -203,7 +206,7 @@ describe("Tasks routes", () => {
   it("rejects empty titles on update", async () => {
     const taskId = insertTask("Needs validation");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .put(`/tasks/${taskId}`)
       .send({ title: "   " });
 
@@ -211,7 +214,7 @@ describe("Tasks routes", () => {
   });
 
   it("returns 404 when updating a missing task", async () => {
-    const response = await request(baseUrl)
+    const response = await request(app)
       .put("/tasks/9999")
       .send({ title: "Doesn't matter" });
 
@@ -231,7 +234,7 @@ describe("Tasks routes", () => {
       lowerPriorityId
     );
 
-    const response = await request(baseUrl).get("/tasks");
+    const response = await request(app).get("/tasks");
 
     expect(response.status).toBe(200);
     const ids = response.body.map((task: any) => task.id);
@@ -245,7 +248,7 @@ describe("Tasks routes", () => {
 
     db.prepare("UPDATE tasks SET status = ? WHERE id = ?").run("dates", taskId);
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .get("/tasks")
       .query({ includeDeleted: "true" });
 
@@ -256,7 +259,7 @@ describe("Tasks routes", () => {
   });
 
   it("creates a task with the provided status", async () => {
-    const response = await request(baseUrl)
+    const response = await request(app)
       .post("/tasks")
       .send({ title: "Status-aware task", status: "ongoing" });
 
@@ -280,13 +283,13 @@ describe("Tasks routes", () => {
     const second = insertTask("Second task");
     const third = insertTask("Third task");
 
-    const reorderResponse = await request(baseUrl)
+    const reorderResponse = await request(app)
       .patch("/tasks/reorder")
       .send({ status: "next", orderedTaskIds: [second, third, first] });
 
     expect(reorderResponse.status).toBe(204);
 
-    const response = await request(baseUrl).get("/tasks");
+    const response = await request(app).get("/tasks");
     expect(response.status).toBe(200);
 
     const orderedIds = response.body
@@ -299,7 +302,7 @@ describe("Tasks routes", () => {
   it("rejects reorder requests for finished status", async () => {
     const finishedTask = insertTask("Finished task", "finished");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch("/tasks/reorder")
       .send({ status: "finished", orderedTaskIds: [finishedTask] });
 
@@ -310,7 +313,7 @@ describe("Tasks routes", () => {
     const nextTask = insertTask("Next task");
     const ongoingTask = insertTask("Ongoing task", "ongoing");
 
-    const response = await request(baseUrl)
+    const response = await request(app)
       .patch("/tasks/reorder")
       .send({ status: "next", orderedTaskIds: [nextTask, ongoingTask] });
 

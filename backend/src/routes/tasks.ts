@@ -281,6 +281,30 @@ router.patch(
   })
 );
 
+// PATCH restore soft deleted task
+router.patch(
+  "/:id/restore",
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = Number.parseInt(req.params.id, 10);
+
+    if (Number.isNaN(id)) {
+      const error: ApiError = new Error("Invalid task ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const restoredTask = taskQueries.restore(id);
+
+    if (!restoredTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.json(restoredTask);
+  })
+);
+
 // DELETE task
 // TODO: update to capture soft and hard delete
 router.delete(

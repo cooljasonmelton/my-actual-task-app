@@ -47,6 +47,9 @@ const statements: TaskStatementsType = {
   selectTaskById: db.prepare(
     "SELECT * FROM tasks WHERE id = ? AND deleted_at IS NULL"
   ),
+  selectTaskByIdIncludingSoftDeleted: db.prepare(
+    "SELECT * FROM tasks WHERE id = ?"
+  ),
   selectDeletedTasks: db.prepare(`
         SELECT * FROM tasks
         WHERE deleted_at IS NOT NULL
@@ -103,6 +106,16 @@ const statements: TaskStatementsType = {
     `
       DELETE FROM tasks
       WHERE id = ?
+    `
+  ),
+  restoreTask: db.prepare(
+    `
+      UPDATE tasks
+      SET deleted_at = NULL,
+          sort_index = ?,
+          priority = COALESCE(priority, 5)
+      WHERE id = ?
+        AND deleted_at IS NOT NULL
     `
   ),
 };
@@ -238,6 +251,36 @@ export const taskQueries = {
 
     const hardDeleteResult = statements.hardDeleteTask.run(id);
     return { changes: hardDeleteResult.changes };
+  },
+
+  restore: (id: number): Task | undefined => {
+    const existingRow = statements.selectTaskByIdIncludingSoftDeleted.get(
+      id
+    ) as DbTaskRow | undefined;
+
+    if (!existingRow || existingRow.deleted_at === null) {
+      return undefined;
+    }
+
+    const status = (existingRow.status ?? "next") as Status;
+    const shouldAssignSortIndex = status !== "finished";
+    const minSortIndex = shouldAssignSortIndex
+      ? getMinSortIndexForStatus(statements, status)
+      : null;
+    const nextSortIndex = shouldAssignSortIndex
+      ? (minSortIndex ?? SORT_INDEX_STEP) - SORT_INDEX_STEP
+      : null;
+
+    const result = statements.restoreTask.run(nextSortIndex, id);
+
+    if (!result.changes) {
+      return undefined;
+    }
+
+    const updatedRow = statements.selectTaskById.get(id) as
+      | DbTaskRow
+      | undefined;
+    return updatedRow ? mapDbTaskToTask(updatedRow) : undefined;
   },
 };
 
