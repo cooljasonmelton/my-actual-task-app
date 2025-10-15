@@ -177,11 +177,27 @@ const TaskContainer = () => {
         onDragOver={handleContainerDragOver}
         onDrop={handleDropOnContainer}
       >
-        {/* TODO: better error component */}
+        {/* TODO: eventually create re-usable error notification / banner*/}
         {error && <p className="task-container__error">{error}</p>}
-        {/* TODO: better loading component */}
-        {isLoading ? (
-          <p className="task-container__loading">Loading tasks…</p>
+        {/* TODO: move loader to reusable design component */}
+        {!isLoading ? (
+          <div
+            className="card task-container__loading-card"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="task-container__loading">
+              <div className="task-container__loading-content">
+                <span
+                  className="task-container__loading-spinner"
+                  aria-hidden="true"
+                />
+                <span className="task-container__loading-text">
+                  Loading tasks...
+                </span>
+              </div>
+            </div>
+          </div>
         ) : (
           renderTasks()
         )}
