@@ -180,7 +180,7 @@ const TaskContainer = () => {
         {/* TODO: eventually create re-usable error notification / banner*/}
         {error && <p className="task-container__error">{error}</p>}
         {/* TODO: move loader to reusable design component */}
-        {!isLoading ? (
+        {isLoading ? (
           <div
             className="card task-container__loading-card"
             role="status"
