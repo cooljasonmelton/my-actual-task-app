@@ -1,6 +1,6 @@
 # My Actual Task App
 
-My Actual Task App is a full-stack productivity dashboard I’m building to keep my day organised. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights the tasks I care about (priority stars, flexible status buckets), lets me soft delete without losing data, and even keeps my browser awake when I’m in focus mode.
+My Actual Task App is my actual task map, a full-stack productivity dashboard I’m building to keep my day organized. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights tasks I care about (priority stars, flexible status buckets, drag-and-drop reordering), lets me soft delete without losing data, and has convienence features like keyboard accessibility and a toggle to keep my browser awake.
 
 ## ✨ Highlights
 
@@ -102,6 +102,8 @@ npm run dev:all
 - Subtasks for breaking big tasks into steps
 - Drag-and-drop reassignment between sections (drop onto tab to move status).
 - Sort (asc/desc) and filter by tag, created date, priority
+- Multi-done checkboxes: task requires multiple iterations, create multiple checkboxes tallying each complete iteration e.g. answer 3 emails: [ x ] [ x ][ ]
+- Screen saver that auto plays and keeps computer awake after x seconds
 
 ### long term
 
@@ -113,6 +115,7 @@ npm run dev:all
 - Quick tasks list or quick view similar to momentum extension todo list?
 - Stale tasks - if date is greater than X, style task to indicate stale
 - First app open of day, prompt user to review tasks in 'next' and setup days goals (cookies or storage)
+- Settings page allowing to alter some of the features, maybe colors, fonts, degrees of certain things etc
 
 ---
 
