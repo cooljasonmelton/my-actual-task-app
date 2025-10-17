@@ -1,12 +1,13 @@
 # My Actual Task App
 
-My Actual Task App is my actual task map, a full-stack productivity dashboard I’m building to keep my day organized. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights tasks I care about (priority stars, flexible status buckets, drag-and-drop reordering), lets me soft delete without losing data, and has convienence features like keyboard accessibility and a toggle to keep my browser awake.
+My Actual Task App is my actual task map, a full-stack productivity dashboard I’m building to keep things organized. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights tasks I care about (priority stars, flexible status buckets, drag-and-drop reordering), lets me break work into subtasks with inline editing, keeps soft-deleted items recoverable, and has convenience features like keyboard accessibility and a toggle to keep my browser awake.
 
 ## ✨ Highlights
 
 - **Priority-Driven Workflow** – Toggle the star to mark a task as urgent. The UI sorts by priority and reflects the change instantly while the backend keeps everything in sync.
 - **Rich Status Buckets** – Tasks flow between `next`, `dates`, `ongoing`, `get`, `backburner`, and `finished`, with live counts surfaced in the dashboard header.
-- **Soft Delete Safety Net** – Deleted tasks move to an archival state and drop to low priority instead of disappearing outright.
+- **Soft Delete Safety Net** – Deleted tasks (and their subtasks) move to an archival state and drop to low priority instead of disappearing outright.
+- **Nested Subtasks** – Create, edit, soft delete, and restore subtasks inline from the task details panel; they follow the same styling cues for active vs. archived items so nothing slips through the cracks.
 - **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column; changes persist instantly for priority-driven sorting.
 - **Live Loading Feedback** – Animated spinner plus typewriter status copy shows when tasks are reloading, keeping the UI lively without breaking the existing styling.
 - **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
@@ -98,8 +99,8 @@ npm run dev:all
 - Rich-text task descriptions
 - Tag management and sorting
 - Double click task title to edit
-- Restore soft-deleted tasks, permantely delete soft-deleted tasks
-- Subtasks for breaking big tasks into steps
+- Permantely delete soft-deleted tasks
+- Subtask drag-and-drop ordering
 - Drag-and-drop reassignment between sections (drop onto tab to move status).
 - Sort (asc/desc) and filter by tag, created date, priority
 - Multi-done checkboxes: task requires multiple iterations, create multiple checkboxes tallying each complete iteration e.g. answer 3 emails: [ x ] [ x ][ ]
