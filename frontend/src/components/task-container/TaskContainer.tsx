@@ -3,10 +3,7 @@ import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
 import type { DerivedTask } from "./types";
-import {
-  DEFAULT_SECTION_TAB_ITEM,
-  STATUS_SECTION_TAB_ITEMS,
-} from "../../constants";
+import { DEFAULT_SECTION_TAB_ITEM, STATUS_VALUES } from "../../constants";
 import { DEFAULT_TASK_SORT_OPTION } from "./utils/taskSorting";
 import { useTaskDragAndDrop } from "./utils/taskDragAndDrop";
 import { useReferenceWindow } from "./useReferenceWindow";
@@ -23,10 +20,7 @@ import { useUpdateSubtaskTitle } from "./useUpdateSubtaskTitle";
 import { useSoftDeleteSubtask } from "./useSoftDeleteSubtask";
 import { useRestoreSubtask } from "./useRestoreSubtask";
 import NoTasksPlaceholder from "./NoTasksPlaceholder";
-
 import "./TaskContainer.css";
-
-const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
 
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -37,7 +31,6 @@ const TaskContainer = () => {
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(
     () => new Set()
   );
-
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
   useEffect(() => {
     void loadTasks();

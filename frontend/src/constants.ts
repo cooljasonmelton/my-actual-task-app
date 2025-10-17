@@ -27,3 +27,5 @@ export const STATUS_SECTION_TAB_ITEMS: StatusSectionTabItem[] = [
   },
 ];
 export const DEFAULT_SECTION_TAB_ITEM = "next";
+
+export const STATUS_VALUES = STATUS_SECTION_TAB_ITEMS.map((item) => item.value);
