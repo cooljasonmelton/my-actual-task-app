@@ -1,9 +1,17 @@
 import type { DragEvent } from "react";
-import type { TaskType } from "../../types";
+import type { Subtask, TaskType } from "../../types";
 
-export type ApiTask = Omit<TaskType, "createdAt" | "deletedAt"> & {
+export type ApiSubtask = Omit<Subtask, "deletedAt"> & {
+  deletedAt: string | Date | null;
+};
+
+export type ApiTask = Omit<
+  TaskType,
+  "createdAt" | "deletedAt" | "subtasks"
+> & {
   createdAt: string | Date;
   deletedAt: string | Date | null;
+  subtasks: ApiSubtask[];
 };
 
 export type DerivedTask = {
@@ -21,6 +29,25 @@ export interface TaskProps {
     currentPriority: TaskType["priority"]
   ) => Promise<void>;
   onUpdateTitle: (id: TaskType["id"], updatedTitle: string) => Promise<void>;
+  onCreateSubtask: (
+    taskId: TaskType["id"],
+    title: string
+  ) => Promise<void>;
+  onUpdateSubtaskTitle: (
+    taskId: TaskType["id"],
+    subtaskId: Subtask["id"],
+    updatedTitle: string
+  ) => Promise<void>;
+  onDeleteSubtask: (
+    taskId: TaskType["id"],
+    subtaskId: Subtask["id"]
+  ) => Promise<void>;
+  onRestoreSubtask: (
+    taskId: TaskType["id"],
+    subtaskId: Subtask["id"]
+  ) => Promise<void>;
+  isExpanded: boolean;
+  onToggleExpanded: (taskId: TaskType["id"]) => void;
   isSoftDeleted: boolean;
   isSoftDeletedToday: boolean;
   isPriorityUpdating: boolean;

@@ -12,6 +12,7 @@ type InputFieldProps = {
   required?: boolean;
   value?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 };
 
 // TODO: handle error
@@ -27,6 +28,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       required = false,
       value = "",
       onChange,
+      disabled = false,
     },
     ref
   ) => {
@@ -45,6 +47,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           onChange={onChange}
           required={required}
           value={value}
+          disabled={disabled}
         />
       </>
     );
