@@ -7,10 +7,15 @@ import type { Status } from "../../database/types";
 let app: Application;
 let db: Database.Database;
 let taskQueries: typeof import("../../database/taskRepository").taskQueries;
+let subtaskQueries: typeof import("../../database/subtaskRepository").subtaskQueries;
 
 const insertTask = (title: string, status: Status = "next") => {
   const { id } = taskQueries.create({ title, status });
   return Number(id);
+};
+
+const insertSubtask = (taskId: number, title: string) => {
+  return subtaskQueries.create(taskId, title);
 };
 
 beforeAll(async () => {
@@ -21,12 +26,15 @@ beforeAll(async () => {
 
   const taskRepoModule = await import("../../database/taskRepository");
   taskQueries = taskRepoModule.taskQueries;
+  const subtaskRepoModule = await import("../../database/subtaskRepository");
+  subtaskQueries = subtaskRepoModule.subtaskQueries;
 
   const appModule = await import("../../app");
   app = appModule.default;
 });
 
 beforeEach(() => {
+  db.exec("DELETE FROM subtasks;");
   db.exec("DELETE FROM tasks;");
 });
 
@@ -318,5 +326,134 @@ describe("Tasks routes", () => {
       .send({ status: "next", orderedTaskIds: [nextTask, ongoingTask] });
 
     expect(response.status).toBe(400);
+  });
+
+  it("creates a subtask via POST /tasks/:taskId/subtasks", async () => {
+    const taskId = insertTask("Task with subtasks");
+
+    const response = await request(app)
+      .post(`/tasks/${taskId}/subtasks`)
+      .send({ title: "Write tests" });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      title: "Write tests",
+      deletedAt: null,
+      taskId,
+    });
+    expect(typeof response.body.id).toBe("number");
+
+    const record = db
+      .prepare(
+        "SELECT task_id, title, deleted_at, sort_index FROM subtasks WHERE id = ?"
+      )
+      .get(response.body.id) as
+      | {
+          task_id: number;
+          title: string;
+          deleted_at: string | null;
+          sort_index: number | null;
+        }
+      | undefined;
+
+    expect(record?.task_id).toBe(taskId);
+    expect(record?.title).toBe("Write tests");
+    expect(record?.deleted_at).toBeNull();
+    expect(record?.sort_index).not.toBeNull();
+  });
+
+  it("includes subtasks when fetching tasks", async () => {
+    const taskId = insertTask("Task with subtasks");
+    const subtask = insertSubtask(taskId, "Refine copy");
+
+    const response = await request(app)
+      .get("/tasks")
+      .query({ includeDeleted: "true" });
+
+    expect(response.status).toBe(200);
+    const task = response.body.find((item: any) => item.id === taskId);
+    expect(task).toBeTruthy();
+    expect(task.subtasks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: subtask.id,
+          title: "Refine copy",
+          deletedAt: null,
+        }),
+      ])
+    );
+  });
+
+  it("updates a subtask title via PUT /tasks/:taskId/subtasks/:subtaskId", async () => {
+    const taskId = insertTask("Task with subtasks");
+    const subtask = insertSubtask(taskId, "Draft outline");
+
+    const response = await request(app)
+      .put(`/tasks/${taskId}/subtasks/${subtask.id}`)
+      .send({ title: "Draft outline v2" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      id: subtask.id,
+      title: "Draft outline v2",
+      deletedAt: null,
+      taskId,
+    });
+
+    const record = db
+      .prepare("SELECT title FROM subtasks WHERE id = ?")
+      .get(subtask.id) as { title: string } | undefined;
+    expect(record?.title).toBe("Draft outline v2");
+  });
+
+  it("soft deletes a subtask via DELETE /tasks/:taskId/subtasks/:subtaskId", async () => {
+    const taskId = insertTask("Task with subtasks");
+    const subtask = insertSubtask(taskId, "Archive assets");
+
+    const response = await request(app).delete(
+      `/tasks/${taskId}/subtasks/${subtask.id}`
+    );
+
+    expect(response.status).toBe(204);
+
+    const record = db
+      .prepare(
+        "SELECT deleted_at, sort_index FROM subtasks WHERE id = ?"
+      )
+      .get(subtask.id) as
+      | { deleted_at: string | null; sort_index: number | null }
+      | undefined;
+
+    expect(record?.deleted_at).not.toBeNull();
+    expect(record?.sort_index).toBeNull();
+  });
+
+  it("restores a soft-deleted subtask via PATCH /tasks/:taskId/subtasks/:subtaskId/restore", async () => {
+    const taskId = insertTask("Task with subtasks");
+    const subtask = insertSubtask(taskId, "Review PR");
+    await request(app).delete(`/tasks/${taskId}/subtasks/${subtask.id}`);
+
+    const response = await request(app).patch(
+      `/tasks/${taskId}/subtasks/${subtask.id}/restore`
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      id: subtask.id,
+      title: "Review PR",
+      deletedAt: null,
+      taskId,
+    });
+
+    const record = db
+      .prepare(
+        "SELECT deleted_at, sort_index FROM subtasks WHERE id = ?"
+      )
+      .get(subtask.id) as
+      | { deleted_at: string | null; sort_index: number | null }
+      | undefined;
+
+    expect(record?.deleted_at).toBeNull();
+    expect(record?.sort_index).not.toBeNull();
   });
 });

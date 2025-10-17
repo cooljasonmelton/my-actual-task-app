@@ -6,6 +6,7 @@ import {
   getMinSortIndexForStatus,
   mapDbTaskToTask,
 } from "./taskRepositoryUtils";
+import { subtaskQueries } from "./subtaskRepository";
 
 type DbTaskRow = {
   id: number;
@@ -120,23 +121,29 @@ const statements: TaskStatementsType = {
   ),
 };
 
+const mapRowToTaskWithSubtasks = (row: DbTaskRow): Task => {
+  return mapDbTaskToTask(row, {
+    subtasks: subtaskQueries.getByTaskId(row.id, { includeDeleted: true }),
+  });
+};
+
 export const taskQueries = {
   getAll: (includeDeleted = false): Task[] => {
     const statement = includeDeleted
       ? statements.selectAllTasks
       : statements.selectActiveTasks;
-    return (statement.all() as DbTaskRow[]).map(mapDbTaskToTask);
+    return (statement.all() as DbTaskRow[]).map(mapRowToTaskWithSubtasks);
   },
 
   getDeleted: (): Task[] => {
     return (statements.selectDeletedTasks.all() as DbTaskRow[]).map(
-      mapDbTaskToTask
+      mapRowToTaskWithSubtasks
     );
   },
 
   getById: (id: number): Task | undefined => {
     const row = statements.selectTaskById.get(id) as DbTaskRow | undefined;
-    return row ? mapDbTaskToTask(row) : undefined;
+    return row ? mapRowToTaskWithSubtasks(row) : undefined;
   },
 
   create: (taskData: CreateTaskRequest): { id: number } => {
@@ -180,7 +187,7 @@ export const taskQueries = {
 
     const currentStatus = (existingRow.status ?? "next") as Status;
     if (currentStatus === status) {
-      return mapDbTaskToTask(existingRow);
+      return mapRowToTaskWithSubtasks(existingRow);
     }
 
     const shouldAssignSortIndex = status !== "finished";
@@ -200,7 +207,7 @@ export const taskQueries = {
     const updatedRow = statements.selectTaskById.get(id) as
       | DbTaskRow
       | undefined;
-    return updatedRow ? mapDbTaskToTask(updatedRow) : undefined;
+    return updatedRow ? mapRowToTaskWithSubtasks(updatedRow) : undefined;
   },
 
   updateSortOrder: (
@@ -280,7 +287,7 @@ export const taskQueries = {
     const updatedRow = statements.selectTaskById.get(id) as
       | DbTaskRow
       | undefined;
-    return updatedRow ? mapDbTaskToTask(updatedRow) : undefined;
+    return updatedRow ? mapRowToTaskWithSubtasks(updatedRow) : undefined;
   },
 };
 

@@ -1,6 +1,7 @@
 // TODO: refactor for smaller file size
 import { Router, Request, Response } from "express";
 import { taskQueries } from "../database/taskRepository";
+import { subtaskQueries } from "../database/subtaskRepository";
 import { CreateTaskRequest, UpdateTaskRequest } from "../database/types";
 import type { Priority, Status } from "../../../shared/types/task";
 import { asyncHandler, ApiError } from "../middleware/errorHandler";
@@ -278,6 +279,177 @@ router.patch(
     }
 
     res.json(updatedTask);
+  })
+);
+
+// POST create subtask
+router.post(
+  "/:taskId/subtasks",
+  asyncHandler(async (req: Request, res: Response) => {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    const { title } = req.body as { title?: string };
+
+    if (Number.isNaN(taskId)) {
+      const error: ApiError = new Error("Invalid task ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const trimmedTitle = title?.trim();
+    if (!trimmedTitle) {
+      const error: ApiError = new Error("Title is required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const parentTask = taskQueries.getById(taskId);
+    if (!parentTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const createdSubtask = subtaskQueries.create(taskId, trimmedTitle);
+    res.status(201).json({ ...createdSubtask, taskId });
+  })
+);
+
+// PUT update subtask title
+router.put(
+  "/:taskId/subtasks/:subtaskId",
+  asyncHandler(async (req: Request, res: Response) => {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    const subtaskId = Number.parseInt(req.params.subtaskId, 10);
+    const { title } = req.body as { title?: string };
+
+    if (Number.isNaN(taskId) || Number.isNaN(subtaskId)) {
+      const error: ApiError = new Error("Invalid subtask ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const trimmedTitle = title?.trim();
+    if (!trimmedTitle) {
+      const error: ApiError = new Error("Title is required");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const parentTask = taskQueries.getById(taskId);
+    if (!parentTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const existingSubtask = subtaskQueries.getById(subtaskId);
+    if (!existingSubtask || existingSubtask.taskId !== taskId) {
+      const error: ApiError = new Error("Subtask not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (existingSubtask.deletedAt) {
+      const error: ApiError = new Error("Cannot edit a deleted subtask");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const updatedSubtask = subtaskQueries.updateTitle(
+      subtaskId,
+      trimmedTitle
+    );
+
+    if (!updatedSubtask) {
+      const error: ApiError = new Error("Subtask not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.json({ ...updatedSubtask, taskId });
+  })
+);
+
+// DELETE soft delete subtask
+router.delete(
+  "/:taskId/subtasks/:subtaskId",
+  asyncHandler(async (req: Request, res: Response) => {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    const subtaskId = Number.parseInt(req.params.subtaskId, 10);
+
+    if (Number.isNaN(taskId) || Number.isNaN(subtaskId)) {
+      const error: ApiError = new Error("Invalid subtask ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const parentTask = taskQueries.getById(taskId);
+    if (!parentTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const existingSubtask = subtaskQueries.getById(subtaskId);
+    if (!existingSubtask || existingSubtask.taskId !== taskId) {
+      const error: ApiError = new Error("Subtask not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const deletedSubtask = subtaskQueries.softDelete(subtaskId);
+    if (!deletedSubtask) {
+      const error: ApiError = new Error("Subtask not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(204).send();
+  })
+);
+
+// PATCH restore subtask
+router.patch(
+  "/:taskId/subtasks/:subtaskId/restore",
+  asyncHandler(async (req: Request, res: Response) => {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    const subtaskId = Number.parseInt(req.params.subtaskId, 10);
+
+    if (Number.isNaN(taskId) || Number.isNaN(subtaskId)) {
+      const error: ApiError = new Error("Invalid subtask ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const parentTask = taskQueries.getById(taskId);
+    if (!parentTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const existingSubtask = subtaskQueries.getById(subtaskId);
+    if (!existingSubtask || existingSubtask.taskId !== taskId) {
+      const error: ApiError = new Error("Subtask not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (!existingSubtask.deletedAt) {
+      const error: ApiError = new Error("Subtask is not deleted");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const restoredSubtask = subtaskQueries.restore(subtaskId);
+
+    if (!restoredSubtask) {
+      const error: ApiError = new Error("Subtask not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.json({ ...restoredSubtask, taskId });
   })
 );
 
