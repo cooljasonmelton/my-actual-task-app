@@ -26,16 +26,6 @@ const SubtaskListItemContainer = (props: SubtaskItemProps) => {
     [props.subtask.deletedAt]
   );
 
-  console.log(
-    "SubtaskListItemContainer",
-    "isEditing",
-    isEditing,
-    "props",
-    props,
-    "isTaskSoftDeleted",
-    props.isTaskSoftDeleted
-  );
-
   const isLoading = false; // add isRestoring, isSubmitting, etc
 
   // TODO: add loading logic

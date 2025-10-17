@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import Task from "./task/Task";
+import { useEffect, useState } from "react";
+import TaskList from "./task/TaskList";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
-import type { DerivedTask } from "./types";
-import { DEFAULT_SECTION_TAB_ITEM, STATUS_VALUES } from "../../constants";
+import { DEFAULT_SECTION_TAB_ITEM } from "../../constants";
 import { DEFAULT_TASK_SORT_OPTION } from "./utils/taskSorting";
 import { useTaskDragAndDrop } from "./utils/taskDragAndDrop";
 import { useReferenceWindow } from "./useReferenceWindow";
-import { createEmptyBuckets } from "./utils/taskContainerUtils";
 import { useLoadTasks } from "./useLoadTasks";
 import { useSoftDeleteTask } from "./useSoftDeleteTask";
 import { useRestoreTask } from "./useRestoreTask";
@@ -19,7 +17,8 @@ import { useCreateSubtask } from "./useCreateSubtask";
 import { useUpdateSubtaskTitle } from "./useUpdateSubtaskTitle";
 import { useSoftDeleteSubtask } from "./useSoftDeleteSubtask";
 import { useRestoreSubtask } from "./useRestoreSubtask";
-import NoTasksPlaceholder from "./NoTasksPlaceholder";
+import { useDerivedTaskData } from "./useDerivedTaskData";
+import { useExpandedTasks } from "./useExpandedTasks";
 import "./TaskContainer.css";
 
 const TaskContainer = () => {
@@ -27,9 +26,6 @@ const TaskContainer = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<Status>(
     DEFAULT_SECTION_TAB_ITEM
-  );
-  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(
-    () => new Set()
   );
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
   useEffect(() => {
@@ -66,34 +62,7 @@ const TaskContainer = () => {
     setError,
     loadTasks,
   });
-
-  useEffect(() => {
-    const taskIds = new Set(tasks.map((task) => task.id));
-    setExpandedTaskIds((prev) => {
-      let hasChanges = false;
-      const next = new Set<number>();
-      prev.forEach((id) => {
-        if (taskIds.has(id)) {
-          next.add(id);
-        } else {
-          hasChanges = true;
-        }
-      });
-      return hasChanges ? next : prev;
-    });
-  }, [tasks]);
-
-  const handleToggleExpanded = useCallback((taskId: number) => {
-    setExpandedTaskIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(taskId)) {
-        next.delete(taskId);
-      } else {
-        next.add(taskId);
-      }
-      return next;
-    });
-  }, []);
+  const { expandedTaskIds, handleToggleExpanded } = useExpandedTasks(tasks);
 
   const {
     draggingTask,
@@ -119,83 +88,11 @@ const TaskContainer = () => {
   });
 
   const { isInCurrentReferenceWindow } = useReferenceWindow();
-  const derivedTasks = useMemo<DerivedTask[]>(() => {
-    return tasks.map((task) => {
-      const deletedAt = task.deletedAt;
-      const isSoftDeleted = Boolean(deletedAt);
-      const isSoftDeletedToday = Boolean(
-        deletedAt && isInCurrentReferenceWindow(deletedAt)
-      );
-
-      return {
-        task,
-        isSoftDeleted,
-        isSoftDeletedToday,
-      };
-    });
-  }, [tasks, isInCurrentReferenceWindow]);
-
-  const statusBuckets = useMemo(() => {
-    const buckets = createEmptyBuckets(STATUS_VALUES);
-
-    derivedTasks.forEach((item) => {
-      const { task, isSoftDeleted, isSoftDeletedToday } = item;
-
-      if (isSoftDeleted && !isSoftDeletedToday) {
-        buckets.finished.push(item);
-      } else {
-        buckets[task.status].push(item);
-      }
-    });
-
-    return buckets;
-  }, [derivedTasks]);
-
-  const statusCounts = useMemo<Record<Status, number>>(() => {
-    return STATUS_VALUES.reduce((acc, status) => {
-      acc[status] = statusBuckets[status]?.length ?? 0;
-      return acc;
-    }, {} as Record<Status, number>);
-  }, [statusBuckets]);
-
-  const tasksForSelectedStatus = statusBuckets[selectedStatus];
-
-  const renderTasks = () => {
-    if (tasksForSelectedStatus.length === 0) {
-      return <NoTasksPlaceholder />;
-    }
-
-    return tasksForSelectedStatus.map(
-      ({ task, isSoftDeleted, isSoftDeletedToday }) => (
-        <Task
-          key={task.id}
-          task={task}
-          onDelete={handleDeleteTask}
-          onRestore={handleRestoreTask}
-          onTogglePriority={handleTogglePriority}
-          onUpdateTitle={handleUpdateTitle}
-          onCreateSubtask={handleCreateSubtask}
-          onUpdateSubtaskTitle={handleUpdateSubtaskTitle}
-          onDeleteSubtask={handleDeleteSubtask}
-          onRestoreSubtask={handleRestoreSubtask}
-          isSoftDeleted={isSoftDeleted}
-          isSoftDeletedToday={isSoftDeletedToday}
-          isPriorityUpdating={updatingPriorities.has(task.id)}
-          isExpanded={expandedTaskIds.has(task.id)}
-          onToggleExpanded={handleToggleExpanded}
-          draggable={!isSoftDeleted && selectedStatus !== "finished"}
-          isDragging={draggingTask?.id === task.id}
-          isDragOver={dragOverTaskId === task.id}
-          onDragStart={handleDragStart}
-          onDragEnter={handleDragEnter}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDragEnd={handleDragEnd}
-          onDrop={handleDropOnTask}
-        />
-      )
-    );
-  };
+  const { statusCounts, tasksForSelectedStatus } = useDerivedTaskData({
+    tasks,
+    selectedStatus,
+    isInCurrentReferenceWindow,
+  });
 
   const isDraggingInSelectedStatus = Boolean(
     draggingTask && draggingTask.status === selectedStatus
@@ -246,7 +143,29 @@ const TaskContainer = () => {
             </div>
           </div>
         ) : (
-          renderTasks()
+          <TaskList
+            tasks={tasksForSelectedStatus}
+            selectedStatus={selectedStatus}
+            expandedTaskIds={expandedTaskIds}
+            onToggleExpanded={handleToggleExpanded}
+            onDelete={handleDeleteTask}
+            onRestore={handleRestoreTask}
+            onTogglePriority={handleTogglePriority}
+            onUpdateTitle={handleUpdateTitle}
+            onCreateSubtask={handleCreateSubtask}
+            onUpdateSubtaskTitle={handleUpdateSubtaskTitle}
+            onDeleteSubtask={handleDeleteSubtask}
+            onRestoreSubtask={handleRestoreSubtask}
+            updatingPriorities={updatingPriorities}
+            draggingTaskId={draggingTask?.id ?? null}
+            dragOverTaskId={dragOverTaskId}
+            handleDragStart={handleDragStart}
+            handleDragEnter={handleDragEnter}
+            handleDragOver={handleDragOver}
+            handleDragLeave={handleDragLeave}
+            handleDragEnd={handleDragEnd}
+            handleDropOnTask={handleDropOnTask}
+          />
         )}
       </div>
     </>
