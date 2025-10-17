@@ -17,7 +17,7 @@ export interface Subtask {
   id: number;
   title: string;
   deletedAt: Date | null;
-  order: number;
+  sortIndex: number | null;
 }
 
 export interface Task {
