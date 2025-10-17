@@ -7,9 +7,10 @@ interface ButtonProps {
   size?: "small" | "medium" | "large";
   disabled?: boolean;
   onClick?: () => void;
-  type?: "button" | "submit" | "reset" | undefined;
+  type?: "button" | "submit" | "reset";
   isLoading?: boolean;
-  className?: string;
+  className: string;
+  form?: string;
 }
 
 const Button = ({
