@@ -9,7 +9,7 @@ interface ButtonProps {
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
   isLoading?: boolean;
-  className: string;
+  className?: string;
   form?: string;
 }
 
