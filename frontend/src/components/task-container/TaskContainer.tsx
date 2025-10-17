@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Task from "./task/Task";
 import DashboardHeader from "../dashboard-header/DashboardHeader";
 import type { Status, TaskType } from "../../types";
@@ -18,6 +18,10 @@ import { useTogglePriority } from "./useTogglePriorty";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
 import { usePersistReorder } from "./usePersistReorder";
+import { useCreateSubtask } from "./useCreateSubtask";
+import { useUpdateSubtaskTitle } from "./useUpdateSubtaskTitle";
+import { useSoftDeleteSubtask } from "./useSoftDeleteSubtask";
+import { useRestoreSubtask } from "./useRestoreSubtask";
 import NoTasksPlaceholder from "./NoTasksPlaceholder";
 
 import "./TaskContainer.css";
@@ -29,6 +33,9 @@ const TaskContainer = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<Status>(
     DEFAULT_SECTION_TAB_ITEM
+  );
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(
+    () => new Set()
   );
 
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
@@ -53,6 +60,47 @@ const TaskContainer = () => {
     loadTasks,
   });
   const { persistReorder } = usePersistReorder({ loadTasks, setError });
+  const { handleCreateSubtask } = useCreateSubtask({ setError, loadTasks });
+  const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({
+    setError,
+    loadTasks,
+  });
+  const { handleDeleteSubtask } = useSoftDeleteSubtask({
+    setError,
+    loadTasks,
+  });
+  const { handleRestoreSubtask } = useRestoreSubtask({
+    setError,
+    loadTasks,
+  });
+
+  useEffect(() => {
+    const taskIds = new Set(tasks.map((task) => task.id));
+    setExpandedTaskIds((prev) => {
+      let hasChanges = false;
+      const next = new Set<number>();
+      prev.forEach((id) => {
+        if (taskIds.has(id)) {
+          next.add(id);
+        } else {
+          hasChanges = true;
+        }
+      });
+      return hasChanges ? next : prev;
+    });
+  }, [tasks]);
+
+  const handleToggleExpanded = useCallback((taskId: number) => {
+    setExpandedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) {
+        next.delete(taskId);
+      } else {
+        next.add(taskId);
+      }
+      return next;
+    });
+  }, []);
 
   const {
     draggingTask,
@@ -133,9 +181,15 @@ const TaskContainer = () => {
           onRestore={handleRestoreTask}
           onTogglePriority={handleTogglePriority}
           onUpdateTitle={handleUpdateTitle}
+          onCreateSubtask={handleCreateSubtask}
+          onUpdateSubtaskTitle={handleUpdateSubtaskTitle}
+          onDeleteSubtask={handleDeleteSubtask}
+          onRestoreSubtask={handleRestoreSubtask}
           isSoftDeleted={isSoftDeleted}
           isSoftDeletedToday={isSoftDeletedToday}
           isPriorityUpdating={updatingPriorities.has(task.id)}
+          isExpanded={expandedTaskIds.has(task.id)}
+          onToggleExpanded={handleToggleExpanded}
           draggable={!isSoftDeleted && selectedStatus !== "finished"}
           isDragging={draggingTask?.id === task.id}
           isDragOver={dragOverTaskId === task.id}

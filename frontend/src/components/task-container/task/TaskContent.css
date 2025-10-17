@@ -1,9 +1,44 @@
 .task-content {
-  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
   border: 0.125rem solid var(--color-border);
   border-radius: calc(0.5rem - 2px);
-
-  padding: 0.5rem;
-
+  padding: 0.75rem;
   background-color: var(--color-bg-alt);
+}
+
+.task-content__form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-content__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--color-border, #cbd5f5);
+  border-radius: 0.5rem;
+  font: inherit;
+  line-height: 1.4;
+  background-color: var(--color-surface, #f8fafc);
+}
+
+.task-content__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.task-content__form-error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-accent-red, #ef4444);
+}
+
+.task-content__empty {
+  margin: auto;
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #64748b);
 }

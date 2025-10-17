@@ -67,7 +67,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
       setIsDeleting(false);
     }
   };
-
+  // TODO: move to shared util
   const handleKeyDown = (
     event: KeyboardEvent<SVGSVGElement>,
     action: "expand" | "delete" | "star" | "restore"

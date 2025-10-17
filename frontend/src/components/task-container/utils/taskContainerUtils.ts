@@ -1,11 +1,21 @@
-import type { Status, TaskType } from "../../../types";
-import type { ApiTask, DerivedTask } from "../types";
+import type { Status, Subtask, TaskType } from "../../../types";
+import type { ApiSubtask, ApiTask, DerivedTask } from "../types";
 import { parseReferenceWindowDate } from "../useReferenceWindow";
+
+const parseSubtaskFromApi = (subtask: ApiSubtask): Subtask => ({
+  ...subtask,
+  deletedAt: subtask.deletedAt
+    ? parseReferenceWindowDate(subtask.deletedAt)
+    : null,
+});
 
 export const parseTaskFromApi = (task: ApiTask): TaskType => ({
   ...task,
   createdAt: parseReferenceWindowDate(task.createdAt),
   deletedAt: task.deletedAt ? parseReferenceWindowDate(task.deletedAt) : null,
+  subtasks: Array.isArray(task.subtasks)
+    ? task.subtasks.map(parseSubtaskFromApi)
+    : [],
 });
 
 export const createEmptyBuckets = (

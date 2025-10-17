@@ -53,6 +53,7 @@
   width: 1.35rem;
   height: 1.35rem;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .task-header__icon--star {

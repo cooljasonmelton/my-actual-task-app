@@ -3,8 +3,8 @@ import TaskHeader from "./TaskHeader";
 import TaskContent from "./TaskContent";
 import Modal from "../../design-system-components/modal/Modal";
 import ConfirmationModalContent from "./ConfirmationModalContent";
-import "./Task.css";
 import type { TaskProps } from "../types";
+import "./Task.css";
 
 const Task = ({
   task,
@@ -12,6 +12,12 @@ const Task = ({
   onRestore,
   onTogglePriority,
   onUpdateTitle,
+  onCreateSubtask,
+  onUpdateSubtaskTitle,
+  onDeleteSubtask,
+  onRestoreSubtask,
+  isExpanded,
+  onToggleExpanded,
   isSoftDeleted,
   isSoftDeletedToday,
   isPriorityUpdating,
@@ -25,8 +31,6 @@ const Task = ({
   onDragEnd,
   onDrop,
 }: TaskProps) => {
-  // TODO: add animation to expansion
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isTitleEditing, setIsTitleEditing] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -89,7 +93,7 @@ const Task = ({
           title={task.title}
           priority={task.priority}
           isExpanded={isExpanded}
-          toggleExpanded={() => setIsExpanded(!isExpanded)}
+          toggleExpanded={() => onToggleExpanded(task.id)}
           onDelete={onDelete}
           onTogglePriority={onTogglePriority}
           onUpdateTitle={onUpdateTitle}
@@ -99,7 +103,18 @@ const Task = ({
           onTitleEditingChange={setIsTitleEditing}
           onRestoreRequest={() => setIsRestoreModalOpen(true)}
         />
-        {isExpanded && <TaskContent />}
+        {/* TODO: add animation to expansion */}
+        {isExpanded && (
+          <TaskContent
+            taskId={task.id}
+            subtasks={task.subtasks}
+            isSoftDeleted={isSoftDeleted}
+            onCreateSubtask={onCreateSubtask}
+            onUpdateSubtaskTitle={onUpdateSubtaskTitle}
+            onDeleteSubtask={onDeleteSubtask}
+            onRestoreSubtask={onRestoreSubtask}
+          />
+        )}
       </div>
       <Modal
         isOpen={isRestoreModalOpen}
@@ -111,6 +126,9 @@ const Task = ({
         <ConfirmationModalContent
           titleId={modalTitleId}
           title="Restore task?"
+          confirmLabel="Restore"
+          cancelLabel="Cancel"
+          confirmLoadingLabel="Restoring..."
           onCancel={handleDismissRestoreModal}
           onConfirm={handleConfirmRestore}
           isConfirming={isRestoring}
