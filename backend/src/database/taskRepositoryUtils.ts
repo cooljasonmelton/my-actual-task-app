@@ -1,4 +1,4 @@
-import type { Status, Priority, Task } from "../../../shared/types/task";
+import type { Status, Priority, Task, Subtask } from "../../../shared/types/task";
 import { DbTaskRow, TaskStatementsType } from "./taskRepository";
 
 const SERIALIZED_DATE_TIME_REGEX = /[Tt]|Z$|[+-]\d{2}:?\d{2}$/;
@@ -13,7 +13,7 @@ export const getMinSortIndexForStatus = (
   return result?.min_sort_index ?? null;
 };
 
-const parseSqliteDate = (value: string | Date | null): Date | null => {
+export const parseSqliteDate = (value: string | Date | null): Date | null => {
   if (!value) {
     return null;
   }
@@ -30,7 +30,10 @@ const parseSqliteDate = (value: string | Date | null): Date | null => {
   return Number.isNaN(parsed.getTime()) ? new Date(value) : parsed;
 };
 
-export const mapDbTaskToTask = (row: DbTaskRow): Task => {
+export const mapDbTaskToTask = (
+  row: DbTaskRow,
+  options?: { subtasks?: Subtask[] }
+): Task => {
   const priorityValue =
     row.priority === null || row.priority === undefined
       ? 5
@@ -50,6 +53,6 @@ export const mapDbTaskToTask = (row: DbTaskRow): Task => {
     status: statusValue,
     sortIndex: row.sort_index ?? null,
     tags: [],
-    subtasks: [],
+    subtasks: options?.subtasks ?? [],
   };
 };

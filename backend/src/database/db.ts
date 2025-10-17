@@ -45,6 +45,24 @@ const recreateTaskIndexesSQL = `
   CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at);
 `;
 
+const recreateSubtaskIndexesSQL = `
+  CREATE INDEX IF NOT EXISTS idx_subtasks_task_id ON subtasks(task_id);
+  CREATE INDEX IF NOT EXISTS idx_subtasks_task_id_sort_index ON subtasks(task_id, sort_index);
+  CREATE INDEX IF NOT EXISTS idx_subtasks_deleted_at ON subtasks(deleted_at);
+`;
+
+const createSubtasksTempTableSQL = `
+  CREATE TABLE subtasks_new (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    sort_index INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+  )
+`;
+
 function migrateTasksTableStatusConstraint(): void {
   const tableDefinition = db
     .prepare(
@@ -163,6 +181,52 @@ function ensureTaskSortIndexColumn(): void {
   db.exec("UPDATE tasks SET sort_index = NULL WHERE deleted_at IS NOT NULL");
 }
 
+function migrateSubtasksTable(): void {
+  const columns = db
+    .prepare("PRAGMA table_info(subtasks)")
+    .all() as Array<{ name: string }>;
+
+  if (columns.length === 0) {
+    db.exec(recreateSubtaskIndexesSQL);
+    return;
+  }
+
+  const hasSortIndex = columns.some((column) => column.name === "sort_index");
+  const hasDeletedAt = columns.some(
+    (column) => column.name === "deleted_at"
+  );
+  const hasCompletedColumn = columns.some(
+    (column) => column.name === "completed" || column.name === "completed_at"
+  );
+
+  if (hasSortIndex && hasDeletedAt && !hasCompletedColumn) {
+    db.exec(recreateSubtaskIndexesSQL);
+    db.exec(
+      "UPDATE subtasks SET sort_index = NULL WHERE deleted_at IS NOT NULL"
+    );
+    return;
+  }
+
+  const selectSortIndex = hasSortIndex ? "sort_index" : "NULL";
+  const selectDeletedAt = hasDeletedAt ? "deleted_at" : "NULL";
+  const hasCreatedAt = columns.some((column) => column.name === "created_at");
+  const selectCreatedAt = hasCreatedAt ? "created_at" : "CURRENT_TIMESTAMP";
+
+  db.exec(`
+    BEGIN TRANSACTION;
+    ${createSubtasksTempTableSQL};
+    INSERT INTO subtasks_new (id, task_id, title, sort_index, created_at, deleted_at)
+    SELECT id, task_id, title, ${selectSortIndex}, ${selectCreatedAt}, ${selectDeletedAt}
+    FROM subtasks;
+    DROP TABLE subtasks;
+    ALTER TABLE subtasks_new RENAME TO subtasks;
+    ${recreateSubtaskIndexesSQL}
+    COMMIT;
+  `);
+
+  db.exec("UPDATE subtasks SET sort_index = NULL WHERE deleted_at IS NOT NULL");
+}
+
 function initializeDatabase(): void {
   const schemaSQL = fs.readFileSync(
     path.join(__dirname, "schema.sql"),
@@ -171,6 +235,7 @@ function initializeDatabase(): void {
   db.exec(schemaSQL);
   migrateTasksTableStatusConstraint();
   ensureTaskSortIndexColumn();
+  migrateSubtasksTable();
 }
 
 initializeDatabase();
