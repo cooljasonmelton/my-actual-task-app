@@ -79,4 +79,5 @@ export type TaskHeaderProps = {
   isPriorityUpdating: boolean;
   onTitleEditingChange: (isEditing: boolean) => void;
   onRestoreRequest: () => void;
+  hasSubtasks: boolean;
 };

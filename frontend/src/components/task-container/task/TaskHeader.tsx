@@ -5,6 +5,7 @@ import {
   ChevronRight,
   XCircle,
   ArchiveRestore,
+  ListChecks,
 } from "lucide-react";
 import type { TaskHeaderProps } from "../types";
 import TaskTitleEditor from "./TaskTitleEditor";
@@ -25,6 +26,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   isPriorityUpdating,
   onTitleEditingChange,
   onRestoreRequest,
+  hasSubtasks,
 }) => {
   const [shouldDelete, setShouldDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -140,28 +142,43 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
           />
         </div>
       </div>
-      {isSoftDeleted ? (
-        <ArchiveRestore
-          onClick={onRestoreRequest}
-          onKeyDown={(e) => handleKeyDown(e, "restore")}
-          className="task-header__icon task-header__icon--restore"
-          aria-label="Restore task"
-          role="button"
-          tabIndex={0}
-        />
-      ) : (
-        <XCircle
-          onClick={handleClickDelete}
-          onKeyDown={(e) => handleKeyDown(e, "delete")}
-          className={`${
-            shouldDelete ? "filled-delete" : "empty-delete"
-          } task-header__icon`}
-          aria-label={shouldDelete ? "Confirm delete task" : "Delete task"}
-          role="button"
-          aria-disabled={isDeleting}
-          tabIndex={0}
-        />
-      )}
+      <div className="task-header__actions">
+        {hasSubtasks ? (
+          <div
+            className="task-header__subtasks-indicator"
+            role="img"
+            aria-label="Task has subtasks"
+          >
+            <ListChecks
+              className="task-header__icon task-header__icon--subtasks"
+              aria-hidden="true"
+              focusable="false"
+            />
+          </div>
+        ) : null}
+        {isSoftDeleted ? (
+          <ArchiveRestore
+            onClick={onRestoreRequest}
+            onKeyDown={(e) => handleKeyDown(e, "restore")}
+            className="task-header__icon task-header__icon--restore"
+            aria-label="Restore task"
+            role="button"
+            tabIndex={0}
+          />
+        ) : (
+          <XCircle
+            onClick={handleClickDelete}
+            onKeyDown={(e) => handleKeyDown(e, "delete")}
+            className={`${
+              shouldDelete ? "filled-delete" : "empty-delete"
+            } task-header__icon`}
+            aria-label={shouldDelete ? "Confirm delete task" : "Delete task"}
+            role="button"
+            aria-disabled={isDeleting}
+            tabIndex={0}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -18,6 +18,7 @@ describe("TaskHeader", () => {
     isPriorityUpdating: false,
     onTitleEditingChange: vi.fn(),
     onRestoreRequest: vi.fn(),
+    hasSubtasks: false,
   };
 
   beforeEach(() => {
@@ -108,6 +109,22 @@ describe("TaskHeader", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /star task/i }));
     expect(onTogglePriority).not.toHaveBeenCalled();
+  });
+
+  it("shows a subtasks indicator when the task has subtasks", () => {
+    render(<TaskHeader {...defaultProps} hasSubtasks />);
+
+    expect(
+      screen.getByRole("img", { name: /task has subtasks/i })
+    ).toBeInTheDocument();
+  });
+
+  it("hides the subtasks indicator when there are no subtasks", () => {
+    render(<TaskHeader {...defaultProps} />);
+
+    expect(
+      screen.queryByRole("img", { name: /task has subtasks/i })
+    ).not.toBeInTheDocument();
   });
 
   it("supports toggling priority with the keyboard", () => {

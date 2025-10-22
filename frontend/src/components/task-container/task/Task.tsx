@@ -102,6 +102,7 @@ const Task = ({
           isPriorityUpdating={isPriorityUpdating}
           onTitleEditingChange={setIsTitleEditing}
           onRestoreRequest={() => setIsRestoreModalOpen(true)}
+          hasSubtasks={task.subtasks.length > 0}
         />
         {/* TODO: add animation to expansion */}
         {isExpanded && (
