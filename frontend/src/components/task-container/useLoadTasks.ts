@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useRef,
   useState,
   type Dispatch,
   type SetStateAction,
@@ -18,9 +19,15 @@ export const useLoadTasks = ({
   setTasks: Dispatch<SetStateAction<Task[]>>;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const hasLoadedOnceRef = useRef(false);
 
   const loadTasks = useCallback(async () => {
-    setIsLoading(true);
+    const shouldShowSpinner = !hasLoadedOnceRef.current;
+
+    if (shouldShowSpinner) {
+      setIsLoading(true);
+    }
+
     try {
       setError(null);
       const response = await fetch(`${TASKS_API_URL}?includeDeleted=true`);
@@ -38,7 +45,11 @@ export const useLoadTasks = ({
         err instanceof Error ? err.message : "An unknown error occurred";
       setError(message);
     } finally {
-      setIsLoading(false);
+      hasLoadedOnceRef.current = true;
+
+      if (shouldShowSpinner) {
+        setIsLoading(false);
+      }
     }
   }, [setError, setTasks]);
 

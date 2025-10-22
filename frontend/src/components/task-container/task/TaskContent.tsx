@@ -45,11 +45,19 @@ const TaskContent = ({
 
   useEffect(() => {
     if (newSubtaskTitle === "") {
-      inputRef.current?.focus();
+      const input = inputRef.current;
+      if (!input) {
+        return;
+      }
+
+      try {
+        input.focus({ preventScroll: true });
+      } catch {
+        input.focus();
+      }
     }
   }, [newSubtaskTitle]);
 
-  // TODO: move to hook
   const handleSubmitNewSubtask = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();

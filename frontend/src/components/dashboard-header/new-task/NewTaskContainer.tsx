@@ -45,7 +45,14 @@ const NewTaskContainer = ({
 
       await refreshTasks();
       setTaskTitle("");
-      inputRef.current?.focus();
+      const input = inputRef.current;
+      if (input) {
+        try {
+          input.focus({ preventScroll: true });
+        } catch {
+          input.focus();
+        }
+      }
     } catch (err) {
       reportError(
         err instanceof Error ? err.message : "An unknown error occurred"

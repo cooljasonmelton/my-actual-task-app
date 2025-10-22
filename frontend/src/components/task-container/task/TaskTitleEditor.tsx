@@ -39,13 +39,7 @@ const TaskTitleEditor = ({
     }
 
     const nearestRem = Math.round(textarea.scrollHeight / 16);
-
-    // textarea.style.height = "auto";
-    console.log(
-      "textarea.scrollHeight",
-      textarea.scrollHeight / 50,
-      nearestRem
-    );
+    textarea.style.height = "auto";
     textarea.style.height = `${nearestRem}rem`;
   }, []);
 
@@ -80,14 +74,12 @@ const TaskTitleEditor = ({
   const handleSubmitTitle = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-
       const trimmedTitle = draftTitle.trim();
 
       if (!trimmedTitle) {
         setTitleError("Title cannot be empty");
         return;
       }
-
       if (trimmedTitle === title) {
         handleCancelEditing();
         return;
@@ -193,7 +185,6 @@ const TaskTitleEditor = ({
       </form>
     );
   }
-
   return (
     <h3
       className={titleClassName}
@@ -206,5 +197,4 @@ const TaskTitleEditor = ({
     </h3>
   );
 };
-
 export default TaskTitleEditor;

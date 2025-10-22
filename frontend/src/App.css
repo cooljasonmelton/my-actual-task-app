@@ -27,7 +27,7 @@
 }
 
 .card {
-  overflow: scroll;
+  overflow: auto;
   border: 0.125rem solid var(--color-border);
   border-radius: calc(0.5rem - 2px);
 
