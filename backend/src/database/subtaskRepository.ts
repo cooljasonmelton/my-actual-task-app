@@ -25,8 +25,8 @@ const statements: SubtaskStatements = {
       WHERE task_id = ?
         AND deleted_at IS NULL
       ORDER BY
-        COALESCE(sort_index, 0) ASC,
-        created_at DESC
+        created_at ASC,
+        id ASC
     `
   ),
   selectAllByTaskId: db.prepare(
@@ -36,8 +36,8 @@ const statements: SubtaskStatements = {
       WHERE task_id = ?
       ORDER BY
         CASE WHEN deleted_at IS NULL THEN 0 ELSE 1 END,
-        COALESCE(sort_index, 0) ASC,
-        created_at DESC
+        created_at ASC,
+        id ASC
     `
   ),
   selectMinSortIndexForTask: db.prepare(
@@ -129,11 +129,7 @@ export const subtaskQueries = {
 
   create: (taskId: number, title: string): Subtask => {
     const nextSortIndex = getNextSortIndexForTask(taskId);
-    const result = statements.insertSubtask.run(
-      taskId,
-      title,
-      nextSortIndex
-    );
+    const result = statements.insertSubtask.run(taskId, title, nextSortIndex);
     const createdRow = getSubtaskRowById(result.lastInsertRowid as number);
     if (!createdRow) {
       throw new Error("Failed to retrieve created subtask");

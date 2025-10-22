@@ -116,4 +116,5 @@ describe("TaskContent", () => {
       expect(props.onRestoreSubtask).toHaveBeenCalledWith(99, 2)
     );
   });
+
 });

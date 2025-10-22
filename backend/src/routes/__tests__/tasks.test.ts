@@ -384,6 +384,31 @@ describe("Tasks routes", () => {
     );
   });
 
+  it("orders subtasks with active entries first and preserves creation order", async () => {
+    const taskId = insertTask("Task with subtasks");
+    const first = insertSubtask(taskId, "First subtask");
+    const second = insertSubtask(taskId, "Second subtask");
+    const third = insertSubtask(taskId, "Third subtask");
+    const fourth = insertSubtask(taskId, "Fourth subtask");
+
+    subtaskQueries.softDelete(second.id);
+
+    db.prepare("UPDATE subtasks SET sort_index = NULL WHERE id = ?").run(first.id);
+    db.prepare("UPDATE subtasks SET sort_index = NULL WHERE id = ?").run(fourth.id);
+
+    const response = await request(app)
+      .get("/tasks")
+      .query({ includeDeleted: "true" });
+
+    expect(response.status).toBe(200);
+
+    const task = response.body.find((item: any) => item.id === taskId);
+    expect(task).toBeDefined();
+
+    const orderedIds = task?.subtasks.map((subtask: any) => subtask.id);
+    expect(orderedIds).toEqual([first.id, third.id, fourth.id, second.id]);
+  });
+
   it("updates a subtask title via PUT /tasks/:taskId/subtasks/:subtaskId", async () => {
     const taskId = insertTask("Task with subtasks");
     const subtask = insertSubtask(taskId, "Draft outline");
