@@ -7,8 +7,13 @@
 .task-title-wrapper {
   width: 100%;
   display: flex;
-  gap: 1.5rem;
-  padding-right: 2rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-title-wrapper h3 {
+  padding-left: 0.5rem;
+  padding-right: 1rem;
 }
 
 .task-header__actions {
@@ -82,12 +87,6 @@
 
 .task-header__icon--restore {
   opacity: 0.6;
-}
-
-.task-title-container {
-  width: 100%;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 .task-title {

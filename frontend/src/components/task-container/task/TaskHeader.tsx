@@ -131,16 +131,14 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
           tabIndex={isPriorityDisabled ? -1 : 0}
           aria-disabled={isPriorityDisabled}
         />
-        <div className="task-title-container">
-          <TaskTitleEditor
-            taskId={taskId}
-            title={title}
-            isSoftDeleted={isSoftDeleted}
-            isSoftDeletedToday={isSoftDeletedToday}
-            onUpdateTitle={onUpdateTitle}
-            onEditingChange={onTitleEditingChange}
-          />
-        </div>
+        <TaskTitleEditor
+          taskId={taskId}
+          title={title}
+          isSoftDeleted={isSoftDeleted}
+          isSoftDeletedToday={isSoftDeletedToday}
+          onUpdateTitle={onUpdateTitle}
+          onEditingChange={onTitleEditingChange}
+        />
       </div>
       <div className="task-header__actions">
         {hasSubtasks ? (
