@@ -20,4 +20,26 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 0.25rem;
+}
+
+.modal__close-button {
+  z-index: 1000;
+  align-self: flex-end;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+  transition: color 120ms ease;
+}
+
+.modal__close-button:hover {
+  color: var(--color-primary, #2563eb);
+}
+
+.modal__close-button:focus-visible {
+  outline: 2px solid var(--color-primary, #2563eb);
+  outline-offset: 2px;
 }
