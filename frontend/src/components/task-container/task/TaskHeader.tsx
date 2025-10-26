@@ -71,9 +71,18 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
     }
   };
   const Chevron = isExpanded ? ChevronDown : ChevronRight;
-  const isStarred = priority === 1;
   const isPriorityDisabled = isPriorityUpdating || isSoftDeleted;
-  const isStarredClassName = isStarred ? "filled-star" : "empty-star";
+
+  let starVisualClass = "task-header__icon--star-default";
+  let starAriaLabel = "Mark task as top priority";
+
+  if (priority === 1) {
+    starVisualClass = "task-header__icon--star-primary";
+    starAriaLabel = "Set task to red priority";
+  } else if (priority === 2) {
+    starVisualClass = "task-header__icon--star-secondary";
+    starAriaLabel = "Remove task priority";
+  }
 
   const handleToggleStar = () => {
     if (isPriorityDisabled) {
@@ -116,8 +125,8 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         <Star
           onClick={handleToggleStar}
           onKeyDown={handleStarKeyDown}
-          className={`${isStarredClassName} task-header__icon task-header__icon--star`}
-          aria-label={isStarred ? "Unstar task" : "Star task"}
+          className={`${starVisualClass} task-header__icon task-header__icon--star`}
+          aria-label={starAriaLabel}
           role="button"
           tabIndex={isPriorityDisabled ? -1 : 0}
           aria-disabled={isPriorityDisabled}

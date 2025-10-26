@@ -23,11 +23,16 @@
 }
 
 /* TODO: add animation when starring tasks */
-.filled-star {
+.task-header__icon--star-default {
+  fill: var(--color-bg);
+}
+
+.task-header__icon--star-primary {
   fill: var(--color-accent-yellow);
 }
-.empty-star {
-  fill: var(--color-bg);
+
+.task-header__icon--star-secondary {
+  fill: var(--color-accent-red, #ef4444);
 }
 
 .task-header__chevron {

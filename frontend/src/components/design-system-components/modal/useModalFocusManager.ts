@@ -7,11 +7,6 @@ type UseModalFocusManagerOptions = {
   isDismissDisabled?: boolean;
 };
 
-type UseModalFocusManagerReturn = {
-  modalRef: React.MutableRefObject<HTMLDivElement | null>;
-  closeButtonRef: React.MutableRefObject<HTMLButtonElement | null>;
-};
-
 const FOCUSABLE_SELECTORS = [
   'button:not([disabled])',
   '[href]',
@@ -26,7 +21,7 @@ const useModalFocusManager = ({
   onDismiss,
   disableBackdropClose = false,
   isDismissDisabled = false,
-}: UseModalFocusManagerOptions): UseModalFocusManagerReturn => {
+}: UseModalFocusManagerOptions) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const previouslyFocusedElementRef = useRef<

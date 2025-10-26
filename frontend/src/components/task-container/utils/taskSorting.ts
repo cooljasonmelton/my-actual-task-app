@@ -40,5 +40,13 @@ export const sortTasks = (
 export const getNextPriority = (
   currentPriority: TaskType["priority"]
 ): TaskType["priority"] => {
-  return currentPriority === 1 ? 5 : 1;
+  if (currentPriority === 1) {
+    return 2;
+  }
+
+  if (currentPriority === 2) {
+    return 5;
+  }
+
+  return 1;
 };

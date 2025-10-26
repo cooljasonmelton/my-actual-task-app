@@ -58,8 +58,9 @@ describe("taskSorting utilities", () => {
     expect(sorted.map((task) => task.id)).toEqual([2, 3, 1]);
   });
 
-  it("toggles a task priority between starred and default values", () => {
-    expect(getNextPriority(1)).toBe(5);
+  it("cycles priority through gold, red, then default values", () => {
+    expect(getNextPriority(1)).toBe(2);
+    expect(getNextPriority(2)).toBe(5);
     expect(getNextPriority(3)).toBe(1);
   });
 });
