@@ -1,10 +1,9 @@
 import {
-  useEffect,
-  useRef,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 import { X } from "lucide-react";
+import useModalFocusManager from "./useModalFocusManager";
 import "./Modal.css";
 
 type ModalProps = {
@@ -26,69 +25,12 @@ const Modal = ({
   labelledBy,
   describedBy,
 }: ModalProps) => {
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const previouslyFocusedElementRef = useRef<(HTMLElement | SVGElement) | null>(
-    null
-  );
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    // TODO: move keydown logic to shared util or hook
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === "Escape" &&
-        !disableBackdropClose &&
-        !isDismissDisabled
-      ) {
-        onDismiss();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, disableBackdropClose, isDismissDisabled, onDismiss]);
-
-  // focus on X button on open and return to previous element on close
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const activeElement = document.activeElement;
-    if (
-      activeElement instanceof HTMLElement ||
-      activeElement instanceof SVGElement
-    ) {
-      previouslyFocusedElementRef.current = activeElement;
-    } else {
-      previouslyFocusedElementRef.current = null;
-    }
-
-    const explicitCloseButton = closeButtonRef.current;
-    if (explicitCloseButton) {
-      explicitCloseButton.focus({ preventScroll: true });
-    } else {
-      const modalElement = modalRef.current;
-      modalElement?.focus({ preventScroll: true });
-    }
-
-    return () => {
-      const previouslyFocusedElement = previouslyFocusedElementRef.current;
-      previouslyFocusedElementRef.current = null;
-      if (!previouslyFocusedElement) {
-        return;
-      }
-      if (previouslyFocusedElement instanceof HTMLElement) {
-        previouslyFocusedElement.focus({ preventScroll: true });
-        return;
-      }
-      previouslyFocusedElement.focus();
-    };
-  }, [isOpen]);
+  const { modalRef, closeButtonRef } = useModalFocusManager({
+    isOpen,
+    onDismiss,
+    disableBackdropClose,
+    isDismissDisabled,
+  });
 
   if (!isOpen) {
     return null;
@@ -133,5 +75,4 @@ const Modal = ({
     </div>
   );
 };
-
 export default Modal;
