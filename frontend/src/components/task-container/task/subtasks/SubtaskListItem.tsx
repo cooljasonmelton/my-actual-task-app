@@ -2,6 +2,7 @@ import { useCallback, useState, type KeyboardEvent } from "react";
 import { Square } from "lucide-react";
 import Button from "../../../design-system-components/button/Button";
 import type { Subtask } from "../../../../types";
+import useEditableActivation from "../../useEditableActivation";
 
 import "./SubtaskListItem.css";
 
@@ -70,23 +71,25 @@ const SubtaskListItem = ({
     }
   }, [isTaskSoftDeleted, isDeleting, onDeleteSubtask, subtask.id, taskId]);
 
-  const handleKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+  const handleDeleteKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
     if (event.key !== "Enter" && event.key !== " ") {
       return;
     }
     event.preventDefault();
     void handleDelete();
   };
-
+  // TODO: fix disabled logic to handle loading / error states
   // const isActionDisabled =
   //   isTaskSoftDeleted || isSaving || isDeleting || isRestoring;
   const isActionDisabled = isTaskSoftDeleted || isDeleting;
+  const { handleDoubleClick, handleKeyDown, interactionProps } =
+    useEditableActivation(handleStartEditing, { isDisabled: isActionDisabled });
 
   return (
     <li className={"subtask-item"}>
       <Square
         onClick={handleDelete}
-        onKeyDown={(event) => handleKeyDown(event)}
+        onKeyDown={(event) => handleDeleteKeyDown(event)}
         className={`${"empty-delete"} task-header__icon`}
         aria-label={"Delete task"}
         role="button"
@@ -94,7 +97,14 @@ const SubtaskListItem = ({
         tabIndex={0}
       />
       <div className="subtask-item__content">
-        <span className="subtask-item__title">{subtask.title}</span>
+        <span
+          className="subtask-item__title"
+          onDoubleClick={handleDoubleClick}
+          onKeyDown={handleKeyDown}
+          {...interactionProps}
+        >
+          {subtask.title}
+        </span>
       </div>
       <div className="subtask-item__actions">
         <Button

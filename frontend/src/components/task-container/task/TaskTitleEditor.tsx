@@ -8,6 +8,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import Button from "../../design-system-components/button/Button";
+import useEditableActivation from "../useEditableActivation";
 
 type TaskTitleEditorProps = {
   taskId: number;
@@ -103,16 +104,8 @@ const TaskTitleEditor = ({
     [draftTitle, handleCancelEditing, onUpdateTitle, taskId, title]
   );
 
-  // TODO: move keydown logic to a shared hook or util function - share with new task form
-  const handleTitleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLHeadingElement>) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        handleStartEditing();
-      }
-    },
-    [handleStartEditing]
-  );
+  const { handleDoubleClick, handleKeyDown, interactionProps } =
+    useEditableActivation(handleStartEditing, { isDisabled: isSoftDeleted });
 
   const handleTitleInputKeyDown = useCallback(
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -188,10 +181,9 @@ const TaskTitleEditor = ({
   return (
     <h3
       className={titleClassName}
-      onDoubleClick={handleStartEditing}
-      onKeyDown={handleTitleKeyDown}
-      role={isSoftDeleted ? undefined : "button"}
-      tabIndex={isSoftDeleted ? -1 : 0}
+      onDoubleClick={handleDoubleClick}
+      onKeyDown={handleKeyDown}
+      {...interactionProps}
     >
       {title}
     </h3>
