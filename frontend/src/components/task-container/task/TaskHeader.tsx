@@ -1,4 +1,4 @@
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
 import {
   Star,
   ChevronDown,
@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import type { TaskHeaderProps } from "../types";
 import TaskTitleEditor from "./TaskTitleEditor";
+import useKeyboardActivation from "../useKeyboardActivation";
 
 import "./TaskHeader.css";
 
@@ -69,33 +70,6 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
       setIsDeleting(false);
     }
   };
-  // TODO: move to shared util
-  const handleKeyDown = (
-    event: KeyboardEvent<SVGSVGElement>,
-    action: "expand" | "delete" | "star" | "restore"
-  ) => {
-    if (event.key !== "Enter" && event.key !== " ") {
-      return;
-    }
-    event.preventDefault();
-
-    if (action === "expand") {
-      toggleExpanded();
-    }
-
-    if (action === "delete" && !isSoftDeleted) {
-      void handleClickDelete();
-    }
-
-    if (action === "restore" && isSoftDeleted) {
-      onRestoreRequest();
-    }
-
-    if (action === "star") {
-      handleToggleStar();
-    }
-  };
-
   const Chevron = isExpanded ? ChevronDown : ChevronRight;
   const isStarred = priority === 1;
   const isPriorityDisabled = isPriorityUpdating || isSoftDeleted;
@@ -111,12 +85,29 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
     });
   };
 
+  const { handleKeyDown: handleExpandKeyDown } =
+    useKeyboardActivation(toggleExpanded);
+
+  const { handleKeyDown: handleStarKeyDown } = useKeyboardActivation(
+    handleToggleStar,
+    {
+      isDisabled: isPriorityDisabled,
+    }
+  );
+
+  const { handleKeyDown: handleRestoreKeyDown } =
+    useKeyboardActivation(onRestoreRequest);
+
+  const { handleKeyDown: handleDeleteKeyDown } = useKeyboardActivation(() => {
+    void handleClickDelete();
+  }, { isDisabled: isSoftDeleted || isDeleting });
+
   return (
     <div className="task-header">
       <div className="task-title-wrapper">
         <Chevron
           onClick={toggleExpanded}
-          onKeyDown={(e) => handleKeyDown(e, "expand")}
+          onKeyDown={handleExpandKeyDown}
           className="task-header__chevron task-header__icon"
           aria-label={isExpanded ? "Hide task details" : "Expand task details"}
           role="button"
@@ -124,7 +115,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         />
         <Star
           onClick={handleToggleStar}
-          onKeyDown={(e) => handleKeyDown(e, "star")}
+          onKeyDown={handleStarKeyDown}
           className={`${isStarredClassName} task-header__icon task-header__icon--star`}
           aria-label={isStarred ? "Unstar task" : "Star task"}
           role="button"
@@ -157,7 +148,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         {isSoftDeleted ? (
           <ArchiveRestore
             onClick={onRestoreRequest}
-            onKeyDown={(e) => handleKeyDown(e, "restore")}
+            onKeyDown={handleRestoreKeyDown}
             className="task-header__icon task-header__icon--restore"
             aria-label="Restore task"
             role="button"
@@ -166,7 +157,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         ) : (
           <XCircle
             onClick={handleClickDelete}
-            onKeyDown={(e) => handleKeyDown(e, "delete")}
+            onKeyDown={handleDeleteKeyDown}
             className={`${
               shouldDelete ? "filled-delete" : "empty-delete"
             } task-header__icon`}

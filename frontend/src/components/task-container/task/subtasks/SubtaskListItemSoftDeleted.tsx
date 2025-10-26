@@ -1,6 +1,7 @@
-import { useCallback, useState, type KeyboardEvent } from "react";
+import { useCallback, useState } from "react";
 import { SquareCheck } from "lucide-react";
 import type { Subtask } from "../../../../types";
+import useKeyboardActivation from "../../useKeyboardActivation";
 
 import "./SubtaskListItem.css";
 
@@ -40,24 +41,21 @@ const SubtaskListItemSoftDeleted = ({
     }
   }, [isTaskSoftDeleted, isRestoring, onRestoreSubtask, subtask.id, taskId]);
 
-  const handleKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
-    if (event.key !== "Enter" && event.key !== " ") {
-      return;
-    }
-    event.preventDefault();
-    handleRestore();
-  };
+  const isActionDisabled = isTaskSoftDeleted || isRestoring;
+  const { handleKeyDown } = useKeyboardActivation(() => {
+    void handleRestore();
+  }, { isDisabled: isActionDisabled });
 
   return (
     <div>
       <li className={"subtask-item subtask-item--deleted"}>
         <SquareCheck
           onClick={handleRestore}
-          onKeyDown={(e) => handleKeyDown(e)}
+          onKeyDown={handleKeyDown}
           className="task-header__icon task-header__icon--restore"
           aria-label="Restore task"
           role="button"
-          aria-disabled={isRestoring}
+          aria-disabled={isActionDisabled}
           tabIndex={0}
         />
         <div className="subtask-item__content">

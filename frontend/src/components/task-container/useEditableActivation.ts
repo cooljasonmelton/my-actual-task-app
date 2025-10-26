@@ -1,4 +1,5 @@
-import { useCallback, type KeyboardEvent } from "react";
+import { useCallback } from "react";
+import useKeyboardActivation from "./useKeyboardActivation";
 
 type UseEditableActivationOptions = {
   isDisabled?: boolean;
@@ -18,6 +19,10 @@ const useEditableActivation = (
   onStartEditing: () => void,
   { isDisabled = false }: UseEditableActivationOptions = {}
 ) => {
+  const { handleKeyDown } = useKeyboardActivation(onStartEditing, {
+    isDisabled,
+  });
+
   const handleDoubleClick = useCallback(() => {
     if (isDisabled) {
       return;
@@ -25,22 +30,6 @@ const useEditableActivation = (
 
     onStartEditing();
   }, [isDisabled, onStartEditing]);
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLElement>) => {
-      if (isDisabled) {
-        return;
-      }
-
-      if (event.key !== "Enter" && event.key !== " ") {
-        return;
-      }
-
-      event.preventDefault();
-      onStartEditing();
-    },
-    [isDisabled, onStartEditing]
-  );
 
   const interactionProps: InteractionProps = isDisabled
     ? { role: undefined, tabIndex: -1 }
