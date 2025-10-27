@@ -32,14 +32,16 @@ export const parseReferenceWindowDate = (value: string | Date): Date => {
 const defaultNow = () => new Date();
 
 export const useReferenceWindow = (now: Date = defaultNow()) => {
+  const nowMs = now.getTime();
   const referenceWindowStart = useMemo(
-    () => getReferenceWindowStart(now),
-    [now.getTime()]
+    () => getReferenceWindowStart(new Date(nowMs)),
+    [nowMs]
   );
   const referenceWindowStartMs = referenceWindowStart.getTime();
 
   const isInCurrentReferenceWindow = useCallback(
-    (date: Date) => areDatesInSameReferenceWindow(date, referenceWindowStart),
+    (date: Date) =>
+      getReferenceWindowStart(date).getTime() === referenceWindowStartMs,
     [referenceWindowStartMs]
   );
 
