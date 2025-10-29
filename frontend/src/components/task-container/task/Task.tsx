@@ -36,7 +36,7 @@ const Task = ({
   const [isRestoring, setIsRestoring] = useState(false);
   const modalTitleId = useId();
   const modalDescriptionId = useId();
-  const isDraggable = draggable && !isTitleEditing;
+  const isDraggable = draggable && !isTitleEditing && !isExpanded;
   const taskCardClassName = `card task${
     isSoftDeleted ? " task--soft-deleted" : ""
   }${isDraggable ? " task--draggable" : ""}${
