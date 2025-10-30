@@ -82,12 +82,13 @@
   display: flex;
   align-items: center;
   color: var(--color-accent-blue);
+  cursor: pointer;
 }
 
 .task-header__icon--subtasks {
   width: 1.1rem;
   height: 1.1rem;
-  cursor: default;
+  cursor: inherit;
 }
 
 .task-header__icon--restore {

@@ -7,16 +7,18 @@ export const useExpandedTasks = (tasks: TaskType[]) => {
   );
 
   useEffect(() => {
-    const taskIds = new Set(tasks.map((task) => task.id));
+    const taskMap = new Map(tasks.map((task) => [task.id, task]));
     setExpandedTaskIds((previous) => {
       let hasChanges = false;
       const next = new Set<number>();
       previous.forEach((id) => {
-        if (taskIds.has(id)) {
-          next.add(id);
-        } else {
+        const task = taskMap.get(id);
+        if (!task || task.deletedAt) {
           hasChanges = true;
+          return;
         }
+
+        next.add(id);
       });
       return hasChanges ? next : previous;
     });

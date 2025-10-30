@@ -144,8 +144,13 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         {hasSubtasks ? (
           <div
             className="task-header__subtasks-indicator"
-            role="img"
-            aria-label="Task has subtasks"
+            role="button"
+            aria-label={
+              isExpanded ? "Hide task details" : "Expand task details"
+            }
+            tabIndex={0}
+            onClick={toggleExpanded}
+            onKeyDown={handleExpandKeyDown}
           >
             <ListChecks
               className="task-header__icon task-header__icon--subtasks"
