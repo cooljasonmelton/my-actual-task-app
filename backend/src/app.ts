@@ -2,6 +2,7 @@ import "./config/loadEnv";
 import express, { Application } from "express";
 import cors from "cors";
 import taskRoutes from "./routes/tasks";
+import noteRoutes from "./routes/notes";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app: Application = express();
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/tasks", taskRoutes);
+app.use("/notes", noteRoutes);
 
 // Health check
 app.get("/", (req, res) => {

@@ -34,6 +34,8 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  db.exec("DELETE FROM notes;");
+  db.exec("DELETE FROM users;");
   db.exec("DELETE FROM subtasks;");
   db.exec("DELETE FROM tasks;");
 });
