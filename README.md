@@ -12,6 +12,7 @@ My Actual Task App is my actual task map, a full-stack productivity dashboard I�
 - **Nested Subtasks** – Create, edit, soft delete, and restore subtasks inline from the task details panel; they follow the same styling cues for active vs. archived items so nothing slips through the cracks.
 - **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column; changes persist instantly for priority-driven sorting.
 - **Live Loading Feedback** – Animated spinner plus typewriter status copy shows when tasks are reloading, keeping the UI lively without breaking the existing styling.
+- **Scratchpad Notes Panel** – Slide open a rich-text editor on the right to capture ideas with formatting, auto-linking, undo/redo, and autosave backed by SQLite.
 - **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
 - **Quality of Life Utilities** – Wake-lock toggle, keyboard accessibility, ref-focused forms, and automated tests (Vitest) on both sides of the stack.
 
@@ -56,7 +57,14 @@ npm run dev:all
 
 The scripts open two Terminal tabs: one for the Vite dev server and one for the Express backend with the correct `APP_ENV` wired in.
 
-### 4. Utilities & Scripts
+### 4. Quick Notes Scratchpad
+
+- Click the sticky note button in the dashboard header to slide the notes panel in from the right; collapse it again to reclaim the layout.
+- The editor supports bold, italic, underline, ordered/unordered lists, undo/redo, and quick link creation (URLs auto-link on blur).
+- Notes autosave on change, on blur, and via <kbd>⌘/Ctrl + S</kbd>, persisting to the new `users`/`notes` tables in SQLite (one global scratchpad per profile).
+- Saved timestamps render in Central Time (`America/Chicago`) so the header reflects my local day even when running on other machines.
+
+### 5. Utilities & Scripts
 
 ```bash
 # Run full test suite

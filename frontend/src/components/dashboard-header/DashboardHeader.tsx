@@ -3,6 +3,7 @@ import type { Status } from "../../types";
 import NewTaskContainer from "./new-task/NewTaskContainer";
 import SectionTabsContainer from "./section-tabs/SectionTabsContainer";
 import "./DashboardHeader.css";
+import NotesToggleButton from "./notes-toggle/NotesToggleButton";
 
 const DashboardHeader = ({
   refreshTasks,
@@ -15,6 +16,8 @@ const DashboardHeader = ({
   onStatusDragOver,
   onStatusDragLeave,
   onStatusDrop,
+  isNotesPanelOpen,
+  onToggleNotesPanel,
 }: {
   refreshTasks: () => Promise<void>;
   reportError: Dispatch<SetStateAction<string | null>>;
@@ -26,6 +29,8 @@ const DashboardHeader = ({
   onStatusDragOver: (event: DragEvent<HTMLElement>, status: Status) => void;
   onStatusDragLeave: (event: DragEvent<HTMLElement>, status: Status) => void;
   onStatusDrop: (event: DragEvent<HTMLElement>, status: Status) => void;
+  isNotesPanelOpen: boolean;
+  onToggleNotesPanel: () => void;
 }) => {
   return (
     <div className="dashboard-header">
@@ -39,11 +44,17 @@ const DashboardHeader = ({
         onStatusDragLeave={onStatusDragLeave}
         onStatusDrop={onStatusDrop}
       />
-      <NewTaskContainer
-        refreshTasks={refreshTasks}
-        reportError={reportError}
-        selectedStatus={selectedStatus}
-      />
+      <div className="dashboard-header__actions">
+        <NewTaskContainer
+          refreshTasks={refreshTasks}
+          reportError={reportError}
+          selectedStatus={selectedStatus}
+        />
+        <NotesToggleButton
+          isActive={isNotesPanelOpen}
+          onToggle={onToggleNotesPanel}
+        />
+      </div>
     </div>
   );
 };

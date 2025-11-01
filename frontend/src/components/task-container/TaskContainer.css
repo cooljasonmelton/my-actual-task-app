@@ -1,8 +1,20 @@
-.task-container {
+.task-workspace__body {
   margin: 0 auto 4rem;
   width: 75%;
   padding: 0 2rem;
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+}
 
+.task-workspace__body--panel-open {
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.task-container {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -97,8 +109,13 @@
 }
 
 @media screen and (max-width: 768px) {
-  .task-container {
+  .task-workspace__body {
     width: 100%;
     padding: 0;
+    margin-bottom: 4rem;
+  }
+
+  .task-container {
+    padding: 0 1rem;
   }
 }

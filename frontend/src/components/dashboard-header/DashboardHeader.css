@@ -9,9 +9,23 @@
   gap: 1rem;
 }
 
+.dashboard-header__actions {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.dashboard-header__actions > .card {
+  flex: 1 1 auto;
+}
+
 @media screen and (max-width: 768px) {
   .dashboard-header {
     width: 100%;
     padding: 2rem 0;
+  }
+
+  .dashboard-header__actions {
+    flex-direction: column;
   }
 }
