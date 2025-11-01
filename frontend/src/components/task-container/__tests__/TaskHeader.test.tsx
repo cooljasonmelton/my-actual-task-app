@@ -64,17 +64,21 @@ describe("TaskHeader", () => {
   it("shows a subtasks indicator when the task has subtasks", () => {
     render(<TaskHeader {...createProps({ hasSubtasks: true })} />);
 
-    expect(
-      screen.getByRole("img", { name: /task has subtasks/i })
-    ).toBeInTheDocument();
+    const expandButtons = screen.getAllByRole("button", {
+      name: /expand task details/i,
+    });
+
+    expect(expandButtons).toHaveLength(2);
   });
 
   it("hides the subtasks indicator when there are no subtasks", () => {
     render(<TaskHeader {...createProps()} />);
 
-    expect(
-      screen.queryByRole("img", { name: /task has subtasks/i })
-    ).not.toBeInTheDocument();
+    const expandButtons = screen.getAllByRole("button", {
+      name: /expand task details/i,
+    });
+
+    expect(expandButtons).toHaveLength(1);
   });
 
   it("calls onRestoreRequest when the restore button is clicked", () => {

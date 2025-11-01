@@ -19,6 +19,7 @@ import { useSoftDeleteSubtask } from "./useSoftDeleteSubtask";
 import { useRestoreSubtask } from "./useRestoreSubtask";
 import { useDerivedTaskData } from "./useDerivedTaskData";
 import { useExpandedTasks } from "./useExpandedTasks";
+import NotesPanel from "../notes-panel/NotesPanel";
 import "./TaskContainer.css";
 
 const TaskContainer = () => {
@@ -27,6 +28,8 @@ const TaskContainer = () => {
   const [selectedStatus, setSelectedStatus] = useState<Status>(
     DEFAULT_SECTION_TAB_ITEM
   );
+  const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
+
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
   useEffect(() => {
     void loadTasks();
@@ -114,59 +117,71 @@ const TaskContainer = () => {
         onStatusDragOver={handleStatusDragOver}
         onStatusDragLeave={handleStatusDragLeave}
         onStatusDrop={handleStatusDrop}
+        isNotesPanelOpen={isNotesPanelOpen}
+        onToggleNotesPanel={() => setIsNotesPanelOpen((previous) => !previous)}
       />
 
       <div
-        className={taskContainerClassName}
-        onDragOver={handleContainerDragOver}
-        onDrop={handleDropOnContainer}
+        className={`task-workspace__body${
+          isNotesPanelOpen ? " task-workspace__body--panel-open" : ""
+        }`}
       >
-        {/* TODO: eventually create re-usable error notification / banner*/}
-        {error && <p className="task-container__error">{error}</p>}
-        {/* TODO: move loader to reusable design component */}
-        {isLoading ? (
-          <div
-            className="card task-container__loading-card"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="task-container__loading">
-              <div className="task-container__loading-content">
-                <span
-                  className="task-container__loading-spinner"
-                  aria-hidden="true"
-                />
-                <span className="task-container__loading-text">
-                  Loading tasks...
-                </span>
+        <div
+          className={taskContainerClassName}
+          onDragOver={handleContainerDragOver}
+          onDrop={handleDropOnContainer}
+        >
+          {/* TODO: eventually create re-usable error notification / banner*/}
+          {error && <p className="task-container__error">{error}</p>}
+          {/* TODO: move loader to reusable design component */}
+          {isLoading ? (
+            <div
+              className="card task-container__loading-card"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="task-container__loading">
+                <div className="task-container__loading-content">
+                  <span
+                    className="task-container__loading-spinner"
+                    aria-hidden="true"
+                  />
+                  <span className="task-container__loading-text">
+                    Loading tasks...
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <TaskList
-            tasks={tasksForSelectedStatus}
-            selectedStatus={selectedStatus}
-            expandedTaskIds={expandedTaskIds}
-            onToggleExpanded={handleToggleExpanded}
-            onDelete={handleDeleteTask}
-            onRestore={handleRestoreTask}
-            onTogglePriority={handleTogglePriority}
-            onUpdateTitle={handleUpdateTitle}
-            onCreateSubtask={handleCreateSubtask}
-            onUpdateSubtaskTitle={handleUpdateSubtaskTitle}
-            onDeleteSubtask={handleDeleteSubtask}
-            onRestoreSubtask={handleRestoreSubtask}
-            updatingPriorities={updatingPriorities}
-            draggingTaskId={draggingTask?.id ?? null}
-            dragOverTaskId={dragOverTaskId}
-            handleDragStart={handleDragStart}
-            handleDragEnter={handleDragEnter}
-            handleDragOver={handleDragOver}
-            handleDragLeave={handleDragLeave}
-            handleDragEnd={handleDragEnd}
-            handleDropOnTask={handleDropOnTask}
-          />
-        )}
+          ) : (
+            <TaskList
+              tasks={tasksForSelectedStatus}
+              selectedStatus={selectedStatus}
+              expandedTaskIds={expandedTaskIds}
+              onToggleExpanded={handleToggleExpanded}
+              onDelete={handleDeleteTask}
+              onRestore={handleRestoreTask}
+              onTogglePriority={handleTogglePriority}
+              onUpdateTitle={handleUpdateTitle}
+              onCreateSubtask={handleCreateSubtask}
+              onUpdateSubtaskTitle={handleUpdateSubtaskTitle}
+              onDeleteSubtask={handleDeleteSubtask}
+              onRestoreSubtask={handleRestoreSubtask}
+              updatingPriorities={updatingPriorities}
+              draggingTaskId={draggingTask?.id ?? null}
+              dragOverTaskId={dragOverTaskId}
+              handleDragStart={handleDragStart}
+              handleDragEnter={handleDragEnter}
+              handleDragOver={handleDragOver}
+              handleDragLeave={handleDragLeave}
+              handleDragEnd={handleDragEnd}
+              handleDropOnTask={handleDropOnTask}
+            />
+          )}
+        </div>
+        <NotesPanel
+          isOpen={isNotesPanelOpen}
+          onClose={() => setIsNotesPanelOpen(false)}
+        />
       </div>
     </>
   );

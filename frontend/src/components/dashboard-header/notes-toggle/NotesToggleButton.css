@@ -1,0 +1,40 @@
+.notes-toggle-button {
+  border: 0.125rem solid var(--color-border, #cbd5f5);
+  background: var(--color-bg, #ffffff);
+  color: var(--color-text-muted, #64748b);
+  border-radius: calc(0.5rem - 2px);
+  padding: 0.75rem 0.5rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.notes-toggle-button:hover,
+.notes-toggle-button:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-purple-blue, #7d5fff);
+  color: var(--color-accent-purple-blue, #7d5fff);
+  box-shadow: 0 0 0 2px rgba(125, 95, 255, 0.1);
+}
+
+.notes-toggle-button--active {
+  background: var(--color-accent-purple-blue, #7d5fff);
+  color: var(--color-text);
+  border-color: var(--color-accent-purple-blue, #7d5fff);
+  box-shadow: 0 10px 25px -12px rgba(125, 95, 255, 0.75);
+}
+
+.notes-toggle-button--active:hover,
+.notes-toggle-button--active:focus-visible {
+  color: var(--color-text);
+}
+
+@media screen and (max-width: 768px) {
+  .notes-toggle-button {
+    justify-content: center;
+  }
+}
