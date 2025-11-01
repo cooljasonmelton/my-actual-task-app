@@ -75,11 +75,28 @@ const ensureNoteRow = db.transaction((): DbNoteRow => {
   return noteRow;
 });
 
+const parseUtcDate = (value: string | Date): Date => {
+  if (value instanceof Date) {
+    return value;
+  }
+
+  const trimmed = value.trim();
+  const isoCandidate = trimmed.includes("T")
+    ? trimmed
+    : trimmed.replace(" ", "T");
+  const isoWithZone = isoCandidate.endsWith("Z")
+    ? isoCandidate
+    : `${isoCandidate}Z`;
+  const parsed = new Date(isoWithZone);
+
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+};
+
 const mapDbNoteToNote = (row: DbNoteRow): Note => ({
   id: row.id,
   userId: row.user_id,
   content: row.content ?? "",
-  updatedAt: new Date(row.updated_at),
+  updatedAt: parseUtcDate(row.updated_at),
 });
 
 export const noteQueries = {
