@@ -157,6 +157,7 @@ TODO: say something like this in main readme (above)?
 
 ## TODO
 
+- TODO: FE: better organization of files
 - TODO: FE: update test coverage to cover all logic
 - TODO: BE: update test coverage to cover all logic
 - TODO: FE: slightly change styling for priority tasks
