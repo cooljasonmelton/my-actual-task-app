@@ -314,6 +314,84 @@ router.post(
   })
 );
 
+router.patch(
+  "/:taskId/subtasks/reorder",
+  asyncHandler(async (req: Request, res: Response) => {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    const { orderedSubtaskIds } = req.body as {
+      orderedSubtaskIds?: unknown;
+    };
+
+    if (Number.isNaN(taskId)) {
+      const error: ApiError = new Error("Invalid task ID");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!Array.isArray(orderedSubtaskIds) || orderedSubtaskIds.length === 0) {
+      const error: ApiError = new Error(
+        "orderedSubtaskIds must be a non-empty array"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const subtaskIds = orderedSubtaskIds.map((id) =>
+      Number.parseInt(String(id), 10)
+    );
+
+    if (subtaskIds.some((id) => Number.isNaN(id))) {
+      const error: ApiError = new Error(
+        "orderedSubtaskIds must contain only integers"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const parentTask = taskQueries.getById(taskId);
+    if (!parentTask) {
+      const error: ApiError = new Error("Task not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (subtaskIds.length === 0) {
+      const error: ApiError = new Error(
+        "orderedSubtaskIds must contain at least one subtask id"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const activeSubtaskIds = parentTask.subtasks
+      .filter((subtask) => !subtask.deletedAt)
+      .map((subtask) => subtask.id);
+
+    if (
+      subtaskIds.length !== activeSubtaskIds.length ||
+      subtaskIds.some((id) => !activeSubtaskIds.includes(id))
+    ) {
+      const error: ApiError = new Error(
+        "orderedSubtaskIds must include every active subtask exactly once"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const { updated } = subtaskQueries.updateSortOrder(taskId, subtaskIds);
+
+    if (updated !== subtaskIds.length) {
+      const error: ApiError = new Error(
+        "One or more subtasks could not be reordered"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    res.status(204).send();
+  })
+);
+
 // PUT update subtask title
 router.put(
   "/:taskId/subtasks/:subtaskId",

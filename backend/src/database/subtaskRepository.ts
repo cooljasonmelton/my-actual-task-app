@@ -25,6 +25,7 @@ const statements: SubtaskStatements = {
       WHERE task_id = ?
         AND deleted_at IS NULL
       ORDER BY
+        COALESCE(sort_index, 2147483647) ASC,
         created_at ASC,
         id ASC
     `
@@ -36,6 +37,7 @@ const statements: SubtaskStatements = {
       WHERE task_id = ?
       ORDER BY
         CASE WHEN deleted_at IS NULL THEN 0 ELSE 1 END,
+        COALESCE(sort_index, 2147483647) ASC,
         created_at ASC,
         id ASC
     `
@@ -79,6 +81,15 @@ const statements: SubtaskStatements = {
           sort_index = ?
       WHERE id = ?
         AND deleted_at IS NOT NULL
+    `
+  ),
+  updateSubtaskSortIndexWithinTask: db.prepare(
+    `
+      UPDATE subtasks
+      SET sort_index = ?
+      WHERE id = ?
+        AND task_id = ?
+        AND deleted_at IS NULL
     `
   ),
 };
@@ -168,6 +179,28 @@ export const subtaskQueries = {
     }
     const row = getSubtaskRowById(id);
     return row ? mapDbRowToSubtask(row) : undefined;
+  },
+
+  updateSortOrder: (
+    taskId: number,
+    orderedSubtaskIds: number[]
+  ): { updated: number } => {
+    const applySortOrder = db.transaction((ids: number[]): number => {
+      let updated = 0;
+      ids.forEach((subtaskId, index) => {
+        const sortIndex = (index + 1) * SORT_INDEX_STEP;
+        const result = statements.updateSubtaskSortIndexWithinTask.run(
+          sortIndex,
+          subtaskId,
+          taskId
+        );
+        updated += result.changes ?? 0;
+      });
+      return updated;
+    });
+
+    const updated = applySortOrder(orderedSubtaskIds);
+    return { updated };
   },
 };
 

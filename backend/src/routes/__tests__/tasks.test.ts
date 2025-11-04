@@ -8,6 +8,7 @@ let app: Application;
 let db: Database.Database;
 let taskQueries: typeof import("../../database/taskRepository").taskQueries;
 let subtaskQueries: typeof import("../../database/subtaskRepository").subtaskQueries;
+let SORT_INDEX_STEP: number;
 
 const insertTask = (title: string, status: Status = "next") => {
   const { id } = taskQueries.create({ title, status });
@@ -23,6 +24,7 @@ beforeAll(async () => {
 
   const dbModule = await import("../../database/db");
   db = dbModule.default;
+  SORT_INDEX_STEP = dbModule.SORT_INDEX_STEP;
 
   const taskRepoModule = await import("../../database/taskRepository");
   taskQueries = taskRepoModule.taskQueries;
@@ -482,5 +484,47 @@ describe("Tasks routes", () => {
 
     expect(record?.deleted_at).toBeNull();
     expect(record?.sort_index).not.toBeNull();
+  });
+
+  it("reorders subtasks via PATCH /tasks/:taskId/subtasks/reorder", async () => {
+    const taskId = insertTask("Task with subtasks");
+    const first = insertSubtask(taskId, "First");
+    const second = insertSubtask(taskId, "Second");
+    const third = insertSubtask(taskId, "Third");
+
+    const response = await request(app)
+      .patch(`/tasks/${taskId}/subtasks/reorder`)
+      .send({
+        orderedSubtaskIds: [third.id, first.id, second.id],
+      });
+
+    expect(response.status).toBe(204);
+
+    const rows = db
+      .prepare(
+        "SELECT id, sort_index FROM subtasks WHERE task_id = ? ORDER BY sort_index ASC"
+      )
+      .all(taskId) as { id: number; sort_index: number | null }[];
+
+    expect(rows.map((row) => row.id)).toEqual([third.id, first.id, second.id]);
+    rows.forEach((row, index) => {
+      expect(row.sort_index).toBe((index + 1) * SORT_INDEX_STEP);
+    });
+  });
+
+  it("rejects invalid payload when reordering subtasks", async () => {
+    const taskId = insertTask("Task with subtasks");
+    insertSubtask(taskId, "Only subtask");
+
+  const response = await request(app)
+    .patch(`/tasks/${taskId}/subtasks/reorder`)
+    .send({ orderedSubtaskIds: [] });
+
+  expect(response.status).toBe(400);
+  expect(response.body).toMatchObject({
+    error: {
+      message: expect.any(String),
+    },
+  });
   });
 });
