@@ -9,8 +9,8 @@ My Actual Task App is my actual task map, a full-stack productivity dashboard I�
 - **Priority-Driven Workflow** – Toggle the star to mark a task as urgent. The UI sorts by priority and reflects the change instantly while the backend keeps everything in sync.
 - **Rich Status Buckets** – Tasks flow between `next`, `dates`, `ongoing`, `get`, `backburner`, and `finished`, with live counts surfaced in the dashboard header.
 - **Soft Delete Safety Net** – Deleted tasks (and their subtasks) move to an archival state and drop to low priority instead of disappearing outright.
-- **Nested Subtasks** – Create, edit, soft delete, and restore subtasks inline from the task details panel; they follow the same styling cues for active vs. archived items so nothing slips through the cracks.
-- **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column; changes persist instantly for priority-driven sorting.
+- **Nested Subtasks** – Create, edit, soft delete, restore, and drag-reorder subtasks inline from the task details panel; they follow the same styling cues for active vs. archived items.
+- **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column, or drag subtasks inside the task panel to reprioritize supporting work; both persist instantly and survive refreshes thanks to shared reorder logic.
 - **Live Loading Feedback** – Animated spinner plus typewriter status copy shows when tasks are reloading, keeping the UI lively without breaking the existing styling.
 - **Scratchpad Notes Panel** – Slide open a rich-text editor on the right to capture ideas with formatting, auto-linking, undo/redo, and autosave backed by SQLite.
 - **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
@@ -64,7 +64,21 @@ The scripts open two Terminal tabs: one for the Vite dev server and one for the 
 - Notes autosave on change, on blur, and via <kbd>⌘/Ctrl + S</kbd>, persisting to the new `users`/`notes` tables in SQLite (one global scratchpad per profile).
 - Saved timestamps render in Central Time (`America/Chicago`) so the header reflects my local day even when running on other machines.
 
-### 5. Utilities & Scripts
+### 5. Reordering Tasks & Subtasks
+
+- **Tasks** – Drag a task card within its status column. The shared reorder hook updates the list immediately and patches `/tasks/reorder` to persist the new order.
+- **Subtasks** – Expand a task, then drag any active subtask to a new position. The UI preview uses the same dashed-outline styling as tasks, and the backend stores the new `sort_index` values via:
+
+  ```http
+  PATCH /tasks/:taskId/subtasks/reorder
+  {
+    "orderedSubtaskIds": [3, 1, 2]
+  }
+  ```
+
+  The endpoint expects every active subtask id exactly once; it returns `204 No Content` when the new order is saved.
+
+### 6. Utilities & Scripts
 
 ```bash
 # Run full test suite
@@ -110,7 +124,6 @@ npm run dev:all
 - Tag management and sorting
 - Double click task title to edit
 - Permantely delete soft-deleted tasks
-- Subtask drag-and-drop ordering
 - Drag-and-drop reassignment between sections (drop onto tab to move status).
 - Sort (asc/desc) and filter by tag, created date, priority
 - Multi-done checkboxes: task requires multiple iterations, create multiple checkboxes tallying each complete iteration e.g. answer 3 emails: [ x ] [ x ][ ]
