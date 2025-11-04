@@ -1,0 +1,79 @@
+.subtask-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border, #cbd5f5);
+  border-radius: 0.5rem;
+  background-color: var(--color-bg-gray-0, #f8fafc);
+  transition: background-color 0.15s ease, outline 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.subtask-item--deleted {
+  opacity: 0.7;
+}
+
+.subtask-item--draggable {
+  cursor: grab;
+}
+
+.subtask-item--deleted .subtask-item__title {
+  text-decoration: line-through;
+  color: var(--color-text-muted, #64748b);
+}
+
+.subtask-item--disabled {
+  opacity: 0.6;
+}
+
+.subtask-item__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.subtask-item__title {
+  display: block;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.subtask-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.subtask-item__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.subtask-item__input {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--color-border, #cbd5f5);
+  border-radius: 0.5rem;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.subtask-item__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-accent-red, #ef4444);
+}
+
+.subtask-item--dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+}
+
+.subtask-item--drag-over {
+  outline: 2px dashed var(--color-bg-alt);
+  background-color: var(--color-bg);
+}

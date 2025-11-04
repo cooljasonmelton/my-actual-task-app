@@ -1,0 +1,21 @@
+.subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.subtask-list--dragging {
+  background-color: var(--color-bg-gray-1);
+  border-radius: 0.5rem;
+  outline: 2px dashed var(--color-bg-gray-2);
+  padding: 0.25rem;
+}
+
+.subtask-checkbox-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

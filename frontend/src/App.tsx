@@ -1,5 +1,5 @@
 import Navbar from "./components/navigation/Navbar";
-import TaskContainer from "./components/task-container/TaskContainer";
+import TaskContainer from "./features/tasks/task-container/TaskContainer";
 import "./App.css";
 
 const App = () => {
