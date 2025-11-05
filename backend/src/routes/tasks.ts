@@ -378,15 +378,7 @@ router.patch(
       throw error;
     }
 
-    const { updated } = subtaskQueries.updateSortOrder(taskId, subtaskIds);
-
-    if (updated !== subtaskIds.length) {
-      const error: ApiError = new Error(
-        "One or more subtasks could not be reordered"
-      );
-      error.statusCode = 400;
-      throw error;
-    }
+    subtaskQueries.updateSortOrder(taskId, subtaskIds);
 
     res.status(204).send();
   })

@@ -27,9 +27,8 @@ import "./TaskContainer.css";
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<Status>(
-    DEFAULT_SECTION_TAB_ITEM
-  );
+  const [selectedStatus, setSelectedStatus] =
+    useState<Status>(DEFAULT_SECTION_TAB_ITEM);
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
 
   const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
@@ -48,29 +47,13 @@ const TaskContainer = () => {
   });
   const { handleDeleteTask } = useSoftDeleteTask({ setError, loadTasks });
   const { handleRestoreTask } = useRestoreTask({ setError, loadTasks });
-  const { handleUpdateTitle } = useUpdateTitle({
-    setError,
-    setTasks,
-    loadTasks,
-  });
+  const { handleUpdateTitle } = useUpdateTitle({ setError, setTasks, loadTasks });
   const { persistReorder } = usePersistReorder({ loadTasks, setError });
-  const { persistSubtaskReorder } = usePersistSubtaskReorder({
-    loadTasks,
-    setError,
-  });
+  const { persistSubtaskReorder } = usePersistSubtaskReorder({ loadTasks, setError });
   const { handleCreateSubtask } = useCreateSubtask({ setError, loadTasks });
-  const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({
-    setError,
-    loadTasks,
-  });
-  const { handleDeleteSubtask } = useSoftDeleteSubtask({
-    setError,
-    loadTasks,
-  });
-  const { handleRestoreSubtask } = useRestoreSubtask({
-    setError,
-    loadTasks,
-  });
+  const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({ setError, loadTasks });
+  const { handleDeleteSubtask } = useSoftDeleteSubtask({ setError, loadTasks });
+  const { handleRestoreSubtask } = useRestoreSubtask({ setError, loadTasks });
   const { expandedTaskIds, handleToggleExpanded } = useExpandedTasks(tasks);
 
   const {
@@ -111,7 +94,6 @@ const TaskContainer = () => {
     setTasks,
     persistReorder: persistSubtaskReorder,
   });
-
   const { isInCurrentReferenceWindow } = useReferenceWindow();
   const { statusCounts, tasksForSelectedStatus } = useDerivedTaskData({
     tasks,
@@ -119,12 +101,10 @@ const TaskContainer = () => {
     isInCurrentReferenceWindow,
   });
 
-  const isDraggingInSelectedStatus = Boolean(
-    draggingTask && draggingTask.status === selectedStatus
-  );
-  const taskContainerClassName = `task-container${
-    isDraggingInSelectedStatus ? " task-container--reordering" : ""
-  }`;
+  const isDraggingInSelectedStatus = Boolean(draggingTask && draggingTask.status === selectedStatus);
+  const taskContainerClassName = isDraggingInSelectedStatus
+    ? "task-container task-container--reordering"
+    : "task-container";
 
   return (
     <>
@@ -153,9 +133,7 @@ const TaskContainer = () => {
           onDragOver={handleContainerDragOver}
           onDrop={handleDropOnContainer}
         >
-          {/* TODO: eventually create re-usable error notification / banner*/}
           {error && <p className="task-container__error">{error}</p>}
-          {/* TODO: move loader to reusable design component */}
           {isLoading ? (
             <div
               className="card task-container__loading-card"

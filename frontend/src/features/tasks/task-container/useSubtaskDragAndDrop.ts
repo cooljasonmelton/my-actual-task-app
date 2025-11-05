@@ -1,61 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DragEvent } from "react";
-import type { Subtask, TaskType } from "@/types";
+import type { Subtask } from "@/types";
 import {
   computeReorderedSubtasks,
   SUBTASK_REORDER_STEP,
   type DraggingSubtask,
 } from "./utils/subtaskDragReorder";
 import { useReorderableDragAndDrop } from "../drag-drop/useReorderableDragAndDrop";
-
-type SubtaskDragItem = {
-  subtask: Subtask;
-  taskId: number;
-  isTaskSoftDeleted: boolean;
-};
-
-export interface UseSubtaskDragAndDropOptions {
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
-  persistReorder: (
-    taskId: number,
-    orderedSubtaskIds: number[]
-  ) => Promise<void>;
-  reorderStep?: number;
-}
-
-export interface UseSubtaskDragAndDropResult {
-  draggingSubtask: DraggingSubtask;
-  dragOverSubtaskId: number | null;
-  handleDragStart: (
-    event: DragEvent<HTMLLIElement>,
-    context: { taskId: number; subtask: Subtask; isTaskSoftDeleted: boolean }
-  ) => void;
-  handleDragEnter: (
-    event: DragEvent<HTMLLIElement>,
-    context: { taskId: number; subtask: Subtask }
-  ) => void;
-  handleDragOver: (
-    event: DragEvent<HTMLLIElement>,
-    context: { taskId: number; subtask: Subtask }
-  ) => void;
-  handleDragLeave: (
-    event: DragEvent<HTMLLIElement>,
-    context: { taskId: number; subtask: Subtask }
-  ) => void;
-  handleDropOnSubtask: (
-    event: DragEvent<HTMLLIElement>,
-    context: { taskId: number; subtask: Subtask }
-  ) => void;
-  handleListDragOver: (
-    event: DragEvent<HTMLUListElement>,
-    context: { taskId: number }
-  ) => void;
-  handleDropOnList: (
-    event: DragEvent<HTMLUListElement>,
-    context: { taskId: number }
-  ) => void;
-  handleDragEnd: () => void;
-}
+import type {
+  UseSubtaskDragAndDropOptions,
+  UseSubtaskDragAndDropResult,
+  SubtaskDragItem,
+} from "./useSubtaskDragAndDrop.types";
 
 export const useSubtaskDragAndDrop = ({
   setTasks,
@@ -153,7 +109,7 @@ export const useSubtaskDragAndDrop = ({
   }, [resetReorderDrag]);
 
   const wrapItem =
-    <T,>(
+    (
       handler: (
         event: DragEvent<HTMLElement>,
         item: SubtaskDragItem
@@ -208,3 +164,9 @@ export const useSubtaskDragAndDrop = ({
     handleDragEnd,
   };
 };
+
+export type {
+  UseSubtaskDragAndDropOptions,
+  UseSubtaskDragAndDropResult,
+  SubtaskDragItem,
+} from "./useSubtaskDragAndDrop.types";
