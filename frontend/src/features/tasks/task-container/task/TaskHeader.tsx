@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Star,
   ChevronDown,
@@ -6,6 +6,7 @@ import {
   XCircle,
   ArchiveRestore,
   ListChecks,
+  Copy,
 } from "lucide-react";
 import type { TaskHeaderProps } from "../types";
 import TaskTitleEditor from "./TaskTitleEditor";
@@ -31,6 +32,8 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
 }) => {
   const [shouldDelete, setShouldDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const copyFeedbackTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!shouldDelete) {
@@ -50,6 +53,18 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
       setIsDeleting(false);
     }
   }, [isSoftDeleted]);
+
+  useEffect(() => {
+    return () => {
+      if (
+        typeof window !== "undefined" &&
+        copyFeedbackTimeoutRef.current !== null
+      ) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+        copyFeedbackTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const handleClickDelete = async () => {
     if (isDeleting || isSoftDeleted) {
@@ -111,6 +126,50 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
     void handleClickDelete();
   }, { isDisabled: isSoftDeleted || isDeleting });
 
+  const startCopyFeedback = () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (copyFeedbackTimeoutRef.current !== null) {
+      window.clearTimeout(copyFeedbackTimeoutRef.current);
+    }
+
+    setIsCopying(true);
+    copyFeedbackTimeoutRef.current = window.setTimeout(() => {
+      setIsCopying(false);
+      copyFeedbackTimeoutRef.current = null;
+    }, 400);
+  };
+
+  const handleCopyTitle = () => {
+    if (!title) {
+      return;
+    }
+
+    if (typeof navigator === "undefined" || !navigator.clipboard) {
+      console.warn("Clipboard API is not available");
+      return;
+    }
+
+    startCopyFeedback();
+
+    void navigator.clipboard.writeText(title).catch((error) => {
+      console.error("Failed to copy task title", error);
+      setIsCopying(false);
+      if (
+        typeof window !== "undefined" &&
+        copyFeedbackTimeoutRef.current !== null
+      ) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+        copyFeedbackTimeoutRef.current = null;
+      }
+    });
+  };
+
+  const { handleKeyDown: handleCopyKeyDown } =
+    useKeyboardActivation(handleCopyTitle);
+
   return (
     <div className="task-header">
       <div className="task-title-wrapper">
@@ -159,6 +218,16 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
             />
           </div>
         ) : null}
+        <Copy
+          onClick={handleCopyTitle}
+          onKeyDown={handleCopyKeyDown}
+          className={`task-header__icon task-header__icon--copy${
+            isCopying ? " task-header__icon--copy-active" : ""
+          }`}
+          aria-label="Copy task title"
+          role="button"
+          tabIndex={0}
+        />
         {isSoftDeleted ? (
           <ArchiveRestore
             onClick={onRestoreRequest}

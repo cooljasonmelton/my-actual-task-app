@@ -91,6 +91,20 @@
   cursor: inherit;
 }
 
+.task-header__icon--copy {
+  color: var(--color-text-muted, #64748b);
+  transition: color 0.25s ease, transform 0.15s ease;
+}
+
+.task-header__icon--copy:hover,
+.task-header__icon--copy:focus-visible {
+  color: var(--color-accent-purple-blue, #7d5fff);
+}
+
+.task-header__icon--copy-active {
+  transform: scale(0.9);
+}
+
 .task-header__icon--restore {
   opacity: 0.6;
 }

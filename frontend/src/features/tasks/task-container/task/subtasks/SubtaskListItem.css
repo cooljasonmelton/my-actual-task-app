@@ -43,9 +43,45 @@
 
 .subtask-item__actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-wrap: nowrap;
+  /* gap: 0.5rem; */
   align-items: center;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.subtask-item__copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted, #64748b);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    transform 0.15s ease;
+}
+
+.subtask-item__copy-button:hover,
+.subtask-item__copy-button:focus-visible {
+  background-color: var(--color-bg, #fff);
+  color: var(--color-accent-purple-blue, #7d5fff);
+}
+
+.subtask-item__copy-button--active {
+  transform: scale(0.9);
+  color: var(--color-text-muted, #64748b);
+}
+
+.subtask-item__copy-icon {
+  width: 1rem;
+  height: 1rem;
+  color: inherit;
+  transition: color 0.25s ease;
 }
 
 .subtask-item__form {

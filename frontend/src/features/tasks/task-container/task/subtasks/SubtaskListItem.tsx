@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { Square } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Copy, Square } from "lucide-react";
 import Button from "@/components/design-system-components/button/Button";
 import type { Subtask } from "@/types";
 import useEditableActivation from "../../useEditableActivation";
@@ -47,6 +47,8 @@ const SubtaskListItem = ({
 }: SubtaskItemProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [isCopying, setIsCopying] = useState(false);
+  const copyFeedbackTimeoutRef = useRef<number | null>(null);
 
   const handleStartEditing = useCallback(() => {
     if (
@@ -103,6 +105,53 @@ const SubtaskListItem = ({
       isDisabled: isActionDisabled,
     }
   );
+
+  useEffect(() => {
+    return () => {
+      if (
+        typeof window !== "undefined" &&
+        copyFeedbackTimeoutRef.current !== null
+      ) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+        copyFeedbackTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleCopyTitle = useCallback(() => {
+    if (!subtask.title) {
+      return;
+    }
+
+    if (typeof navigator === "undefined" || !navigator.clipboard) {
+      console.warn("Clipboard API is not available");
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      if (copyFeedbackTimeoutRef.current !== null) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+      }
+
+      setIsCopying(true);
+      copyFeedbackTimeoutRef.current = window.setTimeout(() => {
+        setIsCopying(false);
+        copyFeedbackTimeoutRef.current = null;
+      }, 400);
+    }
+
+    void navigator.clipboard.writeText(subtask.title).catch((error) => {
+      console.error("Failed to copy subtask title", error);
+      setIsCopying(false);
+      if (
+        typeof window !== "undefined" &&
+        copyFeedbackTimeoutRef.current !== null
+      ) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+        copyFeedbackTimeoutRef.current = null;
+      }
+    });
+  }, [subtask.title]);
 
   const isDraggable = !isTaskSoftDeleted && !isDeleting;
   const dropEnabled = !isTaskSoftDeleted;
@@ -170,6 +219,20 @@ const SubtaskListItem = ({
         >
           Edit
         </Button>
+        <button
+          type="button"
+          className={`subtask-item__copy-button${
+            isCopying ? " subtask-item__copy-button--active" : ""
+          }`}
+          onClick={handleCopyTitle}
+          aria-label="Copy subtask title"
+        >
+          <Copy
+            className="subtask-item__copy-icon"
+            aria-hidden="true"
+            focusable="false"
+          />
+        </button>
       </div>
       {localError && (
         <p className="subtask-item__error" role="alert">
