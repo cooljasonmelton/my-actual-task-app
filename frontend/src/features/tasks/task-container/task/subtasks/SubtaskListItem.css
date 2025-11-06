@@ -44,7 +44,6 @@
 .subtask-item__actions {
   display: flex;
   flex-wrap: nowrap;
-  /* gap: 0.5rem; */
   align-items: center;
   flex: 0 0 auto;
   white-space: nowrap;
