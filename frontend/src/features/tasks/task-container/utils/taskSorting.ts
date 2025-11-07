@@ -34,7 +34,7 @@ export const sortTasks = (
   sortOption: TaskSortOption
 ): TaskType[] => {
   const sorter = sorters[sortOption] ?? sorters.priority;
-  return tasks.sort(sorter);
+  return [...tasks].sort(sorter);
 };
 
 export const getNextPriority = (
