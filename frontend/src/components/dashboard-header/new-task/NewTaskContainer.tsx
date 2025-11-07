@@ -4,10 +4,9 @@ import Button from "../../design-system-components/button/Button";
 import InputField from "../../design-system-components/form/InputField";
 import Form from "../../design-system-components/form/Form";
 import type { Status } from "../../../types";
+import { TASKS_API_URL } from "@/config/api";
 
 import "./NewTaskContainer.css";
-
-const TASKS_API_URL = "http://localhost:3000/tasks";
 
 const BUTTON_CTA_TEXT = "Add";
 const INPUT_TEXT = "add new task";

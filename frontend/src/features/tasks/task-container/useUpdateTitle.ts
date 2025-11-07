@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { TaskType } from "@/types";
-import { TASKS_API_URL } from "./constants";
+import { TASKS_API_URL } from "@/config/api";
 import type { ApiTask } from "./types";
 import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "./utils/taskSorting";

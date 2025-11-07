@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { Subtask, TaskType } from "@/types";
-import { TASKS_API_URL } from "./constants";
+import { TASKS_API_URL } from "@/config/api";
 import { useTasksActions } from "./state/TasksContext";
 
 export const useUpdateSubtaskTitle = ({

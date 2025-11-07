@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { TASKS_API_URL } from "./constants";
+import { TASKS_API_URL } from "@/config/api";
 import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import type { ApiTask } from "./types";
 import type { TaskType } from "@/types";

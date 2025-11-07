@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { TASKS_API_URL } from "./constants";
+import { TASKS_API_URL } from "@/config/api";
 import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "./utils/taskSorting";
 import type { ApiTask } from "./types";

@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
+import { NOTES_API_URL } from "@/config/api";
 import type { Note } from "../types";
-
-const NOTES_API_URL = "http://localhost:3000/notes";
 
 type RawNotePayload = {
   id?: unknown;
@@ -107,33 +106,30 @@ export const useScratchNote = () => {
     }
   }, []);
 
-  const saveNote = useCallback(
-    async (content: string) => {
-      try {
-        const response = await fetch(NOTES_API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content }),
-        });
+  const saveNote = useCallback(async (content: string) => {
+    try {
+      const response = await fetch(NOTES_API_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to save scratch note");
-        }
-
-        const data = await response.json();
-        const updated = parseNote(data);
-        setNote(updated);
-        setError(null);
-        return updated;
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to save scratch note";
-        setError(message);
-        throw err;
+      if (!response.ok) {
+        throw new Error("Failed to save scratch note");
       }
-    },
-    []
-  );
+
+      const data = await response.json();
+      const updated = parseNote(data);
+      setNote(updated);
+      setError(null);
+      return updated;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save scratch note";
+      setError(message);
+      throw err;
+    }
+  }, []);
 
   return {
     note,
