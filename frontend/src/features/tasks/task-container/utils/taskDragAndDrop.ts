@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
 import { sortTasks } from "./taskSorting";
 import type { TaskSortOption } from "./taskSorting";
@@ -12,6 +12,7 @@ import { useReorderableDragAndDrop } from "../../drag-drop/useReorderableDragAnd
 import { useTaskStatusDragHandlers } from "./taskStatusDragHandlers";
 
 export interface UseTaskDragAndDropOptions {
+  tasks: TaskType[];
   sortOption: TaskSortOption;
   selectedStatus: Status;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
@@ -41,6 +42,7 @@ export interface UseTaskDragAndDropResult {
 }
 
 export const useTaskDragAndDrop = ({
+  tasks,
   sortOption,
   selectedStatus,
   setTasks,
@@ -50,6 +52,11 @@ export const useTaskDragAndDrop = ({
 }: UseTaskDragAndDropOptions): UseTaskDragAndDropResult => {
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<number | null>(null);
+  const tasksRef = useRef<TaskType[]>(tasks);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   const applyReorder = useCallback<
     (
@@ -59,33 +66,46 @@ export const useTaskDragAndDrop = ({
     ) => number[] | null
   >(
     (status, sourceId, targetId) => {
-      let updatedOrder: number[] | null = null;
-      let didChange = false;
+      const currentTasks = tasksRef.current;
+      const {
+        updatedTasks,
+        orderedIds,
+        changed,
+      } = computeReorderedTasks(
+        currentTasks,
+        status,
+        sourceId,
+        targetId,
+        taskReorderStep
+      );
+
+      if (!changed) {
+        return null;
+      }
+
+      const sortedTasks = sortTasks([...updatedTasks], sortOption);
 
       setTasks((previousTasks) => {
-        const result = computeReorderedTasks(
+        if (previousTasks === currentTasks) {
+          return sortedTasks;
+        }
+
+        const nextResult = computeReorderedTasks(
           previousTasks,
           status,
           sourceId,
           targetId,
           taskReorderStep
         );
-        const { updatedTasks, orderedIds, changed } = result;
 
-        if (!changed) {
+        if (!nextResult.changed) {
           return previousTasks;
         }
 
-        updatedOrder = orderedIds;
-        didChange = true;
-        return sortTasks(updatedTasks, sortOption);
+        return sortTasks(nextResult.updatedTasks, sortOption);
       });
 
-      if (didChange && updatedOrder) {
-        return updatedOrder;
-      }
-
-      return null;
+      return orderedIds;
     },
     [setTasks, sortOption, taskReorderStep]
   );

@@ -23,7 +23,6 @@ import { usePersistSubtaskReorder } from "./usePersistSubtaskReorder";
 import { useSubtaskDragAndDrop } from "./useSubtaskDragAndDrop";
 import NotesPanel from "@/components/notes-panel/NotesPanel";
 import "./TaskContainer.css";
-
 const TaskContainer = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +34,6 @@ const TaskContainer = () => {
   useEffect(() => {
     void loadTasks();
   }, [loadTasks]);
-
   const { updatingPriorities, handleTogglePriority } = useTogglePriority({
     setError,
     setTasks,
@@ -72,6 +70,7 @@ const TaskContainer = () => {
     handleStatusDragLeave,
     handleStatusDrop,
   } = useTaskDragAndDrop({
+    tasks,
     sortOption: DEFAULT_TASK_SORT_OPTION,
     selectedStatus,
     setTasks,
@@ -91,6 +90,7 @@ const TaskContainer = () => {
     handleDropOnList: handleSubtaskListDrop,
     handleDragEnd: handleSubtaskDragEnd,
   } = useSubtaskDragAndDrop({
+    tasks,
     setTasks,
     persistReorder: persistSubtaskReorder,
   });

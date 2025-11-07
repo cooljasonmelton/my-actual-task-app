@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   Star,
   ChevronDown,
@@ -11,6 +10,8 @@ import {
 import type { TaskHeaderProps } from "../types";
 import TaskTitleEditor from "./TaskTitleEditor";
 import useKeyboardActivation from "../useKeyboardActivation";
+import useCopyToClipboard from "../useCopyToClipboard";
+import useTaskDeleteAction from "./useTaskDeleteAction";
 
 import "./TaskHeader.css";
 
@@ -30,61 +31,16 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   onRestoreRequest,
   hasSubtasks,
 }) => {
-  const [shouldDelete, setShouldDelete] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isCopying, setIsCopying] = useState(false);
-  const copyFeedbackTimeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!shouldDelete) {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      setShouldDelete(false);
-    }, 3000);
-
-    return () => window.clearTimeout(timer);
-  }, [shouldDelete]);
-
-  useEffect(() => {
-    if (isSoftDeleted) {
-      setShouldDelete(false);
-      setIsDeleting(false);
-    }
-  }, [isSoftDeleted]);
-
-  useEffect(() => {
-    return () => {
-      if (
-        typeof window !== "undefined" &&
-        copyFeedbackTimeoutRef.current !== null
-      ) {
-        window.clearTimeout(copyFeedbackTimeoutRef.current);
-        copyFeedbackTimeoutRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleClickDelete = async () => {
-    if (isDeleting || isSoftDeleted) {
-      return;
-    }
-
-    if (!shouldDelete) {
-      setShouldDelete(true);
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      await onDelete(taskId);
-    } catch (error) {
-      console.error("Failed to delete task", error);
-      setShouldDelete(false);
-      setIsDeleting(false);
-    }
+  const { shouldDelete, isDeleting, handleDeleteRequest } =
+    useTaskDeleteAction({
+      taskId,
+      onDelete,
+      isSoftDeleted,
+    });
+  const handleDeleteClick = () => {
+    void handleDeleteRequest();
   };
+  const { isCopying, copyText } = useCopyToClipboard();
   const Chevron = isExpanded ? ChevronDown : ChevronRight;
   const isPriorityDisabled = isPriorityUpdating || isSoftDeleted;
 
@@ -122,49 +78,13 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   const { handleKeyDown: handleRestoreKeyDown } =
     useKeyboardActivation(onRestoreRequest);
 
-  const { handleKeyDown: handleDeleteKeyDown } = useKeyboardActivation(() => {
-    void handleClickDelete();
-  }, { isDisabled: isSoftDeleted || isDeleting });
-
-  const startCopyFeedback = () => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    if (copyFeedbackTimeoutRef.current !== null) {
-      window.clearTimeout(copyFeedbackTimeoutRef.current);
-    }
-
-    setIsCopying(true);
-    copyFeedbackTimeoutRef.current = window.setTimeout(() => {
-      setIsCopying(false);
-      copyFeedbackTimeoutRef.current = null;
-    }, 400);
-  };
+  const { handleKeyDown: handleDeleteKeyDown } = useKeyboardActivation(
+    handleDeleteClick,
+    { isDisabled: isSoftDeleted || isDeleting }
+  );
 
   const handleCopyTitle = () => {
-    if (!title) {
-      return;
-    }
-
-    if (typeof navigator === "undefined" || !navigator.clipboard) {
-      console.warn("Clipboard API is not available");
-      return;
-    }
-
-    startCopyFeedback();
-
-    void navigator.clipboard.writeText(title).catch((error) => {
-      console.error("Failed to copy task title", error);
-      setIsCopying(false);
-      if (
-        typeof window !== "undefined" &&
-        copyFeedbackTimeoutRef.current !== null
-      ) {
-        window.clearTimeout(copyFeedbackTimeoutRef.current);
-        copyFeedbackTimeoutRef.current = null;
-      }
-    });
+    void copyText(title);
   };
 
   const { handleKeyDown: handleCopyKeyDown } =
@@ -239,7 +159,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
           />
         ) : (
           <XCircle
-            onClick={handleClickDelete}
+            onClick={handleDeleteClick}
             onKeyDown={handleDeleteKeyDown}
             className={`${
               shouldDelete ? "filled-delete" : "empty-delete"

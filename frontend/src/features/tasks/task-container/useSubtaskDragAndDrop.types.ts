@@ -9,6 +9,7 @@ export type SubtaskDragItem = {
 };
 
 export interface UseSubtaskDragAndDropOptions {
+  tasks: TaskType[];
   setTasks: Dispatch<SetStateAction<TaskType[]>>;
   persistReorder: (
     taskId: number,

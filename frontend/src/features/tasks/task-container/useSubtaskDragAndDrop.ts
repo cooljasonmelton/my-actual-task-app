@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
-import type { Subtask } from "@/types";
+import type { Subtask, TaskType } from "@/types";
 import {
   computeReorderedSubtasks,
   SUBTASK_REORDER_STEP,
@@ -14,6 +14,7 @@ import type {
 } from "./useSubtaskDragAndDrop.types";
 
 export const useSubtaskDragAndDrop = ({
+  tasks,
   setTasks,
   persistReorder,
   reorderStep = SUBTASK_REORDER_STEP,
@@ -21,53 +22,77 @@ export const useSubtaskDragAndDrop = ({
   const [dragOverSubtaskId, setDragOverSubtaskId] = useState<number | null>(
     null
   );
+  const tasksRef = useRef<TaskType[]>(tasks);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   const applyReorder = useCallback(
     (taskId: number, sourceId: number, targetId: number | null) => {
-      let updatedOrder: number[] | null = null;
-      let didChange = false;
+      const currentTasks = tasksRef.current;
+      const currentTask = currentTasks.find((task) => task.id === taskId);
+
+      if (!currentTask) {
+        return null;
+      }
+
+      const result = computeReorderedSubtasks(
+        currentTask.subtasks,
+        taskId,
+        sourceId,
+        targetId,
+        reorderStep
+      );
+      const { updatedSubtasks, orderedIds, changed } = result;
+
+      if (!changed) {
+        return null;
+      }
 
       setTasks((previousTasks) => {
-        let hasChanged = false;
+        if (previousTasks === currentTasks) {
+          return previousTasks.map((task) => {
+            if (task.id !== taskId) {
+              return task;
+            }
+
+            return {
+              ...task,
+              subtasks: updatedSubtasks,
+            };
+          });
+        }
+
+        let didUpdate = false;
         const nextTasks = previousTasks.map((task) => {
           if (task.id !== taskId) {
             return task;
           }
 
-          const result = computeReorderedSubtasks(
+          const nextResult = computeReorderedSubtasks(
             task.subtasks,
             taskId,
             sourceId,
             targetId,
             reorderStep
           );
-          const { updatedSubtasks, orderedIds, changed } = result;
 
-          if (!changed) {
+          if (!nextResult.changed) {
             return task;
           }
 
-          hasChanged = true;
-          updatedOrder = orderedIds;
+          didUpdate = true;
           return {
             ...task,
-            subtasks: updatedSubtasks,
+            subtasks: nextResult.updatedSubtasks,
           };
         });
 
-        if (hasChanged) {
-          didChange = true;
-          return nextTasks;
-        }
-
-        return previousTasks;
+        return didUpdate ? nextTasks : previousTasks;
       });
 
-      if (didChange && updatedOrder) {
-        return updatedOrder;
-      }
-
-      return null;
+      return orderedIds;
     },
     [reorderStep, setTasks]
   );

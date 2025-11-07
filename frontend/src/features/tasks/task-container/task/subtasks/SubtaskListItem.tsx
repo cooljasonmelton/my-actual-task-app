@@ -1,34 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback } from "react";
 import { Copy, Square } from "lucide-react";
 import Button from "@/components/design-system-components/button/Button";
-import type { Subtask } from "@/types";
 import useEditableActivation from "../../useEditableActivation";
 import useKeyboardActivation from "../../useKeyboardActivation";
-import type { TaskProps } from "../../types";
+import useCopyToClipboard from "../../useCopyToClipboard";
+import type { SubtaskItemProps } from "./SubtaskListItemContainer";
+import useSubtaskDeleteAction from "./useSubtaskDeleteAction";
 
 import "./SubtaskListItem.css";
-
-export type SubtaskItemProps = {
-  taskId: number;
-  subtask: Subtask;
-  isTaskSoftDeleted: boolean;
-  onUpdateSubtaskTitle: (
-    taskId: number,
-    subtaskId: number,
-    updatedTitle: string
-  ) => Promise<void>;
-  onDeleteSubtask: (taskId: number, subtaskId: number) => Promise<void>;
-  onRestoreSubtask: (taskId: number, subtaskId: number) => Promise<void>;
-  openEditForm: () => void;
-  onDragStart: NonNullable<TaskProps["onSubtaskDragStart"]>;
-  onDragEnter: NonNullable<TaskProps["onSubtaskDragEnter"]>;
-  onDragOver: NonNullable<TaskProps["onSubtaskDragOver"]>;
-  onDragLeave: NonNullable<TaskProps["onSubtaskDragLeave"]>;
-  onDrop: NonNullable<TaskProps["onSubtaskDrop"]>;
-  onDragEnd: NonNullable<TaskProps["onSubtaskDragEnd"]>;
-  isDragging: boolean;
-  isDragOver: boolean;
-};
 
 const SubtaskListItem = ({
   taskId,
@@ -45,10 +24,14 @@ const SubtaskListItem = ({
   isDragging,
   isDragOver,
 }: SubtaskItemProps) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [isCopying, setIsCopying] = useState(false);
-  const copyFeedbackTimeoutRef = useRef<number | null>(null);
+  const { isCopying, copyText } = useCopyToClipboard();
+  const { isDeleting, error: localError, handleDelete, resetError } =
+    useSubtaskDeleteAction({
+      taskId,
+      subtaskId: subtask.id,
+      onDeleteSubtask,
+      isTaskSoftDeleted,
+    });
 
   const handleStartEditing = useCallback(() => {
     if (
@@ -61,7 +44,7 @@ const SubtaskListItem = ({
       return;
     }
 
-    setLocalError(null);
+    resetError();
     openEditForm();
   }, [
     isTaskSoftDeleted,
@@ -70,26 +53,8 @@ const SubtaskListItem = ({
     isDeleting,
     // isRestoring,
     openEditForm,
+    resetError,
   ]);
-
-  const handleDelete = useCallback(async () => {
-    if (isTaskSoftDeleted || isDeleting) {
-      return;
-    }
-
-    setIsDeleting(true);
-    setLocalError(null);
-
-    try {
-      await onDeleteSubtask(taskId, subtask.id);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to delete subtask";
-      setLocalError(message);
-    } finally {
-      setIsDeleting(false);
-    }
-  }, [isTaskSoftDeleted, isDeleting, onDeleteSubtask, subtask.id, taskId]);
 
   // TODO: fix disabled logic to handle loading / error states
   // const isActionDisabled =
@@ -106,52 +71,9 @@ const SubtaskListItem = ({
     }
   );
 
-  useEffect(() => {
-    return () => {
-      if (
-        typeof window !== "undefined" &&
-        copyFeedbackTimeoutRef.current !== null
-      ) {
-        window.clearTimeout(copyFeedbackTimeoutRef.current);
-        copyFeedbackTimeoutRef.current = null;
-      }
-    };
-  }, []);
-
   const handleCopyTitle = useCallback(() => {
-    if (!subtask.title) {
-      return;
-    }
-
-    if (typeof navigator === "undefined" || !navigator.clipboard) {
-      console.warn("Clipboard API is not available");
-      return;
-    }
-
-    if (typeof window !== "undefined") {
-      if (copyFeedbackTimeoutRef.current !== null) {
-        window.clearTimeout(copyFeedbackTimeoutRef.current);
-      }
-
-      setIsCopying(true);
-      copyFeedbackTimeoutRef.current = window.setTimeout(() => {
-        setIsCopying(false);
-        copyFeedbackTimeoutRef.current = null;
-      }, 400);
-    }
-
-    void navigator.clipboard.writeText(subtask.title).catch((error) => {
-      console.error("Failed to copy subtask title", error);
-      setIsCopying(false);
-      if (
-        typeof window !== "undefined" &&
-        copyFeedbackTimeoutRef.current !== null
-      ) {
-        window.clearTimeout(copyFeedbackTimeoutRef.current);
-        copyFeedbackTimeoutRef.current = null;
-      }
-    });
-  }, [subtask.title]);
+    void copyText(subtask.title);
+  }, [copyText, subtask.title]);
 
   const isDraggable = !isTaskSoftDeleted && !isDeleting;
   const dropEnabled = !isTaskSoftDeleted;
@@ -194,7 +116,7 @@ const SubtaskListItem = ({
         onClick={handleDelete}
         onKeyDown={handleDeleteKeyDown}
         className={`${"empty-delete"} task-header__icon`}
-        aria-label={"Delete task"}
+        aria-label="Delete subtask"
         role="button"
         aria-disabled={isDeleting}
         tabIndex={0}
