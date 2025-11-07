@@ -1,24 +1,12 @@
-import {
-  useCallback,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useCallback, useRef } from "react";
 import { TASKS_API_URL } from "./constants";
 import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "./utils/taskSorting";
 import type { ApiTask } from "./types";
-import type { TaskType } from "@/types";
+import { useTasksActions } from "./state/TasksContext";
 
-export const useLoadTasks = ({
-  setError,
-  setTasks,
-}: {
-  setError: Dispatch<SetStateAction<string | null>>;
-  setTasks: Dispatch<SetStateAction<TaskType[]>>;
-}) => {
-  const [isLoading, setIsLoading] = useState(false);
+export const useLoadTasks = () => {
+  const { setError, setTasks, setIsLoading } = useTasksActions();
   const hasLoadedOnceRef = useRef(false);
 
   const loadTasks = useCallback(async () => {
@@ -51,10 +39,9 @@ export const useLoadTasks = ({
         setIsLoading(false);
       }
     }
-  }, [setError, setTasks]);
+  }, [setError, setTasks, setIsLoading]);
 
   return {
-    isLoading,
     loadTasks,
   };
 };

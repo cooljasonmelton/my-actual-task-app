@@ -1,14 +1,14 @@
-import { useCallback, type Dispatch, type SetStateAction } from "react";
+import { useCallback } from "react";
 import type { TaskType } from "@/types";
 import { TASKS_API_URL } from "./constants";
+import { useTasksActions } from "./state/TasksContext";
 
 export const useRestoreTask = ({
-  setError,
   loadTasks,
 }: {
-  setError: Dispatch<SetStateAction<string | null>>;
   loadTasks: () => Promise<void>;
 }) => {
+  const { setError } = useTasksActions();
   const handleRestoreTask = useCallback(
     async (id: TaskType["id"]) => {
       setError(null);

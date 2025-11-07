@@ -10,12 +10,11 @@ import {
 } from "./taskDragReorder";
 import { useReorderableDragAndDrop } from "../../drag-drop/useReorderableDragAndDrop";
 import { useTaskStatusDragHandlers } from "./taskStatusDragHandlers";
+import { useTasksActions, useTasksState } from "../state/TasksContext";
 
 export interface UseTaskDragAndDropOptions {
-  tasks: TaskType[];
   sortOption: TaskSortOption;
   selectedStatus: Status;
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   persistReorder: (status: Status, orderedTaskIds: number[]) => Promise<void>;
   persistStatusChange: (taskId: number, status: Status) => Promise<void>;
   taskReorderStep?: number;
@@ -42,14 +41,14 @@ export interface UseTaskDragAndDropResult {
 }
 
 export const useTaskDragAndDrop = ({
-  tasks,
   sortOption,
   selectedStatus,
-  setTasks,
   persistReorder,
   persistStatusChange,
   taskReorderStep = TASK_REORDER_STEP,
 }: UseTaskDragAndDropOptions): UseTaskDragAndDropResult => {
+  const { tasks } = useTasksState();
+  const { setTasks } = useTasksActions();
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<number | null>(null);
   const tasksRef = useRef<TaskType[]>(tasks);

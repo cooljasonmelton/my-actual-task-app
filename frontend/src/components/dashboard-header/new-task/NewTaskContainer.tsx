@@ -1,4 +1,4 @@
-import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import Button from "../../design-system-components/button/Button";
 import InputField from "../../design-system-components/form/InputField";
@@ -18,7 +18,7 @@ const NewTaskContainer = ({
   selectedStatus,
 }: {
   refreshTasks: () => Promise<void>;
-  reportError: Dispatch<SetStateAction<string | null>>;
+  reportError: (message: string | null) => void;
   selectedStatus: Status;
 }) => {
   const [taskTitle, setTaskTitle] = useState("");

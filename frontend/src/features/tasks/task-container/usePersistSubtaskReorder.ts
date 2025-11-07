@@ -1,13 +1,13 @@
-import { useCallback, type Dispatch, type SetStateAction } from "react";
+import { useCallback } from "react";
 import { TASKS_API_URL } from "./constants";
+import { useTasksActions } from "./state/TasksContext";
 
 export const usePersistSubtaskReorder = ({
-  setError,
   loadTasks,
 }: {
-  setError: Dispatch<SetStateAction<string | null>>;
   loadTasks: () => Promise<void>;
 }) => {
+  const { setError } = useTasksActions();
   const persistSubtaskReorder = useCallback(
     async (taskId: number, orderedSubtaskIds: number[]) => {
       if (orderedSubtaskIds.length === 0) {

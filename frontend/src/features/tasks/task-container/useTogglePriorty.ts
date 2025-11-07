@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useCallback, useState } from "react";
 import { TASKS_API_URL } from "./constants";
 import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import type { ApiTask } from "./types";
@@ -13,14 +8,10 @@ import {
   getNextPriority,
   sortTasks,
 } from "./utils/taskSorting";
+import { useTasksActions } from "./state/TasksContext";
 
-export const useTogglePriority = ({
-  setError,
-  setTasks,
-}: {
-  setError: Dispatch<SetStateAction<string | null>>;
-  setTasks: Dispatch<SetStateAction<TaskType[]>>;
-}) => {
+export const useTogglePriority = () => {
+  const { setError, setTasks } = useTasksActions();
   const [updatingPriorities, setUpdatingPriorities] = useState<Set<number>>(
     () => new Set()
   );

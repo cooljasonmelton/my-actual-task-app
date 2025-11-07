@@ -1,14 +1,14 @@
-import { useCallback, type SetStateAction, type Dispatch } from "react";
+import { useCallback } from "react";
 import type { TaskType } from "@/types";
 import { TASKS_API_URL } from "./constants";
+import { useTasksActions } from "./state/TasksContext";
 
 export const useSoftDeleteTask = ({
-  setError,
   loadTasks,
 }: {
-  setError: Dispatch<SetStateAction<string | null>>;
   loadTasks: () => Promise<void>;
 }) => {
+  const { setError } = useTasksActions();
   const handleDeleteTask = useCallback(
     async (id: TaskType["id"]) => {
       setError(null);

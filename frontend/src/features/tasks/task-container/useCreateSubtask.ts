@@ -1,14 +1,14 @@
-import { useCallback, type Dispatch, type SetStateAction } from "react";
+import { useCallback } from "react";
 import type { TaskType } from "@/types";
 import { TASKS_API_URL } from "./constants";
+import { useTasksActions } from "./state/TasksContext";
 
 export const useCreateSubtask = ({
-  setError,
   loadTasks,
 }: {
-  setError: Dispatch<SetStateAction<string | null>>;
   loadTasks: () => Promise<void>;
 }) => {
+  const { setError } = useTasksActions();
   const handleCreateSubtask = useCallback(
     async (taskId: TaskType["id"], title: string) => {
       const trimmedTitle = title.trim();

@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction, DragEvent } from "react";
+import type { DragEvent } from "react";
 import type { Status } from "../../types";
 import NewTaskContainer from "./new-task/NewTaskContainer";
 import SectionTabsContainer from "./section-tabs/SectionTabsContainer";
@@ -20,7 +20,7 @@ const DashboardHeader = ({
   onToggleNotesPanel,
 }: {
   refreshTasks: () => Promise<void>;
-  reportError: Dispatch<SetStateAction<string | null>>;
+  reportError: (message: string | null) => void;
   selectedStatus: Status;
   onStatusChange: (value: Status) => void;
   statusCounts: Record<Status, number>;

@@ -12,13 +12,14 @@ import type {
   UseSubtaskDragAndDropResult,
   SubtaskDragItem,
 } from "./useSubtaskDragAndDrop.types";
+import { useTasksActions, useTasksState } from "./state/TasksContext";
 
 export const useSubtaskDragAndDrop = ({
-  tasks,
-  setTasks,
   persistReorder,
   reorderStep = SUBTASK_REORDER_STEP,
 }: UseSubtaskDragAndDropOptions): UseSubtaskDragAndDropResult => {
+  const { tasks } = useTasksState();
+  const { setTasks } = useTasksActions();
   const [dragOverSubtaskId, setDragOverSubtaskId] = useState<number | null>(
     null
   );

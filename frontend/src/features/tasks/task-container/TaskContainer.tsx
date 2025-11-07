@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TaskList from "./task/TaskList";
 import DashboardHeader from "@/components/dashboard-header/DashboardHeader";
-import type { Status, TaskType } from "@/types";
+import type { Status } from "@/types";
 import { DEFAULT_SECTION_TAB_ITEM } from "@/constants";
 import { DEFAULT_TASK_SORT_OPTION } from "./utils/taskSorting";
 import { useTaskDragAndDrop } from "./utils/taskDragAndDrop";
@@ -21,37 +21,35 @@ import { useDerivedTaskData } from "./useDerivedTaskData";
 import { useExpandedTasks } from "./useExpandedTasks";
 import { usePersistSubtaskReorder } from "./usePersistSubtaskReorder";
 import { useSubtaskDragAndDrop } from "./useSubtaskDragAndDrop";
+import { TasksProvider, useTasksState } from "./state/TasksContext";
 import NotesPanel from "@/components/notes-panel/NotesPanel";
 import "./TaskContainer.css";
-const TaskContainer = () => {
-  const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [error, setError] = useState<string | null>(null);
+import { useTasksActions } from "./state/TasksContext";
+
+const TaskContainerContent = () => {
+  const { tasks, error, isLoading } = useTasksState();
+  const { setError } = useTasksActions();
   const [selectedStatus, setSelectedStatus] =
     useState<Status>(DEFAULT_SECTION_TAB_ITEM);
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
 
-  const { loadTasks, isLoading } = useLoadTasks({ setError, setTasks });
+  const { loadTasks } = useLoadTasks();
   useEffect(() => {
     void loadTasks();
   }, [loadTasks]);
-  const { updatingPriorities, handleTogglePriority } = useTogglePriority({
-    setError,
-    setTasks,
-  });
+  const { updatingPriorities, handleTogglePriority } = useTogglePriority();
   const { handleUpdateStatus } = useUpdateStatus({
-    setError,
-    setTasks,
     loadTasks,
   });
-  const { handleDeleteTask } = useSoftDeleteTask({ setError, loadTasks });
-  const { handleRestoreTask } = useRestoreTask({ setError, loadTasks });
-  const { handleUpdateTitle } = useUpdateTitle({ setError, setTasks, loadTasks });
-  const { persistReorder } = usePersistReorder({ loadTasks, setError });
-  const { persistSubtaskReorder } = usePersistSubtaskReorder({ loadTasks, setError });
-  const { handleCreateSubtask } = useCreateSubtask({ setError, loadTasks });
-  const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({ setError, loadTasks });
-  const { handleDeleteSubtask } = useSoftDeleteSubtask({ setError, loadTasks });
-  const { handleRestoreSubtask } = useRestoreSubtask({ setError, loadTasks });
+  const { handleDeleteTask } = useSoftDeleteTask({ loadTasks });
+  const { handleRestoreTask } = useRestoreTask({ loadTasks });
+  const { handleUpdateTitle } = useUpdateTitle({ loadTasks });
+  const { persistReorder } = usePersistReorder({ loadTasks });
+  const { persistSubtaskReorder } = usePersistSubtaskReorder({ loadTasks });
+  const { handleCreateSubtask } = useCreateSubtask({ loadTasks });
+  const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({ loadTasks });
+  const { handleDeleteSubtask } = useSoftDeleteSubtask({ loadTasks });
+  const { handleRestoreSubtask } = useRestoreSubtask({ loadTasks });
   const { expandedTaskIds, handleToggleExpanded } = useExpandedTasks(tasks);
 
   const {
@@ -70,10 +68,8 @@ const TaskContainer = () => {
     handleStatusDragLeave,
     handleStatusDrop,
   } = useTaskDragAndDrop({
-    tasks,
     sortOption: DEFAULT_TASK_SORT_OPTION,
     selectedStatus,
-    setTasks,
     persistReorder,
     persistStatusChange: handleUpdateStatus,
   });
@@ -90,8 +86,6 @@ const TaskContainer = () => {
     handleDropOnList: handleSubtaskListDrop,
     handleDragEnd: handleSubtaskDragEnd,
   } = useSubtaskDragAndDrop({
-    tasks,
-    setTasks,
     persistReorder: persistSubtaskReorder,
   });
   const { isInCurrentReferenceWindow } = useReferenceWindow();
@@ -196,5 +190,11 @@ const TaskContainer = () => {
     </>
   );
 };
+
+const TaskContainer = () => (
+  <TasksProvider>
+    <TaskContainerContent />
+  </TasksProvider>
+);
 
 export default TaskContainer;

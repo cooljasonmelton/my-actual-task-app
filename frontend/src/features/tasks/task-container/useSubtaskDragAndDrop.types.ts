@@ -1,5 +1,5 @@
-import type { Dispatch, DragEvent, SetStateAction } from "react";
-import type { Subtask, TaskType } from "@/types";
+import type { DragEvent } from "react";
+import type { Subtask } from "@/types";
 import type { DraggingSubtask } from "./utils/subtaskDragReorder";
 
 export type SubtaskDragItem = {
@@ -9,8 +9,6 @@ export type SubtaskDragItem = {
 };
 
 export interface UseSubtaskDragAndDropOptions {
-  tasks: TaskType[];
-  setTasks: Dispatch<SetStateAction<TaskType[]>>;
   persistReorder: (
     taskId: number,
     orderedSubtaskIds: number[]

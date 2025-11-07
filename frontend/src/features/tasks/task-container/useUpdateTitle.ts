@@ -1,19 +1,17 @@
-import { useCallback, type SetStateAction, type Dispatch } from "react";
+import { useCallback } from "react";
 import type { TaskType } from "@/types";
 import { TASKS_API_URL } from "./constants";
 import type { ApiTask } from "./types";
 import { parseTaskFromApi } from "./utils/taskContainerUtils";
 import { DEFAULT_TASK_SORT_OPTION, sortTasks } from "./utils/taskSorting";
+import { useTasksActions } from "./state/TasksContext";
 
 export const useUpdateTitle = ({
-  setError,
-  setTasks,
   loadTasks,
 }: {
-  setError: Dispatch<SetStateAction<string | null>>;
-  setTasks: Dispatch<SetStateAction<TaskType[]>>;
   loadTasks: () => Promise<void>;
 }) => {
+  const { setError, setTasks } = useTasksActions();
   const handleUpdateTitle = useCallback(
     async (id: TaskType["id"], updatedTitle: string) => {
       const trimmedTitle = updatedTitle.trim();
