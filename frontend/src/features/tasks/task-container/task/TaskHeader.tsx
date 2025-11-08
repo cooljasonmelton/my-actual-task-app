@@ -31,14 +31,18 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   onRestoreRequest,
   hasSubtasks,
 }) => {
-  const { shouldDelete, isDeleting, handleDeleteRequest } =
-    useTaskDeleteAction({
-      taskId,
-      onDelete,
-      isSoftDeleted,
-    });
-  const handleDeleteClick = () => {
-    void handleDeleteRequest();
+  const {
+    shouldDeleteFromCheckbox,
+    shouldDeleteFromIcon,
+    isDeleting,
+    handleDeleteRequest,
+  } = useTaskDeleteAction({
+    taskId,
+    onDelete,
+    isSoftDeleted,
+  });
+  const handleDeleteClick = (source: "checkbox" | "icon") => {
+    void handleDeleteRequest(source);
   };
   const { isCopying, copyText } = useCopyToClipboard();
   const Chevron = isExpanded ? ChevronDown : ChevronRight;
@@ -78,11 +82,6 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   const { handleKeyDown: handleRestoreKeyDown } =
     useKeyboardActivation(onRestoreRequest);
 
-  const { handleKeyDown: handleDeleteKeyDown } = useKeyboardActivation(
-    handleDeleteClick,
-    { isDisabled: isSoftDeleted || isDeleting }
-  );
-
   const handleCopyTitle = () => {
     void copyText(title);
   };
@@ -95,9 +94,11 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         <TaskDeleteCheckbox
           isSoftDeleted={isSoftDeleted}
           isDeleting={isDeleting}
-          shouldDelete={shouldDelete}
-          onDelete={handleDeleteClick}
-          onDeleteKeyDown={handleDeleteKeyDown}
+          shouldDelete={shouldDeleteFromCheckbox}
+          onDelete={() => handleDeleteClick("checkbox")}
+          onDeleteKeyDown={() => {
+            void handleDeleteRequest("checkbox");
+          }}
         />
         <Chevron
           onClick={toggleExpanded}
@@ -165,12 +166,16 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
           />
         ) : (
           <XCircle
-            onClick={handleDeleteClick}
-            onKeyDown={handleDeleteKeyDown}
+            onClick={() => handleDeleteClick("icon")}
+            onKeyDown={() => {
+              void handleDeleteRequest("icon");
+            }}
             className={`${
-              shouldDelete ? "filled-delete" : "empty-delete"
+              shouldDeleteFromIcon ? "filled-delete" : "empty-delete"
             } task-header__icon`}
-            aria-label={shouldDelete ? "Confirm delete task" : "Delete task"}
+            aria-label={
+              shouldDeleteFromIcon ? "Confirm delete task" : "Delete task"
+            }
             role="button"
             aria-disabled={isDeleting}
             tabIndex={0}

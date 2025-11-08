@@ -1,13 +1,36 @@
 import { useCallback } from "react";
 import { Copy, Square } from "lucide-react";
 import Button from "@/components/design-system-components/button/Button";
+import type { Subtask } from "@/types";
+import type { TaskProps } from "../../types";
 import useEditableActivation from "../../useEditableActivation";
 import useKeyboardActivation from "../../useKeyboardActivation";
 import useCopyToClipboard from "../../useCopyToClipboard";
-import type { SubtaskItemProps } from "./SubtaskListItemContainer";
 import useSubtaskDeleteAction from "./useSubtaskDeleteAction";
 
 import "./SubtaskListItem.css";
+
+type SubtaskListItemProps = {
+  taskId: number;
+  subtask: Subtask;
+  isTaskSoftDeleted: boolean;
+  onDeleteSubtask: (taskId: number, subtaskId: number) => Promise<void>;
+  onUpdateSubtaskTitle: (
+    taskId: number,
+    subtaskId: number,
+    updatedTitle: string
+  ) => Promise<void>;
+  onRestoreSubtask: (taskId: number, subtaskId: number) => Promise<void>;
+  openEditForm: () => void;
+  onDragStart: NonNullable<TaskProps["onSubtaskDragStart"]>;
+  onDragEnter: NonNullable<TaskProps["onSubtaskDragEnter"]>;
+  onDragOver: NonNullable<TaskProps["onSubtaskDragOver"]>;
+  onDragLeave: NonNullable<TaskProps["onSubtaskDragLeave"]>;
+  onDrop: NonNullable<TaskProps["onSubtaskDrop"]>;
+  onDragEnd: NonNullable<TaskProps["onSubtaskDragEnd"]>;
+  isDragging: boolean;
+  isDragOver: boolean;
+};
 
 const SubtaskListItem = ({
   taskId,
@@ -23,7 +46,7 @@ const SubtaskListItem = ({
   onDragEnd,
   isDragging,
   isDragOver,
-}: SubtaskItemProps) => {
+}: SubtaskListItemProps) => {
   const { isCopying, copyText } = useCopyToClipboard();
   const { isDeleting, error: localError, handleDelete, resetError } =
     useSubtaskDeleteAction({

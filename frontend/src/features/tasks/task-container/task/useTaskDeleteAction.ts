@@ -11,51 +11,85 @@ const useTaskDeleteAction = ({
   onDelete,
   isSoftDeleted,
 }: UseTaskDeleteActionOptions) => {
-  const [shouldDelete, setShouldDelete] = useState(false);
+  const [confirmations, setConfirmations] = useState({
+    checkbox: false,
+    icon: false,
+  });
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (!shouldDelete) {
+    if (!confirmations.checkbox && !confirmations.icon) {
       return;
     }
 
     const timer = window.setTimeout(() => {
-      setShouldDelete(false);
+      setConfirmations({ checkbox: false, icon: false });
     }, 3000);
 
     return () => window.clearTimeout(timer);
-  }, [shouldDelete]);
+  }, [confirmations.checkbox, confirmations.icon]);
 
   useEffect(() => {
     if (isSoftDeleted) {
-      setShouldDelete(false);
+      setConfirmations({ checkbox: false, icon: false });
       setIsDeleting(false);
     }
   }, [isSoftDeleted]);
 
-  const handleDeleteRequest = useCallback(async () => {
-    if (isDeleting || isSoftDeleted) {
-      return;
-    }
+  const requestDelete = useCallback(
+    (source: "checkbox" | "icon") => {
+      setConfirmations((previous) => {
+        const currentConfirmation = previous[source];
+        if (currentConfirmation) {
+          return previous;
+        }
+        return {
+          ...previous,
+          [source]: true,
+        };
+      });
+    },
+    []
+  );
 
-    if (!shouldDelete) {
-      setShouldDelete(true);
-      return;
-    }
+  const resetConfirmations = useCallback(() => {
+    setConfirmations({ checkbox: false, icon: false });
+  }, []);
 
+  const executeDelete = useCallback(async () => {
     setIsDeleting(true);
 
     try {
       await onDelete(taskId);
     } catch (error) {
       console.error("Failed to delete task", error);
-      setShouldDelete(false);
+      resetConfirmations();
       setIsDeleting(false);
     }
-  }, [isDeleting, isSoftDeleted, onDelete, shouldDelete, taskId]);
+  }, [onDelete, resetConfirmations, taskId]);
+
+  const handleDeleteRequest = useCallback(
+    async (source: "checkbox" | "icon") => {
+      if (isDeleting || isSoftDeleted) {
+        return;
+      }
+
+      if (!confirmations[source]) {
+        requestDelete(source);
+        return;
+      }
+
+      await executeDelete();
+    },
+    [confirmations, executeDelete, isDeleting, isSoftDeleted, requestDelete]
+  );
+
+  const shouldDeleteFromCheckbox = confirmations.checkbox;
+  const shouldDeleteFromIcon = confirmations.icon;
 
   return {
-    shouldDelete,
+    shouldDeleteFromCheckbox,
+    shouldDeleteFromIcon,
     isDeleting,
     handleDeleteRequest,
   };

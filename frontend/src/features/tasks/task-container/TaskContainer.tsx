@@ -27,8 +27,9 @@ import "./TaskContainer.css";
 
 const TaskContainer = () => {
   const { tasks, error, isLoading } = useTasksState();
-  const [selectedStatus, setSelectedStatus] =
-    useState<Status>(DEFAULT_SECTION_TAB_ITEM);
+  const [selectedStatus, setSelectedStatus] = useState<Status>(
+    DEFAULT_SECTION_TAB_ITEM
+  );
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
 
   const { loadTasks } = useLoadTasks();
@@ -93,7 +94,9 @@ const TaskContainer = () => {
     isInCurrentReferenceWindow,
   });
 
-  const isDraggingInSelectedStatus = Boolean(draggingTask && draggingTask.status === selectedStatus);
+  const isDraggingInSelectedStatus = Boolean(
+    draggingTask && draggingTask.status === selectedStatus
+  );
   const taskContainerClassName = isDraggingInSelectedStatus
     ? "task-container task-container--reordering"
     : "task-container";

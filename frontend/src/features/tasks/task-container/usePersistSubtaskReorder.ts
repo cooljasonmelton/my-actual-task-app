@@ -60,7 +60,7 @@ export const usePersistSubtaskReorder = ({
   }, [loadTasks, setError]);
 
   const persistSubtaskReorder = useCallback(
-    (taskId: number, orderedSubtaskIds: number[]) => {
+    async (taskId: number, orderedSubtaskIds: number[]) => {
       if (orderedSubtaskIds.length === 0) {
         return;
       }
@@ -69,7 +69,7 @@ export const usePersistSubtaskReorder = ({
         taskId,
         orderedSubtaskIds: orderedSubtaskIds.slice(),
       };
-      void processQueue();
+      await processQueue();
     },
     [processQueue]
   );
