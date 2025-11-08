@@ -5,24 +5,20 @@ import InputField from "../../design-system-components/form/InputField";
 import Form from "../../design-system-components/form/Form";
 import type { Status } from "../../../types";
 import { TASKS_API_URL } from "@/config/api";
+import { useLoadTasks } from "@/features/tasks/task-container/useLoadTasks";
+import { useTasksActions } from "@/features/tasks/task-container/state/TasksContext";
 
 import "./NewTaskContainer.css";
 
 const BUTTON_CTA_TEXT = "Add";
 const INPUT_TEXT = "add new task";
 
-const NewTaskContainer = ({
-  refreshTasks,
-  reportError,
-  selectedStatus,
-}: {
-  refreshTasks: () => Promise<void>;
-  reportError: (message: string | null) => void;
-  selectedStatus: Status;
-}) => {
+const NewTaskContainer = ({ selectedStatus }: { selectedStatus: Status }) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { loadTasks } = useLoadTasks();
+  const { setError } = useTasksActions();
 
   // TODO: animation on submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,6 +29,7 @@ const NewTaskContainer = ({
     if (!title) return;
 
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(TASKS_API_URL, {
         method: "POST",
@@ -42,7 +39,7 @@ const NewTaskContainer = ({
 
       if (!res.ok) throw new Error("Failed to add task");
 
-      await refreshTasks();
+      await loadTasks();
       setTaskTitle("");
       const input = inputRef.current;
       if (input) {
@@ -53,9 +50,9 @@ const NewTaskContainer = ({
         }
       }
     } catch (err) {
-      reportError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
+      const message =
+        err instanceof Error ? err.message : "An unknown error occurred";
+      setError(message);
     } finally {
       setLoading(false);
     }

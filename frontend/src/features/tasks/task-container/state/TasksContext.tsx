@@ -122,3 +122,13 @@ export const useTasksActions = () => {
     [setTasks, setError, setIsLoading]
   );
 };
+
+export const useTasksSelectors = () => {
+  const { tasks, error, isLoading } = useTasksState();
+
+  return {
+    tasks,
+    error,
+    isLoading,
+  };
+};

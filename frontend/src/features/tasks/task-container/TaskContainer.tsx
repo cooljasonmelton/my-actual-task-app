@@ -21,14 +21,12 @@ import { useDerivedTaskData } from "./useDerivedTaskData";
 import { useExpandedTasks } from "./useExpandedTasks";
 import { usePersistSubtaskReorder } from "./usePersistSubtaskReorder";
 import { useSubtaskDragAndDrop } from "./useSubtaskDragAndDrop";
-import { TasksProvider, useTasksState } from "./state/TasksContext";
+import { useTasksState } from "./state/TasksContext";
 import NotesPanel from "@/components/notes-panel/NotesPanel";
 import "./TaskContainer.css";
-import { useTasksActions } from "./state/TasksContext";
 
-const TaskContainerContent = () => {
+const TaskContainer = () => {
   const { tasks, error, isLoading } = useTasksState();
-  const { setError } = useTasksActions();
   const [selectedStatus, setSelectedStatus] =
     useState<Status>(DEFAULT_SECTION_TAB_ITEM);
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
@@ -103,8 +101,6 @@ const TaskContainerContent = () => {
   return (
     <>
       <DashboardHeader
-        refreshTasks={loadTasks}
-        reportError={setError}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
         statusCounts={statusCounts}
@@ -190,11 +186,5 @@ const TaskContainerContent = () => {
     </>
   );
 };
-
-const TaskContainer = () => (
-  <TasksProvider>
-    <TaskContainerContent />
-  </TasksProvider>
-);
 
 export default TaskContainer;

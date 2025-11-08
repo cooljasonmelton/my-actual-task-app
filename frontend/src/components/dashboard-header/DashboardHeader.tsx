@@ -6,8 +6,6 @@ import "./DashboardHeader.css";
 import NotesToggleButton from "./notes-toggle/NotesToggleButton";
 
 const DashboardHeader = ({
-  refreshTasks,
-  reportError,
   selectedStatus,
   onStatusChange,
   statusCounts,
@@ -19,8 +17,6 @@ const DashboardHeader = ({
   isNotesPanelOpen,
   onToggleNotesPanel,
 }: {
-  refreshTasks: () => Promise<void>;
-  reportError: (message: string | null) => void;
   selectedStatus: Status;
   onStatusChange: (value: Status) => void;
   statusCounts: Record<Status, number>;
@@ -45,11 +41,7 @@ const DashboardHeader = ({
         onStatusDrop={onStatusDrop}
       />
       <div className="dashboard-header__actions">
-        <NewTaskContainer
-          refreshTasks={refreshTasks}
-          reportError={reportError}
-          selectedStatus={selectedStatus}
-        />
+        <NewTaskContainer selectedStatus={selectedStatus} />
         <NotesToggleButton
           isActive={isNotesPanelOpen}
           onToggle={onToggleNotesPanel}
