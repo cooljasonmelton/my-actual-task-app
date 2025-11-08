@@ -2,7 +2,7 @@
 
 My Actual Task App is my actual task map, a full-stack productivity dashboard I’m building to keep things organized. It combines a modern React frontend with a lightweight Express + SQLite backend so I can iterate quickly while keeping everything in one repo. The app highlights tasks I care about (priority stars, flexible status buckets, drag-and-drop reordering), lets me break work into subtasks with inline editing, keeps soft-deleted items recoverable, and has convenience features like keyboard accessibility and a toggle to keep my browser awake.
 
-<img width="1419" height="684" alt="Screenshot 2025-10-31 at 10 53 45 PM" src="https://github.com/user-attachments/assets/31c44ffa-f086-458e-8560-eaaec6bab7b3" />
+<img width="1419" height="683" alt="Screenshot 2025-11-07 at 8 15 13 PM" src="https://github.com/user-attachments/assets/98039664-d28d-4426-a529-1f1b081976c0" />
 
 ## ✨ Highlights
 
