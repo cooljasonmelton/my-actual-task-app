@@ -49,7 +49,10 @@ export const useDerivedTaskData = ({
 
   const statusCounts = useMemo<Record<Status, number>>(() => {
     return STATUS_VALUES.reduce((acc, status) => {
-      acc[status] = statusBuckets[status]?.length ?? 0;
+      const tasksForStatus = statusBuckets[status] ?? [];
+      acc[status] = tasksForStatus.filter(
+        ({ isSoftDeleted }) => !isSoftDeleted
+      ).length;
       return acc;
     }, {} as Record<Status, number>);
   }, [statusBuckets]);

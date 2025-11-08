@@ -25,6 +25,7 @@ export const useSectionTabItems = (
     const status = item.value;
     const isDropTarget = dragOverStatus === status;
     const count = counts[status] ?? 0;
+    const showCount = status !== "finished";
 
     const handleDragOver =
       onStatusDragOver &&
@@ -43,6 +44,7 @@ export const useSectionTabItems = (
           count={count}
           isDropTarget={isDropTarget}
           isDragActive={isDragActive}
+          showCount={showCount}
         />
       ),
       value: status,
