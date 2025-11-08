@@ -1,19 +1,20 @@
 import { useCallback, useRef } from "react";
+import type { Status } from "@/types";
 import { TASKS_API_URL } from "@/config/api";
 import { useTasksActions } from "./state/TasksContext";
 
-type SubtaskReorderPayload = {
-  taskId: number;
-  orderedSubtaskIds: number[];
+type TasksReorderPayload = {
+  status: Status;
+  orderedIds: number[];
 };
 
-export const usePersistSubtaskReorder = ({
+export const usePersistTaskReorder = ({
   loadTasks,
 }: {
   loadTasks: () => Promise<void>;
 }) => {
   const { setError } = useTasksActions();
-  const latestPayloadRef = useRef<SubtaskReorderPayload | null>(null);
+  const latestPayloadRef = useRef<TasksReorderPayload | null>(null);
   const isProcessingRef = useRef(false);
 
   const processQueue = useCallback(async () => {
@@ -29,23 +30,19 @@ export const usePersistSubtaskReorder = ({
         latestPayloadRef.current = null;
 
         try {
-          const response = await fetch(
-            `${TASKS_API_URL}/${payload.taskId}/subtasks/reorder`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                orderedSubtaskIds: payload.orderedSubtaskIds,
-              }),
-            }
-          );
+          const response = await fetch(`${TASKS_API_URL}/reorder`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              status: payload.status,
+              orderedTaskIds: payload.orderedIds,
+            }),
+          });
 
           if (!response.ok) {
-            throw new Error(
-              `Failed to reorder subtasks (${response.status})`
-            );
+            throw new Error(`Failed to reorder tasks (${response.status})`);
           }
         } catch (err) {
           const message =
@@ -59,20 +56,22 @@ export const usePersistSubtaskReorder = ({
     }
   }, [loadTasks, setError]);
 
-  const persistSubtaskReorder = useCallback(
-    (taskId: number, orderedSubtaskIds: number[]) => {
-      if (orderedSubtaskIds.length === 0) {
+  const persistTaskReorder = useCallback(
+    (status: Status, orderedIds: number[]) => {
+      if (orderedIds.length === 0) {
         return;
       }
 
       latestPayloadRef.current = {
-        taskId,
-        orderedSubtaskIds: orderedSubtaskIds.slice(),
+        status,
+        orderedIds: orderedIds.slice(),
       };
       void processQueue();
     },
     [processQueue]
   );
 
-  return { persistSubtaskReorder };
+  return {
+    persistTaskReorder,
+  };
 };

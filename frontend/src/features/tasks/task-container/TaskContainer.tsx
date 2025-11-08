@@ -12,7 +12,7 @@ import { useRestoreTask } from "./useRestoreTask";
 import { useTogglePriority } from "./useTogglePriorty";
 import { useUpdateStatus } from "./useUpdateStatus";
 import { useUpdateTitle } from "./useUpdateTitle";
-import { usePersistReorder } from "./usePersistReorder";
+import { usePersistTaskReorder } from "./usePersistTaskReorder";
 import { useCreateSubtask } from "./useCreateSubtask";
 import { useUpdateSubtaskTitle } from "./useUpdateSubtaskTitle";
 import { useSoftDeleteSubtask } from "./useSoftDeleteSubtask";
@@ -42,7 +42,7 @@ const TaskContainer = () => {
   const { handleDeleteTask } = useSoftDeleteTask({ loadTasks });
   const { handleRestoreTask } = useRestoreTask({ loadTasks });
   const { handleUpdateTitle } = useUpdateTitle({ loadTasks });
-  const { persistReorder } = usePersistReorder({ loadTasks });
+  const { persistTaskReorder } = usePersistTaskReorder({ loadTasks });
   const { persistSubtaskReorder } = usePersistSubtaskReorder({ loadTasks });
   const { handleCreateSubtask } = useCreateSubtask({ loadTasks });
   const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({ loadTasks });
@@ -68,7 +68,7 @@ const TaskContainer = () => {
   } = useTaskDragAndDrop({
     sortOption: DEFAULT_TASK_SORT_OPTION,
     selectedStatus,
-    persistReorder,
+    persistReorder: persistTaskReorder,
     persistStatusChange: handleUpdateStatus,
   });
 
