@@ -12,7 +12,7 @@ import TaskTitleEditor from "./TaskTitleEditor";
 import useKeyboardActivation from "../useKeyboardActivation";
 import useCopyToClipboard from "../useCopyToClipboard";
 import useTaskDeleteAction from "./useTaskDeleteAction";
-
+import TaskDeleteCheckbox from "./TaskDeleteCheckbox";
 import "./TaskHeader.css";
 
 const TaskHeader: React.FC<TaskHeaderProps> = ({
@@ -89,10 +89,16 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
 
   const { handleKeyDown: handleCopyKeyDown } =
     useKeyboardActivation(handleCopyTitle);
-
   return (
     <div className="task-header">
       <div className="task-title-wrapper">
+        <TaskDeleteCheckbox
+          isSoftDeleted={isSoftDeleted}
+          isDeleting={isDeleting}
+          shouldDelete={shouldDelete}
+          onDelete={handleDeleteClick}
+          onDeleteKeyDown={handleDeleteKeyDown}
+        />
         <Chevron
           onClick={toggleExpanded}
           onKeyDown={handleExpandKeyDown}

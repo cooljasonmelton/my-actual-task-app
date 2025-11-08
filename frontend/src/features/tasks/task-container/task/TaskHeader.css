@@ -11,6 +11,30 @@
   gap: 0.5rem;
 }
 
+.task-header__checkbox {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.task-header__checkbox[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.task-header__icon--checkbox {
+  color: var(--color-border, #cbd5f5);
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.task-header__icon--checkbox-active {
+  color: var(--color-accent-red, #ef4444);
+  transform: scale(0.95);
+}
+
 .task-title-wrapper h3 {
   padding-left: 0.5rem;
   padding-right: 1rem;

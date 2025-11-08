@@ -239,3 +239,11 @@ type Task = {
   sortIndex: number // ?
 };
 ```
+
+
+
+
+TODO: 
+
+- use the cat api to get a cat gif when reach X goals - 3, 5, 7, 10
+- way to soft delete tasks without being complete - checkbox like subtask
