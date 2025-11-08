@@ -40,6 +40,7 @@ const Task = ({
   onSubtaskDragEnd,
   onSubtaskListDragOver,
   onSubtaskListDrop,
+  onCheckboxSoftDelete,
 }: TaskProps) => {
   const [isTitleEditing, setIsTitleEditing] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
@@ -113,6 +114,7 @@ const Task = ({
           onTitleEditingChange={setIsTitleEditing}
           onRestoreRequest={() => setIsRestoreModalOpen(true)}
           hasSubtasks={task.subtasks.length > 0}
+          onCheckboxSoftDelete={onCheckboxSoftDelete}
         />
         {/* TODO: add animation to expansion */}
         {isExpanded && (

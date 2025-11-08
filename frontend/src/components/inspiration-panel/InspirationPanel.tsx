@@ -1,14 +1,26 @@
 import { X } from "lucide-react";
 import NotesToolbar from "./NotesToolbar";
 import { useNotesPanel } from "./useNotesPanel";
-import "./NotesPanel.css";
+import CatRewardPanel from "./CatRewardPanel";
+import "./InspirationPanel.css";
 
-type NotesPanelProps = {
+type InspirationPanelProps = {
   isOpen: boolean;
   onClose: () => void;
+  catGifUrl: string | null;
+  isCatLoading: boolean;
+  catError: string | null;
+  onRetryCat: () => void;
 };
 
-const NotesPanel = ({ isOpen, onClose }: NotesPanelProps) => {
+const InspirationPanel = ({
+  isOpen,
+  onClose,
+  catGifUrl,
+  isCatLoading,
+  catError,
+  onRetryCat,
+}: InspirationPanelProps) => {
   const {
     editorRef,
     isLoading,
@@ -31,6 +43,12 @@ const NotesPanel = ({ isOpen, onClose }: NotesPanelProps) => {
 
   return (
     <aside className={panelClassName} aria-hidden={!isOpen}>
+      <CatRewardPanel
+        catGifUrl={catGifUrl}
+        isCatLoading={isCatLoading}
+        catError={catError}
+        onRetryCat={onRetryCat}
+      />
       <div className="notes-panel__header">
         <div>
           <h2 className="notes-panel__title">NOTES / IDEAS</h2>
@@ -51,7 +69,7 @@ const NotesPanel = ({ isOpen, onClose }: NotesPanelProps) => {
           type="button"
           className="notes-panel__close"
           onClick={handleClose}
-          aria-label="Close notes panel"
+          aria-label="Close inspiration panel"
         >
           <X size={16} />
         </button>
@@ -99,4 +117,4 @@ const NotesPanel = ({ isOpen, onClose }: NotesPanelProps) => {
   );
 };
 
-export default NotesPanel;
+export default InspirationPanel;

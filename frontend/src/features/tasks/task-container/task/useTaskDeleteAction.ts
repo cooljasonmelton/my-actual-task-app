@@ -1,17 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 
+type DeleteSource = "checkbox" | "icon";
+
 type UseTaskDeleteActionOptions = {
   taskId: number;
   onDelete: (taskId: number) => Promise<void>;
   isSoftDeleted: boolean;
+  onDeleteSuccess?: (source: DeleteSource) => void;
 };
 
 const useTaskDeleteAction = ({
   taskId,
   onDelete,
   isSoftDeleted,
+  onDeleteSuccess,
 }: UseTaskDeleteActionOptions) => {
-  const [confirmations, setConfirmations] = useState({
+  const [confirmations, setConfirmations] = useState<
+    Record<DeleteSource, boolean>
+  >({
     checkbox: false,
     icon: false,
   });
@@ -36,40 +42,42 @@ const useTaskDeleteAction = ({
     }
   }, [isSoftDeleted]);
 
-  const requestDelete = useCallback(
-    (source: "checkbox" | "icon") => {
-      setConfirmations((previous) => {
-        const currentConfirmation = previous[source];
-        if (currentConfirmation) {
-          return previous;
-        }
-        return {
-          ...previous,
-          [source]: true,
-        };
-      });
-    },
-    []
-  );
+  const requestDelete = useCallback((source: DeleteSource) => {
+    setConfirmations((previous) => {
+      if (previous[source]) {
+        return previous;
+      }
+      return {
+        ...previous,
+        [source]: true,
+      };
+    });
+  }, []);
 
   const resetConfirmations = useCallback(() => {
     setConfirmations({ checkbox: false, icon: false });
   }, []);
 
-  const executeDelete = useCallback(async () => {
-    setIsDeleting(true);
+  const executeDelete = useCallback(
+    async (source: DeleteSource) => {
+      setIsDeleting(true);
 
-    try {
-      await onDelete(taskId);
-    } catch (error) {
-      console.error("Failed to delete task", error);
-      resetConfirmations();
-      setIsDeleting(false);
-    }
-  }, [onDelete, resetConfirmations, taskId]);
+      try {
+        await onDelete(taskId);
+        resetConfirmations();
+        onDeleteSuccess?.(source);
+      } catch (error) {
+        console.error("Failed to delete task", error);
+        resetConfirmations();
+      } finally {
+        setIsDeleting(false);
+      }
+    },
+    [onDelete, onDeleteSuccess, resetConfirmations, taskId]
+  );
 
   const handleDeleteRequest = useCallback(
-    async (source: "checkbox" | "icon") => {
+    async (source: DeleteSource) => {
       if (isDeleting || isSoftDeleted) {
         return;
       }
@@ -79,7 +87,7 @@ const useTaskDeleteAction = ({
         return;
       }
 
-      await executeDelete();
+      await executeDelete(source);
     },
     [confirmations, executeDelete, isDeleting, isSoftDeleted, requestDelete]
   );

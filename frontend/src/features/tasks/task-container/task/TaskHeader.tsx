@@ -30,6 +30,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
   onTitleEditingChange,
   onRestoreRequest,
   hasSubtasks,
+  onCheckboxSoftDelete,
 }) => {
   const {
     shouldDeleteFromCheckbox,
@@ -40,6 +41,11 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
     taskId,
     onDelete,
     isSoftDeleted,
+    onDeleteSuccess: (source) => {
+      if (source === "checkbox") {
+        onCheckboxSoftDelete?.(taskId);
+      }
+    },
   });
   const handleDeleteClick = (source: "checkbox" | "icon") => {
     void handleDeleteRequest(source);
@@ -96,7 +102,8 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
           isDeleting={isDeleting}
           shouldDelete={shouldDeleteFromCheckbox}
           onDelete={() => handleDeleteClick("checkbox")}
-          onDeleteKeyDown={() => {
+          onDeleteKeyDown={(event) => {
+            event.preventDefault();
             void handleDeleteRequest("checkbox");
           }}
         />
@@ -167,7 +174,8 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         ) : (
           <XCircle
             onClick={() => handleDeleteClick("icon")}
-            onKeyDown={() => {
+            onKeyDown={(event) => {
+              event.preventDefault();
               void handleDeleteRequest("icon");
             }}
             className={`${

@@ -54,6 +54,7 @@ type TaskListProps = DragHandlers & {
   handleSubtaskDragEnd: NonNullable<TaskProps["onSubtaskDragEnd"]>;
   handleSubtaskListDragOver: NonNullable<TaskProps["onSubtaskListDragOver"]>;
   handleSubtaskListDrop: NonNullable<TaskProps["onSubtaskListDrop"]>;
+  onTaskCompletedViaCheckbox: (taskId: TaskType["id"]) => void;
 };
 
 const TaskList = ({
@@ -88,6 +89,7 @@ const TaskList = ({
   handleDragLeave,
   handleDragEnd,
   handleDropOnTask,
+  onTaskCompletedViaCheckbox,
 }: TaskListProps) => {
   if (tasks.length === 0) {
     return <NoTasksPlaceholder />;
@@ -131,6 +133,7 @@ const TaskList = ({
           onSubtaskDragEnd={handleSubtaskDragEnd}
           onSubtaskListDragOver={handleSubtaskListDragOver}
           onSubtaskListDrop={handleSubtaskListDrop}
+          onCheckboxSoftDelete={() => onTaskCompletedViaCheckbox(task.id)}
         />
       ))}
     </>

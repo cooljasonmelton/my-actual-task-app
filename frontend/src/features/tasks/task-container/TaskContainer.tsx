@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TaskList from "./task/TaskList";
 import DashboardHeader from "@/components/dashboard-header/DashboardHeader";
 import type { Status } from "@/types";
@@ -22,24 +22,22 @@ import { useExpandedTasks } from "./useExpandedTasks";
 import { usePersistSubtaskReorder } from "./usePersistSubtaskReorder";
 import { useSubtaskDragAndDrop } from "./useSubtaskDragAndDrop";
 import { useTasksState } from "./state/TasksContext";
-import NotesPanel from "@/components/notes-panel/NotesPanel";
+import { useTaskCompletionRewards } from "./useTaskCompletionRewards";
+import InspirationPanel from "@/components/inspiration-panel/InspirationPanel";
 import "./TaskContainer.css";
-
 const TaskContainer = () => {
   const { tasks, error, isLoading } = useTasksState();
-  const [selectedStatus, setSelectedStatus] = useState<Status>(
-    DEFAULT_SECTION_TAB_ITEM
-  );
+  const [selectedStatus, setSelectedStatus] =
+    useState<Status>(DEFAULT_SECTION_TAB_ITEM);
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
-
+  const { catGifUrl, isCatLoading, catError, registerTaskCompletion, retryCatReward } =
+    useTaskCompletionRewards();
   const { loadTasks } = useLoadTasks();
   useEffect(() => {
     void loadTasks();
   }, [loadTasks]);
   const { updatingPriorities, handleTogglePriority } = useTogglePriority();
-  const { handleUpdateStatus } = useUpdateStatus({
-    loadTasks,
-  });
+  const { handleUpdateStatus } = useUpdateStatus({ loadTasks });
   const { handleDeleteTask } = useSoftDeleteTask({ loadTasks });
   const { handleRestoreTask } = useRestoreTask({ loadTasks });
   const { handleUpdateTitle } = useUpdateTitle({ loadTasks });
@@ -50,7 +48,9 @@ const TaskContainer = () => {
   const { handleDeleteSubtask } = useSoftDeleteSubtask({ loadTasks });
   const { handleRestoreSubtask } = useRestoreSubtask({ loadTasks });
   const { expandedTaskIds, handleToggleExpanded } = useExpandedTasks(tasks);
-
+  const handleTaskCompletedViaCheckbox = () => {
+    void registerTaskCompletion();
+  };
   const {
     draggingTask,
     dragOverTaskId,
@@ -72,7 +72,6 @@ const TaskContainer = () => {
     persistReorder: persistTaskReorder,
     persistStatusChange: handleUpdateStatus,
   });
-
   const {
     draggingSubtask,
     dragOverSubtaskId,
@@ -84,23 +83,25 @@ const TaskContainer = () => {
     handleListDragOver: handleSubtaskListDragOver,
     handleDropOnList: handleSubtaskListDrop,
     handleDragEnd: handleSubtaskDragEnd,
-  } = useSubtaskDragAndDrop({
-    persistReorder: persistSubtaskReorder,
-  });
+  } = useSubtaskDragAndDrop({ persistReorder: persistSubtaskReorder });
   const { isInCurrentReferenceWindow } = useReferenceWindow();
   const { statusCounts, tasksForSelectedStatus } = useDerivedTaskData({
     tasks,
     selectedStatus,
     isInCurrentReferenceWindow,
   });
-
-  const isDraggingInSelectedStatus = Boolean(
+  const hasActiveCatState = Boolean(catGifUrl || catError || isCatLoading);
+  const hasRewardRef = useRef(false);
+  useEffect(() => {
+    if (!hasRewardRef.current && hasActiveCatState) {
+      setIsNotesPanelOpen(true);
+    }
+    hasRewardRef.current = hasActiveCatState;
+  }, [hasActiveCatState]);
+  const taskContainerClassName =
     draggingTask && draggingTask.status === selectedStatus
-  );
-  const taskContainerClassName = isDraggingInSelectedStatus
     ? "task-container task-container--reordering"
     : "task-container";
-
   return (
     <>
       <DashboardHeader
@@ -115,7 +116,6 @@ const TaskContainer = () => {
         isNotesPanelOpen={isNotesPanelOpen}
         onToggleNotesPanel={() => setIsNotesPanelOpen((previous) => !previous)}
       />
-
       <div
         className={`task-workspace__body${
           isNotesPanelOpen ? " task-workspace__body--panel-open" : ""
@@ -178,12 +178,17 @@ const TaskContainer = () => {
               handleDragLeave={handleDragLeave}
               handleDragEnd={handleDragEnd}
               handleDropOnTask={handleDropOnTask}
+              onTaskCompletedViaCheckbox={handleTaskCompletedViaCheckbox}
             />
           )}
         </div>
-        <NotesPanel
+        <InspirationPanel
           isOpen={isNotesPanelOpen}
           onClose={() => setIsNotesPanelOpen(false)}
+          catGifUrl={catGifUrl}
+          isCatLoading={isCatLoading}
+          catError={catError}
+          onRetryCat={retryCatReward}
         />
       </div>
     </>

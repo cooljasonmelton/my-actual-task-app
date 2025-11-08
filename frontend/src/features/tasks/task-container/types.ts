@@ -61,6 +61,7 @@ export interface TaskProps {
   onDragLeave?: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
   onDragEnd?: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
   onDrop?: (event: DragEvent<HTMLDivElement>, task: TaskType) => void;
+  onCheckboxSoftDelete?: (taskId: TaskType["id"]) => void;
   draggingSubtask?: DraggingSubtask;
   dragOverSubtaskId?: number | null;
   onSubtaskDragStart?: (
@@ -112,4 +113,5 @@ export type TaskHeaderProps = {
   onTitleEditingChange: (isEditing: boolean) => void;
   onRestoreRequest: () => void;
   hasSubtasks: boolean;
+  onCheckboxSoftDelete?: (taskId: TaskType["id"]) => void;
 };

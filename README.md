@@ -40,10 +40,12 @@ npm install
 ```bash
 cp backend/.env.personal.example backend/.env.personal
 cp backend/.env.development.example backend/.env.development
+cp frontend/.env.example frontend/.env
 ```
 
-- Adjust `DATABASE_PATH` or other env vars if you want custom locations.
+- Adjust backend `DATABASE_PATH` or other vars if you want custom locations.
 - Personal and development profiles resolve to different SQLite files by default.
+- The frontend `.env` file should define `VITE_API_BASE_URL` (usually `http://localhost:3000`) and your own `VITE_CAT_API_KEY` from [thecatapi.com](https://thecatapi.com/).
 
 ### 3. Run the App
 
@@ -246,4 +248,3 @@ type Task = {
 TODO: 
 
 - use the cat api to get a cat gif when reach X goals - 3, 5, 7, 10
-- way to soft delete tasks without being complete - checkbox like subtask
