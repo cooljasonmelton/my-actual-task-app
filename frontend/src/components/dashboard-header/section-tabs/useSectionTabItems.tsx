@@ -1,6 +1,6 @@
-import { STATUS_SECTION_TAB_ITEMS } from "../../../constants";
+import { STATUS_SECTION_TAB_ITEMS } from "@/constants";
 import SectionTab from "./SectionTab";
-import type { Status } from "../../../types";
+import type { Status } from "@/types";
 import type { DragEvent } from "react";
 
 type SectionTabItemOptions = {

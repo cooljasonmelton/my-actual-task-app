@@ -3,10 +3,10 @@ import { Plus } from "lucide-react";
 import Button from "../../design-system-components/button/Button";
 import InputField from "../../design-system-components/form/InputField";
 import Form from "../../design-system-components/form/Form";
-import type { Status } from "../../../types";
+import type { Status } from "@/types";
 import { TASKS_API_URL } from "@/config/api";
-import { useLoadTasks } from "@/features/tasks/task-container/useLoadTasks";
-import { useTasksActions } from "@/features/tasks/task-container/state/TasksContext";
+import { useLoadTasks } from "@/features/tasks/api/useLoadTasks";
+import { useTasksActions } from "@/features/tasks/context/TasksContext";
 
 import "./NewTaskContainer.css";
 

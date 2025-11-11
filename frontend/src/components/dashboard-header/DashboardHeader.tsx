@@ -1,5 +1,5 @@
 import type { DragEvent } from "react";
-import type { Status } from "../../types";
+import type { Status } from "@/types";
 import NewTaskContainer from "./new-task/NewTaskContainer";
 import SectionTabsContainer from "./section-tabs/SectionTabsContainer";
 import "./DashboardHeader.css";

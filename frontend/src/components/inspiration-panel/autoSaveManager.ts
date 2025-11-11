@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import type { Note } from "../../types";
+import type { Note } from "@/types";
 import { autoLinkHtml } from "./utils";
 
 export type SaveOptions = {

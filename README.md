@@ -113,7 +113,12 @@ npm run dev:all
 
 ## 🧭 Project Structure
 
-- `frontend/` – React application, task container logic, drag-and-drop utilities, dashboard header, design-system components, Vitest tests.
+- `frontend/`
+  - `src/app` – App shell, providers, and global styles.
+  - `src/components/design-system-components` – Reusable, presentation-only primitives (buttons, inputs, modals).
+  - `src/features/tasks` – Feature module split into `api/` (fetch & mutations), `hooks/`, `components/` (task board, task views), `context/`, `types/`, and `utils/`.
+  - `src/features/inspiration-panel` – Notes editor, toolbar, cat reward components, and related hooks.
+  - `src/config` / `src/constants` / `src/lib` – Shared configuration, enums, and utilities.
 - `backend/` – Express API, SQLite integration, migrations, route tests, scripts for backups/sync.
 - `shared/` – Source of truth for TypeScript types shared across both sides.
 - `package.json` (root) – Convenience scripts to orchestrate both apps simultaneously.

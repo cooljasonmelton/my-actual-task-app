@@ -8,7 +8,7 @@ import {
   type KeyboardEvent,
   type RefObject,
 } from "react";
-import type { Note } from "../../types";
+import type { Note } from "@/types";
 import { applyAnchorAttributes, formatSavedTime } from "./utils";
 import { createAutoSaveManager, type SaveOptions } from "./autoSaveManager";
 import { createEditorCommands } from "./editorCommands";

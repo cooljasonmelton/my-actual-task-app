@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { NOTES_API_URL } from "@/config/api";
-import type { Note } from "../types";
+import type { Note } from "@/types";
 
 type RawNotePayload = {
   id?: unknown;

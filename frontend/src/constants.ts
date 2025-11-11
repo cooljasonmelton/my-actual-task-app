@@ -1,4 +1,4 @@
-import type { StatusSectionTabItem } from "./types";
+import type { StatusSectionTabItem } from "./types.ts";
 
 export const STATUS_SECTION_TAB_ITEMS: StatusSectionTabItem[] = [
   {

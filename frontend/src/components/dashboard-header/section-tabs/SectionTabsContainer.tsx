@@ -1,11 +1,9 @@
 import RadioButtonGroup from "../../design-system-components/radio-button-group/RadioButtonGroup";
-import { DEFAULT_SECTION_TAB_ITEM } from "../../../constants";
+import { DEFAULT_SECTION_TAB_ITEM } from "@/constants";
 import { useSectionTabItems } from "./useSectionTabItems";
 import "./SectionTabsContainer.css";
-import type { Status } from "../../../types";
+import type { Status } from "@/types";
 import type { DragEvent } from "react";
-
-// TODO: fix styling so tabs stretch across container
 
 const SectionTabsContainer = ({
   selectedStatus,

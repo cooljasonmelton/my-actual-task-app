@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useScratchNote } from "../../hooks/useScratchNote";
-import type { Note } from "../../types";
+import type { Note } from "@/types";
 
 interface UseNotesPersistenceParams {
   isOpen: boolean;
