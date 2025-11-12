@@ -1,0 +1,27 @@
+.completion-progress {
+  border: 1px solid var(--color-border, #cbd5f5);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--color-bg-alt, #f8fafc);
+  display: flex;
+}
+
+.completion-progress__label {
+  margin: 0;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #64748b);
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+
+.completion-progress__count {
+  margin: 0;
+  margin-left: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0 0.375rem;
+  font-weight: 700;
+  background-color: var(--color-accent-purple-blue);
+  color: var(--color-text);
+  letter-spacing: 0px;
+}

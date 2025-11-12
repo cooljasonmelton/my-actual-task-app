@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import TaskList from "../task/TaskList";
 import DashboardHeader from "@/components/dashboard-header/DashboardHeader";
 import type { Status } from "@/types";
 import { DEFAULT_SECTION_TAB_ITEM } from "@/constants";
@@ -23,15 +22,21 @@ import { usePersistSubtaskReorder } from "@/features/tasks/api/usePersistSubtask
 import { useSubtaskDragAndDrop } from "@/features/tasks/hooks/useSubtaskDragAndDrop";
 import { useTasksState } from "@/features/tasks/context/TasksContext";
 import { useTaskCompletionRewards } from "@/features/tasks/hooks/useTaskCompletionRewards";
-import InspirationPanel from "@/components/inspiration-panel/InspirationPanel";
+import TaskWorkspaceBody from "./TaskWorkspaceBody";
 import "./TaskContainer.css";
 const TaskContainer = () => {
   const { tasks, error, isLoading } = useTasksState();
   const [selectedStatus, setSelectedStatus] =
     useState<Status>(DEFAULT_SECTION_TAB_ITEM);
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
-  const { catGifUrl, isCatLoading, catError, registerTaskCompletion, retryCatReward } =
-    useTaskCompletionRewards();
+  const {
+    completionCount,
+    catGifUrl,
+    isCatLoading,
+    catError,
+    registerTaskCompletion,
+    retryCatReward,
+  } = useTaskCompletionRewards();
   const { loadTasks } = useLoadTasks();
   useEffect(() => {
     void loadTasks();
@@ -98,10 +103,62 @@ const TaskContainer = () => {
     }
     hasRewardRef.current = hasActiveCatState;
   }, [hasActiveCatState]);
+  const handleToggleNotesPanel = () => {
+    setIsNotesPanelOpen((previous) => !previous);
+  };
+  const handleCloseNotesPanel = () => {
+    setIsNotesPanelOpen(false);
+  };
   const taskContainerClassName =
     draggingTask && draggingTask.status === selectedStatus
     ? "task-container task-container--reordering"
     : "task-container";
+  const workspaceClassName = `task-workspace__body${
+    isNotesPanelOpen ? " task-workspace__body--panel-open" : ""
+  }`;
+  const taskListProps = {
+    tasks: tasksForSelectedStatus,
+    selectedStatus,
+    expandedTaskIds,
+    onToggleExpanded: handleToggleExpanded,
+    onDelete: handleDeleteTask,
+    onRestore: handleRestoreTask,
+    onTogglePriority: handleTogglePriority,
+    onUpdateTitle: handleUpdateTitle,
+    onCreateSubtask: handleCreateSubtask,
+    onUpdateSubtaskTitle: handleUpdateSubtaskTitle,
+    onDeleteSubtask: handleDeleteSubtask,
+    onRestoreSubtask: handleRestoreSubtask,
+    updatingPriorities,
+    draggingTaskId: draggingTask?.id ?? null,
+    dragOverTaskId,
+    draggingSubtask,
+    dragOverSubtaskId,
+    handleSubtaskDragStart,
+    handleSubtaskDragEnter,
+    handleSubtaskDragOver,
+    handleSubtaskDragLeave,
+    handleSubtaskDrop: handleDropOnSubtask,
+    handleSubtaskDragEnd,
+    handleSubtaskListDragOver,
+    handleSubtaskListDrop,
+    handleDragStart,
+    handleDragEnter,
+    handleDragOver,
+    handleDragLeave,
+    handleDragEnd,
+    handleDropOnTask,
+    onTaskCompletedViaCheckbox: handleTaskCompletedViaCheckbox,
+  };
+  const inspirationPanelProps = {
+    isOpen: isNotesPanelOpen,
+    onClose: handleCloseNotesPanel,
+    completionCount,
+    catGifUrl,
+    isCatLoading,
+    catError,
+    onRetryCat: retryCatReward,
+  };
   return (
     <>
       <DashboardHeader
@@ -114,85 +171,19 @@ const TaskContainer = () => {
         onStatusDragLeave={handleStatusDragLeave}
         onStatusDrop={handleStatusDrop}
         isNotesPanelOpen={isNotesPanelOpen}
-        onToggleNotesPanel={() => setIsNotesPanelOpen((previous) => !previous)}
+        onToggleNotesPanel={handleToggleNotesPanel}
       />
-      <div
-        className={`task-workspace__body${
-          isNotesPanelOpen ? " task-workspace__body--panel-open" : ""
-        }`}
-      >
-        <div
-          className={taskContainerClassName}
-          onDragOver={handleContainerDragOver}
-          onDrop={handleDropOnContainer}
-        >
-          {error && <p className="task-container__error">{error}</p>}
-          {isLoading ? (
-            <div
-              className="card task-container__loading-card"
-              role="status"
-              aria-live="polite"
-            >
-              <div className="task-container__loading">
-                <div className="task-container__loading-content">
-                  <span
-                    className="task-container__loading-spinner"
-                    aria-hidden="true"
-                  />
-                  <span className="task-container__loading-text">
-                    Loading tasks...
-                  </span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <TaskList
-              tasks={tasksForSelectedStatus}
-              selectedStatus={selectedStatus}
-              expandedTaskIds={expandedTaskIds}
-              onToggleExpanded={handleToggleExpanded}
-              onDelete={handleDeleteTask}
-              onRestore={handleRestoreTask}
-              onTogglePriority={handleTogglePriority}
-              onUpdateTitle={handleUpdateTitle}
-              onCreateSubtask={handleCreateSubtask}
-              onUpdateSubtaskTitle={handleUpdateSubtaskTitle}
-              onDeleteSubtask={handleDeleteSubtask}
-              onRestoreSubtask={handleRestoreSubtask}
-              updatingPriorities={updatingPriorities}
-              draggingTaskId={draggingTask?.id ?? null}
-              dragOverTaskId={dragOverTaskId}
-              draggingSubtask={draggingSubtask}
-              dragOverSubtaskId={dragOverSubtaskId}
-              handleSubtaskDragStart={handleSubtaskDragStart}
-              handleSubtaskDragEnter={handleSubtaskDragEnter}
-              handleSubtaskDragOver={handleSubtaskDragOver}
-              handleSubtaskDragLeave={handleSubtaskDragLeave}
-              handleSubtaskDrop={handleDropOnSubtask}
-              handleSubtaskDragEnd={handleSubtaskDragEnd}
-              handleSubtaskListDragOver={handleSubtaskListDragOver}
-              handleSubtaskListDrop={handleSubtaskListDrop}
-              handleDragStart={handleDragStart}
-              handleDragEnter={handleDragEnter}
-              handleDragOver={handleDragOver}
-              handleDragLeave={handleDragLeave}
-              handleDragEnd={handleDragEnd}
-              handleDropOnTask={handleDropOnTask}
-              onTaskCompletedViaCheckbox={handleTaskCompletedViaCheckbox}
-            />
-          )}
-        </div>
-        <InspirationPanel
-          isOpen={isNotesPanelOpen}
-          onClose={() => setIsNotesPanelOpen(false)}
-          catGifUrl={catGifUrl}
-          isCatLoading={isCatLoading}
-          catError={catError}
-          onRetryCat={retryCatReward}
-        />
-      </div>
+      <TaskWorkspaceBody
+        workspaceClassName={workspaceClassName}
+        taskContainerClassName={taskContainerClassName}
+        handleContainerDragOver={handleContainerDragOver}
+        handleDropOnContainer={handleDropOnContainer}
+        error={error}
+        isLoading={isLoading}
+        taskListProps={taskListProps}
+        inspirationPanelProps={inspirationPanelProps}
+      />
     </>
   );
 };
-
 export default TaskContainer;

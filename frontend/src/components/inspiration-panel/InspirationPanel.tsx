@@ -2,11 +2,13 @@ import { X } from "lucide-react";
 import NotesToolbar from "./NotesToolbar";
 import { useNotesPanel } from "./useNotesPanel";
 import CatRewardPanel from "./CatRewardPanel";
+import CompletionProgress from "./CompletionProgress";
 import "./InspirationPanel.css";
 
 type InspirationPanelProps = {
   isOpen: boolean;
   onClose: () => void;
+  completionCount: number;
   catGifUrl: string | null;
   isCatLoading: boolean;
   catError: string | null;
@@ -16,6 +18,7 @@ type InspirationPanelProps = {
 const InspirationPanel = ({
   isOpen,
   onClose,
+  completionCount,
   catGifUrl,
   isCatLoading,
   catError,
@@ -43,6 +46,7 @@ const InspirationPanel = ({
 
   return (
     <aside className={panelClassName} aria-hidden={!isOpen}>
+      <CompletionProgress count={completionCount} />
       <CatRewardPanel
         catGifUrl={catGifUrl}
         isCatLoading={isCatLoading}
