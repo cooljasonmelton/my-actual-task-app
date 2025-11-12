@@ -1,9 +1,8 @@
-import RadioButtonGroup from "../../design-system-components/radio-button-group/RadioButtonGroup";
+import type { DragEvent } from "react";
+import type { Status } from "@/types";
 import { DEFAULT_SECTION_TAB_ITEM } from "@/constants";
 import { useSectionTabItems } from "./useSectionTabItems";
-import "./SectionTabsContainer.css";
-import type { Status } from "@/types";
-import type { DragEvent } from "react";
+import RadioButtonGroup from "../../design-system-components/radio-button-group/RadioButtonGroup";
 
 const SectionTabsContainer = ({
   selectedStatus,
