@@ -13,6 +13,7 @@ My Actual Task App is my actual task map, a full-stack productivity dashboard I�
 - **Drag & Drop Reordering** – Grab a task to rearrange it within its current status column, or drag subtasks inside the task panel to reprioritize supporting work; both persist instantly and survive refreshes thanks to shared reorder logic.
 - **Live Loading Feedback** – Animated spinner plus typewriter status copy shows when tasks are reloading, keeping the UI lively without breaking the existing styling.
 - **Scratchpad Notes Panel** – Slide open a rich-text editor on the right to capture ideas with formatting, auto-linking, undo/redo, and autosave backed by SQLite.
+- **Cat Milestone Rewards** – Finishing 3, 5, 7, or 10 tasks in a day auto-opens the inspiration panel with a celebratory cat GIF from The Cat API, complete with retry handling and graceful fallbacks.
 - **Environment-Aware Data** – Separate personal vs. dev SQLite databases, one-command syncing, and automated backups so I can experiment without losing my actual todo list.
 - **Quality of Life Utilities** – Wake-lock toggle, keyboard accessibility, ref-focused forms, and automated tests (Vitest) on both sides of the stack.
 
@@ -108,17 +109,16 @@ npm run use:all
 npm run dev:all
 
 # Run frontend and backend tests
-npm run dev:all
+npm run test:all
 ```
 
 ## 🧭 Project Structure
 
 - `frontend/`
-  - `src/app` – App shell, providers, and global styles.
-  - `src/components/design-system-components` – Reusable, presentation-only primitives (buttons, inputs, modals).
-  - `src/features/tasks` – Feature module split into `api/` (fetch & mutations), `hooks/`, `components/` (task board, task views), `context/`, `types/`, and `utils/`.
-  - `src/features/inspiration-panel` – Notes editor, toolbar, cat reward components, and related hooks.
-  - `src/config` / `src/constants` / `src/lib` – Shared configuration, enums, and utilities.
+  - `src/App.tsx` – Wires the navbar, global providers, and the task workspace.
+  - `src/components/` – Surface-level UI pieces; includes `design-system-components/` for primitives, `dashboard-header/` for status tabs + creation affordances, and `inspiration-panel/` for the scratchpad + cat rewards.
+  - `src/features/tasks/` – Feature module split into `api/` (fetch & mutations), `hooks/`, `components/` (task board, task views), `context/`, `types/`, and `utils/`.
+  - `src/config` / `src/constants.ts` / `src/hooks/` – Shared configuration, enums, and cross-cutting utilities.
 - `backend/` – Express API, SQLite integration, migrations, route tests, scripts for backups/sync.
 - `shared/` – Source of truth for TypeScript types shared across both sides.
 - `package.json` (root) – Convenience scripts to orchestrate both apps simultaneously.
@@ -129,9 +129,7 @@ npm run dev:all
 
 - Rich-text task descriptions
 - Tag management and sorting
-- Double click task title to edit
 - Permantely delete soft-deleted tasks
-- Drag-and-drop reassignment between sections (drop onto tab to move status).
 - Sort (asc/desc) and filter by tag, created date, priority
 - Multi-done checkboxes: task requires multiple iterations, create multiple checkboxes tallying each complete iteration e.g. answer 3 emails: [ x ] [ x ][ ]
 - Screen saver that auto plays and keeps computer awake after x seconds
@@ -142,7 +140,6 @@ npm run dev:all
 - Analytics around productivity trends
 - AI ADHD helpers to help give suggestions on tasks, brainstorm, keep focused, etc
 - Animnations for creating task, completing task, or completing X number of tasks (rewards)
-- Scratch pad for some quick notes
 - Quick tasks list or quick view similar to momentum extension todo list?
 - Stale tasks - if date is greater than X, style task to indicate stale
 - First app open of day, prompt user to review tasks in 'next' and setup days goals (cookies or storage)
@@ -177,7 +174,6 @@ TODO: say something like this in main readme (above)?
 
 ## TODO
 
-- TODO: FE: better organization of files
 - TODO: FE: update test coverage to cover all logic
 - TODO: BE: update test coverage to cover all logic
 - TODO: FE: slightly change styling for priority tasks
