@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CAT_API_KEY, CAT_IMAGES_URL } from "@/config/api";
+import {
+  CAT_API_KEY,
+  CAT_IMAGES_URL,
+  CAT_TAGGED_IMAGES_URL,
+  CAT_ASSET_BASE_URL,
+} from "@/config/api";
 import { useReferenceWindow } from "./useReferenceWindow";
 
 const COMPLETION_STORAGE_KEY = "task-completion-rewards";
@@ -82,7 +87,39 @@ export const useTaskCompletionRewards = () => {
     setIsCatLoading(true);
     setCatError(null);
 
+    // Try to grab an orange-tagged gif before falling back to the generic API.
+    const fetchOrangeTaggedGif = async (): Promise<string | null> => {
+      try {
+        const response = await fetch(
+          `${CAT_TAGGED_IMAGES_URL}/orange?type=gif&json=true`
+        );
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = (await response.json()) as { url?: string };
+        const relativeUrl = data?.url;
+
+        if (!relativeUrl) {
+          return null;
+        }
+
+        return relativeUrl.startsWith("http")
+          ? relativeUrl
+          : `${CAT_ASSET_BASE_URL}${relativeUrl}`;
+      } catch {
+        return null;
+      }
+    };
+
     try {
+      const orangeCatGifUrl = await fetchOrangeTaggedGif();
+      if (orangeCatGifUrl) {
+        setCatGifUrl(orangeCatGifUrl);
+        return;
+      }
+
       const requestHeaders = CAT_API_KEY
         ? { "x-api-key": CAT_API_KEY }
         : undefined;
