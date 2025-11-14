@@ -73,6 +73,7 @@ const Task = ({
   const safeSubtaskListDragOver =
     onSubtaskListDragOver ?? noopSubtaskListDragOver;
   const safeSubtaskListDrop = onSubtaskListDrop ?? noopSubtaskListDrop;
+  const hasActiveSubtasks = task.subtasks.some((subtask) => !subtask.deletedAt);
 
   const handleConfirmRestore = async () => {
     if (isRestoring) {
@@ -133,7 +134,7 @@ const Task = ({
           isPriorityUpdating={isPriorityUpdating}
           onTitleEditingChange={setIsTitleEditing}
           onRestoreRequest={() => setIsRestoreModalOpen(true)}
-          hasSubtasks={task.subtasks.length > 0}
+          hasSubtasks={hasActiveSubtasks}
           onCheckboxSoftDelete={onCheckboxSoftDelete}
         />
         {/* TODO: add animation to expansion */}

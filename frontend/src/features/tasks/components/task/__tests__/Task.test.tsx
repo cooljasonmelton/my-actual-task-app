@@ -71,4 +71,56 @@ describe("Task component", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     );
   });
+
+  it("shows the subtask indicator when there are active subtasks", () => {
+    const taskWithActiveSubtasks = {
+      ...baseTask,
+      subtasks: [
+        {
+          id: 1,
+          title: "Active subtask",
+          deletedAt: null,
+          sortIndex: null,
+        },
+        {
+          id: 2,
+          title: "Soft deleted subtask",
+          deletedAt: new Date(),
+          sortIndex: null,
+        },
+      ],
+    };
+
+    render(<Task {...createTaskProps({ task: taskWithActiveSubtasks })} />);
+
+    expect(
+      screen.getAllByRole("button", { name: /expand task details/i })
+    ).toHaveLength(2);
+  });
+
+  it("hides the subtask indicator when all subtasks are soft deleted", () => {
+    const taskWithOnlyDeletedSubtasks = {
+      ...baseTask,
+      subtasks: [
+        {
+          id: 3,
+          title: "Soft deleted subtask",
+          deletedAt: new Date(),
+          sortIndex: null,
+        },
+      ],
+    };
+
+    render(
+      <Task
+        {...createTaskProps({
+          task: taskWithOnlyDeletedSubtasks,
+        })}
+      />
+    );
+
+    expect(
+      screen.getAllByRole("button", { name: /expand task details/i })
+    ).toHaveLength(1);
+  });
 });
