@@ -95,6 +95,11 @@ npm run test --prefix frontend
 npm run db:backup:personal --prefix backend
 npm run db:backup:dev --prefix backend
 
+# Every backend command (`npm run backend:dev`, `npm run dev:all`, plain `npm run dev --prefix backend`, etc.)
+# now wraps the server process so `npm run db:backup:personal` runs right before it starts
+# and again as soon as it exits (even on Ctrl+C). Expect fresh snapshots in `backend/backups/`
+# for each start/stop cycle.
+
 # Sync personal tasks into the dev database
 npm run db:sync --prefix backend
 ```
