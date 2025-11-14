@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     sort_index INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
-    status TEXT CHECK(status IN ('next', 'dates', 'ongoing', 'get', 'backburner', 'finished')) NOT NULL DEFAULT 'next'
+    status TEXT CHECK(status IN ('next', 'dates', 'ongoing', 'get', 'watch', 'backburner', 'finished')) NOT NULL DEFAULT 'next'
 );
 
 -- tags (has many tasks)

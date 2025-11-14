@@ -3,6 +3,7 @@ export type Status =
   | "dates"
   | "ongoing"
   | "get"
+  | "watch"
   | "backburner"
   | "finished";
 export type Priority = 1 | 2 | 3 | 4 | 5;

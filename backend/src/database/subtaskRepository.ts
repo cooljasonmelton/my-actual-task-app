@@ -30,6 +30,17 @@ const statements: SubtaskStatements = {
         id ASC
     `
   ),
+  selectActiveByTaskIdOrderByCreation: db.prepare(
+    `
+      SELECT *
+      FROM subtasks
+      WHERE task_id = ?
+        AND deleted_at IS NULL
+      ORDER BY
+        created_at ASC,
+        id ASC
+    `
+  ),
   selectAllByTaskId: db.prepare(
     `
       SELECT *
@@ -113,6 +124,21 @@ const getSubtaskRowById = (id: number): DbSubtaskRow | undefined => {
   return statements.selectSubtaskById.get(id) as DbSubtaskRow | undefined;
 };
 
+const reseedSubtaskSortIndexes = db.transaction((taskId: number) => {
+  const activeRows = statements.selectActiveByTaskIdOrderByCreation.all(
+    taskId
+  ) as DbSubtaskRow[];
+
+  if (activeRows.length === 0) {
+    return;
+  }
+
+  activeRows.forEach((row, index) => {
+    const sortIndex = (index + 1) * SORT_INDEX_STEP;
+    statements.updateSubtaskSortIndexWithinTask.run(sortIndex, row.id, taskId);
+  });
+});
+
 export const subtaskQueries = {
   getByTaskId: (
     taskId: number,
@@ -122,7 +148,17 @@ export const subtaskQueries = {
     const statement = includeDeleted
       ? statements.selectAllByTaskId
       : statements.selectActiveByTaskId;
-    const rows = statement.all(taskId) as DbSubtaskRow[];
+    let rows = statement.all(taskId) as DbSubtaskRow[];
+
+    const hasActiveMissingSortIndex = rows.some(
+      (row) => row.deleted_at === null && row.sort_index === null
+    );
+
+    if (hasActiveMissingSortIndex) {
+      reseedSubtaskSortIndexes(taskId);
+      rows = statement.all(taskId) as DbSubtaskRow[];
+    }
+
     return rows.map(mapDbRowToSubtask);
   },
 

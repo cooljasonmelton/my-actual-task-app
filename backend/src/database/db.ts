@@ -18,6 +18,7 @@ const REQUIRED_STATUS_VALUES = [
   "dates",
   "ongoing",
   "get",
+  "watch",
   "backburner",
   "finished",
 ];
@@ -33,7 +34,7 @@ const createTasksTableSQL = `
     sort_index INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
-    status TEXT CHECK(status IN ('next', 'dates', 'ongoing', 'get', 'backburner', 'finished')) NOT NULL DEFAULT 'next'
+    status TEXT CHECK(status IN ('next', 'dates', 'ongoing', 'get', 'watch', 'backburner', 'finished')) NOT NULL DEFAULT 'next'
   )
 `;
 
@@ -94,7 +95,7 @@ function migrateTasksTableStatusConstraint(): void {
       created_at,
       deleted_at,
       CASE
-        WHEN status IN ('next', 'dates', 'ongoing', 'get', 'backburner', 'finished') THEN status
+        WHEN status IN ('next', 'dates', 'ongoing', 'get', 'watch', 'backburner', 'finished') THEN status
         ELSE 'next'
       END as status
     FROM tasks;

@@ -18,6 +18,10 @@ export const STATUS_SECTION_TAB_ITEMS: StatusSectionTabItem[] = [
     value: "get",
   },
   {
+    cta: "Watch",
+    value: "watch",
+  },
+  {
     cta: "Backburner",
     value: "backburner",
   },

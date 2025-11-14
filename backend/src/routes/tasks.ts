@@ -13,6 +13,7 @@ const VALID_STATUSES: Status[] = [
   "dates",
   "ongoing",
   "get",
+  "watch",
   "backburner",
   "finished",
 ];
