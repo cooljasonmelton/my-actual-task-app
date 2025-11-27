@@ -1,5 +1,3 @@
-// TODO: add tags, subtasks and joins for them to task
-// TODO: refactor for smaller file size
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
@@ -183,9 +181,9 @@ function ensureTaskSortIndexColumn(): void {
 }
 
 function migrateSubtasksTable(): void {
-  const columns = db
-    .prepare("PRAGMA table_info(subtasks)")
-    .all() as Array<{ name: string }>;
+  const columns = db.prepare("PRAGMA table_info(subtasks)").all() as Array<{
+    name: string;
+  }>;
 
   if (columns.length === 0) {
     db.exec(recreateSubtaskIndexesSQL);
@@ -193,9 +191,7 @@ function migrateSubtasksTable(): void {
   }
 
   const hasSortIndex = columns.some((column) => column.name === "sort_index");
-  const hasDeletedAt = columns.some(
-    (column) => column.name === "deleted_at"
-  );
+  const hasDeletedAt = columns.some((column) => column.name === "deleted_at");
   const hasCompletedColumn = columns.some(
     (column) => column.name === "completed" || column.name === "completed_at"
   );
