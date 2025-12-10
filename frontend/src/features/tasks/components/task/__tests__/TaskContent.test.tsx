@@ -104,7 +104,7 @@ describe("TaskContent", () => {
     const listItems = screen.getAllByRole("listitem");
     const firstItem = listItems[0];
     fireEvent.click(
-      within(firstItem).getByRole("button", { name: /delete task/i })
+      within(firstItem).getByRole("button", { name: /delete subtask/i })
     );
 
     await waitFor(() =>

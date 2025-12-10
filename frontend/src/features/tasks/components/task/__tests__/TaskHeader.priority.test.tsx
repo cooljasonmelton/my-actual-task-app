@@ -101,4 +101,23 @@ describe("TaskHeader priority controls", () => {
       screen.getByRole("button", { name: /mark task as top priority/i })
     ).toHaveAttribute("aria-disabled", "true");
   });
+
+  it("highlights the title when priority is 1", () => {
+    render(<TaskHeader {...createProps({ priority: 1 })} />);
+    expect(screen.getByText("Test Task")).toHaveClass("task-title--priority-1");
+  });
+
+  it("does not highlight the title when soft deleted even if priority is 1", () => {
+    render(
+      <TaskHeader
+        {...createProps({
+          priority: 1,
+          isSoftDeleted: true,
+        })}
+      />
+    );
+    expect(screen.getByText("Test Task")).not.toHaveClass(
+      "task-title--priority-1"
+    );
+  });
 });

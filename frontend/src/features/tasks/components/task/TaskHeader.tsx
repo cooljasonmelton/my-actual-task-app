@@ -127,6 +127,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         <TaskTitleEditor
           taskId={taskId}
           title={title}
+          priority={priority}
           isSoftDeleted={isSoftDeleted}
           isSoftDeletedToday={isSoftDeletedToday}
           onUpdateTitle={onUpdateTitle}

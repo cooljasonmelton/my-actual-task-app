@@ -143,6 +143,11 @@
   word-break: break-word;
 }
 
+.task-title--priority-1 {
+  color: var(--color-accent-blue, #00bfff);
+  font-weight: 700;
+}
+
 .task-title-form {
   width: 100%;
   display: grid;

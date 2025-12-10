@@ -9,10 +9,12 @@ import {
 } from "react";
 import Button from "@/components/design-system-components/button/Button";
 import useEditableActivation from "@/features/tasks/hooks/useEditableActivation";
+import type { TaskType } from "@/types";
 
 type TaskTitleEditorProps = {
   taskId: number;
   title: string;
+  priority: TaskType["priority"];
   isSoftDeleted: boolean;
   isSoftDeletedToday: boolean;
   onUpdateTitle: (id: number, updatedTitle: string) => Promise<void>;
@@ -24,6 +26,7 @@ const TaskTitleEditor = ({
   title,
   isSoftDeleted,
   isSoftDeletedToday,
+  priority,
   onUpdateTitle,
   onEditingChange,
 }: TaskTitleEditorProps) => {
@@ -131,9 +134,12 @@ const TaskTitleEditor = ({
     [handleCancelEditing, isSavingTitle]
   );
 
+  const shouldHighlightPriority = !isSoftDeleted && priority === 1;
   const titleClassName = `task-title${
     isSoftDeleted ? " task-title--soft-deleted" : ""
-  }${isSoftDeletedToday ? " task-title--soft-deleted-today" : ""}`;
+  }${isSoftDeletedToday ? " task-title--soft-deleted-today" : ""}${
+    shouldHighlightPriority ? " task-title--priority-1" : ""
+  }`;
 
   if (isEditing) {
     return (
