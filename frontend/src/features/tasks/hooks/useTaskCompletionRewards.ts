@@ -6,58 +6,15 @@ import {
   CAT_ASSET_BASE_URL,
 } from "@/config/api";
 import { useReferenceWindow } from "./useReferenceWindow";
+import {
+  createDefaultStorage,
+  loadStoredRewards,
+  persistRewards,
+  type RewardStorage,
+} from "./taskCompletionRewardsStorage";
 
-const COMPLETION_STORAGE_KEY = "task-completion-rewards";
 const COMPLETION_MILESTONES = [3, 5, 7, 10];
-
-type RewardStorage = {
-  count: number;
-  windowStart: string;
-  achievedMilestones: number[];
-};
-
-const createDefaultStorage = (windowStart: Date): RewardStorage => ({
-  count: 0,
-  windowStart: windowStart.toISOString(),
-  achievedMilestones: [],
-});
-
-const loadStoredRewards = (windowStart: Date): RewardStorage => {
-  if (typeof window === "undefined") {
-    return createDefaultStorage(windowStart);
-  }
-
-  try {
-    const raw = window.localStorage.getItem(COMPLETION_STORAGE_KEY);
-    if (!raw) {
-      return createDefaultStorage(windowStart);
-    }
-
-    const parsed = JSON.parse(raw) as RewardStorage;
-    if (!parsed?.windowStart) {
-      return createDefaultStorage(windowStart);
-    }
-
-    const isSameWindow = parsed.windowStart === windowStart.toISOString();
-    return isSameWindow ? parsed : createDefaultStorage(windowStart);
-  } catch {
-    return createDefaultStorage(windowStart);
-  }
-};
-
-const persistRewards = (storage: RewardStorage) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-  try {
-    window.localStorage.setItem(
-      COMPLETION_STORAGE_KEY,
-      JSON.stringify(storage)
-    );
-  } catch {
-    // ignore storage failures
-  }
-};
+const COMPLETION_SCROLL_TARGET = "[data-completion-progress]";
 
 export const useTaskCompletionRewards = () => {
   const { referenceWindowStart } = useReferenceWindow();
@@ -149,6 +106,17 @@ export const useTaskCompletionRewards = () => {
     }
   }, []);
 
+  const scrollCompletionIntoView = useCallback(() => {
+    if (typeof window === "undefined" || !("document" in window)) {
+      return;
+    }
+
+    const target = window.document.querySelector(COMPLETION_SCROLL_TARGET);
+    if (target && "scrollIntoView" in target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
   const registerTaskCompletion = useCallback(async () => {
     let triggeredMilestone: number | null = null;
 
@@ -178,9 +146,10 @@ export const useTaskCompletionRewards = () => {
     });
 
     if (triggeredMilestone) {
+      scrollCompletionIntoView();
       await fetchCatGif();
     }
-  }, [fetchCatGif, referenceWindowKey, referenceWindowStart]);
+  }, [fetchCatGif, referenceWindowKey, referenceWindowStart, scrollCompletionIntoView]);
 
   const retryCatReward = useCallback(async () => {
     await fetchCatGif();

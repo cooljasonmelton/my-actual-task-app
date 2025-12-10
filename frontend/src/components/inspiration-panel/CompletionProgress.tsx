@@ -6,7 +6,11 @@ type CompletionProgressProps = {
 
 const CompletionProgress = ({ count }: CompletionProgressProps) => {
   return (
-    <div className="completion-progress" aria-live="polite">
+    <div
+      className="completion-progress"
+      aria-live="polite"
+      data-completion-progress
+    >
       <p className="completion-progress__label">COMPLETED</p>
       <p className="completion-progress__count">{count}</p>
     </div>
