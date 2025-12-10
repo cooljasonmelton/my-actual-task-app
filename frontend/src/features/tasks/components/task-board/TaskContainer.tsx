@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import DashboardHeader from "@/components/dashboard-header/DashboardHeader";
 import type { Status } from "@/types";
 import { DEFAULT_SECTION_TAB_ITEM } from "@/constants";
@@ -24,6 +24,7 @@ import { useTasksState } from "@/features/tasks/context/TasksContext";
 import { useTaskCompletionRewards } from "@/features/tasks/hooks/useTaskCompletionRewards";
 import TaskWorkspaceBody from "./TaskWorkspaceBody";
 import "./TaskContainer.css";
+
 const TaskContainer = () => {
   const { tasks, error, isLoading } = useTasksState();
   const [selectedStatus, setSelectedStatus] =
@@ -51,6 +52,13 @@ const TaskContainer = () => {
   const { handleCreateSubtask } = useCreateSubtask({ loadTasks });
   const { handleUpdateSubtaskTitle } = useUpdateSubtaskTitle({ loadTasks });
   const { handleDeleteSubtask } = useSoftDeleteSubtask({ loadTasks });
+  const handleSubtaskCompleted = useCallback(
+    async (taskId: number, subtaskId: number) => {
+      await handleDeleteSubtask(taskId, subtaskId);
+      void registerTaskCompletion();
+    },
+    [handleDeleteSubtask, registerTaskCompletion]
+  );
   const { handleRestoreSubtask } = useRestoreSubtask({ loadTasks });
   const { expandedTaskIds, handleToggleExpanded } = useExpandedTasks(tasks);
   const handleTaskCompletedViaCheckbox = () => {
@@ -127,7 +135,7 @@ const TaskContainer = () => {
     onUpdateTitle: handleUpdateTitle,
     onCreateSubtask: handleCreateSubtask,
     onUpdateSubtaskTitle: handleUpdateSubtaskTitle,
-    onDeleteSubtask: handleDeleteSubtask,
+    onDeleteSubtask: handleSubtaskCompleted,
     onRestoreSubtask: handleRestoreSubtask,
     updatingPriorities,
     draggingTaskId: draggingTask?.id ?? null,
