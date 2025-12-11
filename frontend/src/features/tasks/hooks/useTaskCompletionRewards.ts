@@ -13,7 +13,7 @@ import {
   type RewardStorage,
 } from "./taskCompletionRewardsStorage";
 
-const COMPLETION_MILESTONES = [3, 5, 7, 10];
+const COMPLETION_MILESTONES = [3, 5, 7, 10, 15, 20, 25, 30];
 const COMPLETION_SCROLL_TARGET = "[data-completion-progress]";
 
 export const useTaskCompletionRewards = () => {
@@ -149,7 +149,12 @@ export const useTaskCompletionRewards = () => {
       scrollCompletionIntoView();
       await fetchCatGif();
     }
-  }, [fetchCatGif, referenceWindowKey, referenceWindowStart, scrollCompletionIntoView]);
+  }, [
+    fetchCatGif,
+    referenceWindowKey,
+    referenceWindowStart,
+    scrollCompletionIntoView,
+  ]);
 
   const retryCatReward = useCallback(async () => {
     await fetchCatGif();
