@@ -28,12 +28,20 @@ My Actual Task App is my actual task map, a full-stack productivity dashboard I�
 
 ## 🚀 Getting Started
 
+### ✅ First Run Checklist
+
+- Run `npm install` and `npm run install:all` from the repo root.
+- Copy the env files in `backend/` and `frontend/` (see below) and set any required values.
+- Start the app with `npm run use:all` (personal) or `npm run dev:all` (development).
+- Confirm the backend created `backend/data/tasks.personal.sqlite` or `backend/data/tasks.dev.sqlite`.
+
 ### 1. Clone & Install
 
 ```bash
 git clone https://github.com/<your-username>/my-actual-task-app.git
 cd my-actual-task-app
 npm install
+npm run install:all
 ```
 
 ### 2. Configure Environments
@@ -58,7 +66,7 @@ npm run use:all
 npm run dev:all
 ```
 
-The scripts open two Terminal tabs: one for the Vite dev server and one for the Express backend with the correct `APP_ENV` wired in.
+The scripts open two Terminal tabs: one for the Vite dev server and one for the Express backend with the correct `APP_ENV` wired in. The backend auto-initializes its SQLite database on first run.
 
 ### 4. Quick Notes Scratchpad
 
@@ -84,6 +92,9 @@ The scripts open two Terminal tabs: one for the Vite dev server and one for the 
 ### 6. Utilities & Scripts
 
 ```bash
+# Install frontend + backend deps
+npm run install:all
+
 # Run full test suite
 npm run test:all
 
@@ -94,6 +105,9 @@ npm run test --prefix frontend
 # Create timestamped DB backups
 npm run db:backup:personal --prefix backend
 npm run db:backup:dev --prefix backend
+
+# Initialize database (usually automatic on backend start)
+npm run db:init --prefix backend
 
 # Every backend command (`npm run backend:dev`, `npm run dev:all`, plain `npm run dev --prefix backend`, etc.)
 # now wraps the server process so `npm run db:backup:personal` runs right before it starts

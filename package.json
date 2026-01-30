@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "install:all": "npm install --prefix frontend && npm install --prefix backend",
     "frontend:dev": "npm run dev --prefix frontend",
     "frontend:build": "npm run build --prefix frontend",
     "frontend:lint": "npm run lint --prefix frontend",
@@ -11,7 +12,7 @@
     "backend:build": "npm run build --prefix backend",
     "backend:start": "npm run start --prefix backend",
     "backend:test": "npm run test --prefix backend",
-    "use:all": "PROJECT_ROOT=\"$PWD\" APP_ENV=\"personal\" osascript -e 'set projectRoot to system attribute \"PROJECT_ROOT\"' -e 'set backendEnv to system attribute \"APP_ENV\"' -e 'set frontendPath to projectRoot & \"/frontend\"' -e 'set backendPath to projectRoot & \"/backend\"' -e 'tell application \"Terminal\"' -e 'activate' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'do script \"cd \" & quoted form of frontendPath & \" && npm run dev\" in selected tab of front window' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'do script \"cd \" & quoted form of backendPath & \" && APP_ENV=\" & backendEnv & \" npm run dev\" in selected tab of front window' -e 'end tell'",
+    "use:all": "npm run install:all && PROJECT_ROOT=\"$PWD\" APP_ENV=\"personal\" osascript -e 'set projectRoot to system attribute \"PROJECT_ROOT\"' -e 'set backendEnv to system attribute \"APP_ENV\"' -e 'set frontendPath to projectRoot & \"/frontend\"' -e 'set backendPath to projectRoot & \"/backend\"' -e 'tell application \"Terminal\"' -e 'activate' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'do script \"cd \" & quoted form of frontendPath & \" && npm run dev\" in selected tab of front window' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'do script \"cd \" & quoted form of backendPath & \" && APP_ENV=\" & backendEnv & \" npm run dev\" in selected tab of front window' -e 'end tell'",
     "dev:all": "PROJECT_ROOT=\"$PWD\" APP_ENV=\"development\" osascript -e 'set projectRoot to system attribute \"PROJECT_ROOT\"' -e 'set backendEnv to system attribute \"APP_ENV\"' -e 'set frontendPath to projectRoot & \"/frontend\"' -e 'set backendPath to projectRoot & \"/backend\"' -e 'tell application \"Terminal\"' -e 'activate' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'do script \"cd \" & quoted form of frontendPath & \" && npm run dev\" in selected tab of front window' -e 'tell application \"System Events\" to keystroke \"t\" using command down' -e 'delay 0.2' -e 'do script \"cd \" & quoted form of backendPath & \" && APP_ENV=\" & backendEnv & \" npm run dev\" in selected tab of front window' -e 'end tell'",
     "test:all": "npm run test --prefix backend && npm run test --prefix frontend"
   },
