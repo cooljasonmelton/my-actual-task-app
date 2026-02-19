@@ -72,7 +72,7 @@ The scripts open two Terminal tabs: one for the Vite dev server and one for the 
 
 - Click the sticky note button in the dashboard header to slide the notes panel in from the right; collapse it again to reclaim the layout.
 - The editor supports bold, italic, underline, ordered/unordered lists, undo/redo, and quick link creation (URLs auto-link on blur).
-- Notes autosave on change, on blur, and via <kbd>⌘/Ctrl + S</kbd>, persisting to the new `users`/`notes` tables in SQLite (one global scratchpad per profile).
+- Notes autosave on change, on blur, and via `⌘/Ctrl + S`, persisting to the new `users`/`notes` tables in SQLite (one global scratchpad per profile).
 - Saved timestamps render in Central Time (`America/Chicago`) so the header reflects my local day even when running on other machines.
 
 ### 5. Reordering Tasks & Subtasks
@@ -168,11 +168,11 @@ npm run test:all
 
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
-# JUNKYARD / NOTES
+## JUNKYARD / NOTES
 
 TODO: say something like this in main readme (above)?
 
-#### Environment profiles & databases
+### Environment profiles & databases
 
 - Environment variables live under `backend/`. Copy the sample files to create real configs:
   - `cp backend/.env.development.example backend/.env.development`
@@ -202,37 +202,33 @@ TODO: say something like this in main readme (above)?
 
 ### FRONTEND NOTES
 
-- colors: https://coolors.co/111827-1f2937-ff2d95-39ff14-ffef00-00bfff-f5f5f5-a3a3a3-000000
+- colors: <https://coolors.co/111827-1f2937-ff2d95-39ff14-ffef00-00bfff-f5f5f5-a3a3a3-000000>
 
-# TODO FILTERING
+## TODO FILTERING
 
 - For MVP, filter tasks on FE
 - Later, implement adaptative filtering:
-
   - When a user has > 2000 tasks, pull tasks from BE instead of FE
     - get task count and check > 2000
       - if <2000, use frontend filtering
       - if >2000, fetch get `/api/tasks?status=${status}`
 
 - Tasks
-
   - Rich Text Description (optional)
   - Display Subtasks (optional)
   - Display Tags (optional)
   - Placeholder screen when no tasks
 
 - Subtasks
-
   - Display
   - Order
   - Reorder subtasks drag and drop
 
 - Tags
-
   - Display
   - Create when adding to task: name, color (later)
 
-#### models
+## models
 
 ```typescript
 type Tag = {
@@ -261,10 +257,3 @@ type Task = {
   sortIndex: number // ?
 };
 ```
-
-
-
-
-TODO: 
-
-- use the cat api to get a cat gif when reach X goals - 3, 5, 7, 10
